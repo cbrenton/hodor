@@ -1,0 +1,9 @@
+window_sizes 1062 945 245 811 751 120
+show_stereotypes
+selected attribute_ref 129026 // radius
+open
+  class_ref 128002 // Image
+  class_ref 128130 // Pixel
+  class_ref 128258 // sphere_t
+end
+end
