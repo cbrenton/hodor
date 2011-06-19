@@ -1,0 +1,13 @@
+window_sizes 1527 945 245 1276 751 120
+diagrams
+  active  classdiagram_ref 128002 // terlR_classes
+    1276 751 100 4 0 0
+end
+show_stereotypes
+selected attribute_ref 135554 // location
+open
+  class_ref 128002 // Image
+  class_ref 128130 // Pixel
+  class_ref 128258 // sphere_t
+end
+end

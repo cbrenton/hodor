@@ -1,6 +1,6 @@
 format 74
 "terlR"
-  revision 1
+  revision 2
   modified_by 2 "cbrenton"
 
 
@@ -220,6 +220,31 @@ ${members}};
 	idl_decl ""
 	comment "The radius of the sphere."
       end
+
+      attribute 135554 "location"
+	private type class_ref 134786 // vec3_t
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "The location in world space of the sphere."
+      end
+    end
+
+    class 134786 "vec3_t"
+      visibility package 
+      cpp_external cpp_decl "#include <vector.h>
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl "${comment}${abstract}${custom}valuetype ${name}${inherit} {
+${members}};
+"
+      explicit_switch_type ""
+      
     end
   end
 end
