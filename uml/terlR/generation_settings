@@ -22,7 +22,7 @@
   
   relations_stereotypes 5 // uml cpp java pythonidl
     "sequence" "vector" "Vector" "list" "sequence"
-    "vector" "vector" "Vector" "list" "sequence"
+    "vector" "thrust::host_vector" "Vector" "list" "sequence"
     "list" "list" "List" "list" "sequence"
     "set" "set" "Set" "set" "sequence"
     "map" "map" "Map" "dict" "sequence"
@@ -46,10 +46,15 @@
   cpp_enum_default_type_forms "${type}" "${type} &" "${type} &" "${type}" // in out inout return
   other_cpp_types_default_type_forms "const ${type} &" "${type} &" "${type} &" "${type}" // in out inout return
 
-  cpp_default_h_content "#ifndef ${NAMESPACE}_${NAME}_H
+  cpp_default_h_content "/**
+ * ${comment}
+ * @author Chris Brenton
+ * @date 06/20/2011
+ */
+
+#ifndef ${NAMESPACE}_${NAME}_H
 #define ${NAMESPACE}_${NAME}_H
 
-${comment}
 ${includes}
 ${declarations}
 ${namespace_start}
@@ -57,27 +62,36 @@ ${definition}
 ${namespace_end}
 #endif
 "
-  cpp_default_src_content "${comment}
+  cpp_default_src_content "/**
+ * ${comment}
+ * @author Chris Brenton
+ * @date 06/20/2011
+ */
+
 ${includes}
 ${namespace_start}
 ${members}
 ${namespace_end}"
-  cpp_default_class_decl "${comment}${template}class ${name}${inherit} {
+  cpp_default_class_decl "${comment}${template}class ${name}${inherit}
+{
 ${members}};
 ${inlines}
 "
   cpp_default_external_class_decl "${name}
 #include <${name}.h>
 "
-  cpp_default_struct_decl "${comment}${template}struct ${name}${inherit} {
+  cpp_default_struct_decl "${comment}${template}struct ${name}${inherit}
+{
 ${members}};
 ${inlines}
 "
-  cpp_default_union_decl "${comment}${template}union ${name} {
+  cpp_default_union_decl "${comment}${template}union ${name}
+{
 ${members}};
 ${inlines}
 "
-  cpp_default_enum_decl "${comment}enum ${name} {
+  cpp_default_enum_decl "${comment}enum ${name}
+{
 ${items}
 };
 "

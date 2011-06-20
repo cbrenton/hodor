@@ -1,6 +1,5 @@
 // "a type" "needed cpp_includes"
-"vector" "#include <vector>
-using namespace std;"
+"thrust::host_vector" "#include <thrust/host_vector>"
 
 "list" "#include <list>
 using namespace std;"
