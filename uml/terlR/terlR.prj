@@ -1,6 +1,6 @@
 format 74
 "terlR"
-  revision 4
+  revision 7
   modified_by 2 "cbrenton"
 
 
@@ -131,7 +131,6 @@ ${inlines}
 	idl_decl ""
 	comment "The pixel data currently stored in the image."
       end
-
     end
 
     class 128130 "Pixel"
@@ -169,7 +168,6 @@ ${inlines}
 	idl_decl ""
 	comment "The alpha value of the current pixel. Will never be used in most image types."
       end
-
     end
 
     class 128258 "sphere_t"
@@ -187,7 +185,7 @@ ${members}};
 "
       explicit_switch_type ""
       
-      comment "A struct representing a sphere for CUDA."
+      comment "A struct representing a sphere."
       attribute 129026 "radius"
 	public explicit_type "float"
 	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
@@ -200,7 +198,7 @@ ${members}};
       end
 
       attribute 135554 "location"
-	private type class_ref 134786 // vec3_t
+	private explicit_type "Vector3f"
 	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
 "
 	java_decl ""
@@ -209,22 +207,6 @@ ${members}};
 	idl_decl ""
 	comment "The location in world space of the sphere."
       end
-    end
-
-    class 134786 "vec3_t"
-      visibility public stereotype "struct"
-      cpp_decl "${comment}${template}struct ${name}${inherit} {
-${members}};
-${inlines}
-"
-      java_decl ""
-      php_decl ""
-      python_2_2 python_decl ""
-      idl_decl "${comment}struct ${name} {
-${members}};
-"
-      explicit_switch_type ""
-      
     end
 
     class 141314 "Geometry"
@@ -264,7 +246,7 @@ ${inlines}
       end
 
       attribute 151682 "location"
-	public type class_ref 134786 // vec3_t
+	public explicit_type "Vector3f"
 	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
 "
 	java_decl ""
@@ -275,11 +257,11 @@ ${inlines}
       end
 
       operation 139778 "hit"
-	abstract cpp_virtual public explicit_return_type "bool"
+	abstract cpp_virtual public explicit_return_type "int"
 	nparams 5
 	  param in name "ray" type class_ref 148994 // Ray
 	  param in name "*t" explicit_type "float"
-	  param in name "*data" explicit_type "HitData"
+	  param in name "*data" type class_ref 150018 // HitData
 	    defaultvalue "NULL"
 	  param in name "minT" explicit_type "float"
 	    defaultvalue "0.0f"
@@ -291,13 +273,13 @@ ${inlines}
 	
 	
 	
-	comment "Determines whether the input ray intersects the current geometry object. If it does, returns true, and correctly populates the fields of the input HitData object. If not, returns false."
+	comment "Determines whether the input ray intersects the current geometry object. If it does not, returns 0. If it does, returns -1 if hit from within the object, or 1 if hit from outside the object, and correctly populates the fields of the input HitData object."
       end
 
       operation 139906 "getNormal"
-	abstract cpp_virtual public return_type class_ref 134786 // vec3_t
+	abstract cpp_virtual public explicit_return_type "Vector3f"
 	nparams 1
-	  param in name "point" type class_ref 134786 // vec3_t
+	  param in name "point" explicit_type "Vector3f"
 	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${abstract};
 "
 	
@@ -317,6 +299,16 @@ ${inlines}
 	
 	
 	comment "Gets the bounding box of the current geometry object."
+      end
+
+      attribute 167938 "transform"
+	public explicit_type "Matrix3f"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}Eigen::${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
       end
     end
 
@@ -463,10 +455,10 @@ ${inlines}
 	public return_type class_ref 128130 // Pixel
 	nparams 2
 	  param in name "*data" type class_ref 150018 // HitData
-	  param in name "view" type class_ref 134786 // vec3_t
-	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${abstract};
+	  param in name "view" explicit_type "Vector3f"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}, const ${t1} & ${p1}${)}${const}${volatile}${throw}${abstract};
 "
-	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, const ${t1} & ${p1}${)}${const}${volatile}${throw}${staticnl}{
   ${body}}
 "
 	
@@ -544,7 +536,7 @@ ${inlines}
       explicit_switch_type ""
       
       attribute 149378 "point"
-	public type class_ref 134786 // vec3_t
+	public explicit_type "Vector3f"
 	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
 "
 	java_decl ""
@@ -555,7 +547,7 @@ ${inlines}
       end
 
       attribute 149506 "dir"
-	public type class_ref 134786 // vec3_t
+	public explicit_type "Vector3f"
 	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
 "
 	java_decl ""
@@ -633,6 +625,18 @@ ${inlines}
 	python_decl ""
 	idl_decl ""
       end
+
+      attribute 167810 "ior"
+	public explicit_type "double"
+	init_value "1.0"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "The index of refraction of the finish."
+      end
     end
 
     class 149378 "Pigment"
@@ -703,44 +707,6 @@ ${inlines}
 	  b parent class_ref 141314 // Geometry
       end
 
-      operation 140162 "hit"
-	public explicit_return_type "bool"
-	nparams 5
-	  param in name "ray" type class_ref 148994 // Ray
-	  param in name "*t" explicit_type "float"
-	  param in name "*data" explicit_type "HitData"
-	    defaultvalue "NULL"
-	  param in name "minT" explicit_type "float"
-	    defaultvalue "0.0f"
-	  param in name "maxT" explicit_type "float"
-	    defaultvalue "DIST_MAX"
-	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}, ${t1} ${p1}, const ${t2} & ${p2}, ${t3} ${p3}, ${t4} ${p4}${)}${const}${volatile}${throw}${abstract};
-"
-	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}, ${t1} ${p1}, const ${t2} & ${p2}, ${t3} ${p3}, ${t4} ${p4}${)}${const}${volatile}${throw}${staticnl}{
-  ${body}}
-"
-	
-	
-	
-	
-      end
-
-      operation 140290 "getNormal"
-	cpp_virtual public return_type class_ref 134786 // vec3_t
-	nparams 1
-	  param in name "point" type class_ref 134786 // vec3_t
-	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${abstract};
-"
-	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
-  ${body}}
-"
-	
-	
-	
-	
-	comment "Returns the normal of the current geometry object at the specified point."
-      end
-
       operation 140418 "bBox"
 	cpp_virtual public explicit_return_type "Box"
 	nparams 0
@@ -754,6 +720,39 @@ ${inlines}
 	
 	
 	comment "Gets the bounding box of the current geometry object."
+      end
+
+      operation 155650 "hit"
+	cpp_virtual public explicit_return_type "int"
+	nparams 5
+	  param in name "ray" type class_ref 148994 // Ray
+	  param in name "*t" explicit_type "float"
+	  param in name "*data" type class_ref 150018 // HitData
+	    defaultvalue "NULL"
+	  param in name "minT" explicit_type "float"
+	    defaultvalue "0.0f"
+	  param in name "maxT" explicit_type "float"
+	    defaultvalue "DIST_MAX"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}, ${t1} ${p1}, const ${t2} & ${p2}, ${t3} ${p3}, ${t4} ${p4}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment "Determines whether the input ray intersects the current geometry object. If it does not, returns 0. If it does, returns -1 if hit from within the object, or 1 if hit from outside the object, and correctly populates the fields of the input HitData object."
+      end
+
+      operation 156546 "getNormal"
+	cpp_virtual public explicit_return_type "Vector3f"
+	nparams 1
+	  param in name "point" explicit_type "Vector3f"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment "Returns the normal of the current geometry object at the specified point."
       end
     end
 
@@ -782,44 +781,6 @@ ${inlines}
 	comment "The box_t struct representing the geometry object."
       end
 
-      operation 140546 "hit"
-	public explicit_return_type "bool"
-	nparams 5
-	  param in name "ray" type class_ref 148994 // Ray
-	  param in name "*t" explicit_type "float"
-	  param in name "*data" explicit_type "HitData"
-	    defaultvalue "NULL"
-	  param in name "minT" explicit_type "float"
-	    defaultvalue "0.0f"
-	  param in name "maxT" explicit_type "float"
-	    defaultvalue "DIST_MAX"
-	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}, ${t1} ${p1}, const ${t2} & ${p2}, ${t3} ${p3}, ${t4} ${p4}${)}${const}${volatile}${throw}${abstract};
-"
-	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}, ${t1} ${p1}, const ${t2} & ${p2}, ${t3} ${p3}, ${t4} ${p4}${)}${const}${volatile}${throw}${staticnl}{
-  ${body}}
-"
-	
-	
-	
-	
-      end
-
-      operation 140674 "getNormal"
-	cpp_virtual public return_type class_ref 134786 // vec3_t
-	nparams 1
-	  param in name "point" type class_ref 134786 // vec3_t
-	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${abstract};
-"
-	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
-  ${body}}
-"
-	
-	
-	
-	
-	comment "Returns the normal of the current geometry object at the specified point."
-      end
-
       operation 140802 "bBox"
 	cpp_virtual public explicit_return_type "Box"
 	nparams 0
@@ -841,6 +802,39 @@ ${inlines}
 	    cpp default "${type}"
 	    classrelation_ref 136066 // <generalisation>
 	  b parent class_ref 141314 // Geometry
+      end
+
+      operation 155778 "hit"
+	cpp_virtual public explicit_return_type "int"
+	nparams 5
+	  param in name "ray" type class_ref 148994 // Ray
+	  param in name "*t" explicit_type "float"
+	  param in name "*data" type class_ref 150018 // HitData
+	    defaultvalue "NULL"
+	  param in name "minT" explicit_type "float"
+	    defaultvalue "0.0f"
+	  param in name "maxT" explicit_type "float"
+	    defaultvalue "DIST_MAX"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}, ${t1} ${p1}, const ${t2} & ${p2}, ${t3} ${p3}, ${t4} ${p4}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment "Determines whether the input ray intersects the current geometry object. If it does not, returns 0. If it does, returns -1 if hit from within the object, or 1 if hit from outside the object, and correctly populates the fields of the input HitData object."
+      end
+
+      operation 156290 "getNormal"
+	cpp_virtual public explicit_return_type "Vector3f"
+	nparams 1
+	  param in name "point" explicit_type "Vector3f"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment "Returns the normal of the current geometry object at the specified point."
       end
     end
 
@@ -877,44 +871,6 @@ ${inlines}
 	  b parent class_ref 141314 // Geometry
       end
 
-      operation 140930 "hit"
-	public explicit_return_type "bool"
-	nparams 5
-	  param in name "ray" type class_ref 148994 // Ray
-	  param in name "*t" explicit_type "float"
-	  param in name "*data" explicit_type "HitData"
-	    defaultvalue "NULL"
-	  param in name "minT" explicit_type "float"
-	    defaultvalue "0.0f"
-	  param in name "maxT" explicit_type "float"
-	    defaultvalue "DIST_MAX"
-	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}, ${t1} ${p1}, const ${t2} & ${p2}, ${t3} ${p3}, ${t4} ${p4}${)}${const}${volatile}${throw}${abstract};
-"
-	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}, ${t1} ${p1}, const ${t2} & ${p2}, ${t3} ${p3}, ${t4} ${p4}${)}${const}${volatile}${throw}${staticnl}{
-  ${body}}
-"
-	
-	
-	
-	
-      end
-
-      operation 141058 "getNormal"
-	cpp_virtual public return_type class_ref 134786 // vec3_t
-	nparams 1
-	  param in name "point" type class_ref 134786 // vec3_t
-	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${abstract};
-"
-	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
-  ${body}}
-"
-	
-	
-	
-	
-	comment "Returns the normal of the current geometry object at the specified point."
-      end
-
       operation 141186 "bBox"
 	cpp_virtual public explicit_return_type "Box"
 	nparams 0
@@ -928,6 +884,39 @@ ${inlines}
 	
 	
 	comment "Gets the bounding box of the current geometry object."
+      end
+
+      operation 155906 "hit"
+	cpp_virtual public explicit_return_type "int"
+	nparams 5
+	  param in name "ray" type class_ref 148994 // Ray
+	  param in name "*t" explicit_type "float"
+	  param in name "*data" type class_ref 150018 // HitData
+	    defaultvalue "NULL"
+	  param in name "minT" explicit_type "float"
+	    defaultvalue "0.0f"
+	  param in name "maxT" explicit_type "float"
+	    defaultvalue "DIST_MAX"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}, ${t1} ${p1}, const ${t2} & ${p2}, ${t3} ${p3}, ${t4} ${p4}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment "Determines whether the input ray intersects the current geometry object. If it does not, returns 0. If it does, returns -1 if hit from within the object, or 1 if hit from outside the object, and correctly populates the fields of the input HitData object."
+      end
+
+      operation 156418 "getNormal"
+	cpp_virtual public explicit_return_type "Vector3f"
+	nparams 1
+	  param in name "point" explicit_type "Vector3f"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment "Returns the normal of the current geometry object at the specified point."
       end
     end
 
@@ -964,44 +953,6 @@ ${inlines}
 	  b parent class_ref 141314 // Geometry
       end
 
-      operation 141314 "hit"
-	public explicit_return_type "bool"
-	nparams 5
-	  param in name "ray" type class_ref 148994 // Ray
-	  param in name "*t" explicit_type "float"
-	  param in name "*data" explicit_type "HitData"
-	    defaultvalue "NULL"
-	  param in name "minT" explicit_type "float"
-	    defaultvalue "0.0f"
-	  param in name "maxT" explicit_type "float"
-	    defaultvalue "DIST_MAX"
-	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}, ${t1} ${p1}, const ${t2} & ${p2}, ${t3} ${p3}, ${t4} ${p4}${)}${const}${volatile}${throw}${abstract};
-"
-	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}, ${t1} ${p1}, const ${t2} & ${p2}, ${t3} ${p3}, ${t4} ${p4}${)}${const}${volatile}${throw}${staticnl}{
-  ${body}}
-"
-	
-	
-	
-	
-      end
-
-      operation 141442 "getNormal"
-	cpp_virtual public return_type class_ref 134786 // vec3_t
-	nparams 1
-	  param in name "point" type class_ref 134786 // vec3_t
-	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${abstract};
-"
-	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
-  ${body}}
-"
-	
-	
-	
-	
-	comment "Returns the normal of the current geometry object at the specified point."
-      end
-
       operation 141570 "bBox"
 	cpp_virtual public explicit_return_type "Box"
 	nparams 0
@@ -1015,6 +966,39 @@ ${inlines}
 	
 	
 	comment "Gets the bounding box of the current geometry object."
+      end
+
+      operation 155522 "hit"
+	cpp_virtual public explicit_return_type "int"
+	nparams 5
+	  param in name "ray" type class_ref 148994 // Ray
+	  param in name "*t" explicit_type "float"
+	  param in name "*data" type class_ref 150018 // HitData
+	    defaultvalue "NULL"
+	  param in name "minT" explicit_type "float"
+	    defaultvalue "0.0f"
+	  param in name "maxT" explicit_type "float"
+	    defaultvalue "DIST_MAX"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}, ${t1} ${p1}, const ${t2} & ${p2}, ${t3} ${p3}, ${t4} ${p4}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment "Determines whether the input ray intersects the current geometry object. If it does not, returns 0. If it does, returns -1 if hit from within the object, or 1 if hit from outside the object, and correctly populates the fields of the input HitData object."
+      end
+
+      operation 156674 "getNormal"
+	cpp_virtual public explicit_return_type "Vector3f"
+	nparams 1
+	  param in name "point" explicit_type "Vector3f"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment "Returns the normal of the current geometry object at the specified point."
       end
     end
 
@@ -1045,7 +1029,7 @@ ${members}};
       end
 
       attribute 152834 "point"
-	public type class_ref 134786 // vec3_t
+	public explicit_type "Vector3f"
 	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
 "
 	java_decl ""
@@ -1065,7 +1049,195 @@ ${members}};
       end
 
       attribute 153090 "object"
-	public explicit_type "Geometry *"
+	public type class_ref 141314 // Geometry
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} *${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 156546 "triangle_t"
+      visibility package stereotype "struct"
+      cpp_decl "${comment}${template}struct ${name}${inherit}
+{
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl "${comment}struct ${name} {
+${members}};
+"
+      explicit_switch_type ""
+      
+      comment "A struct representing a triangle."
+      attribute 159618 "location"
+	public explicit_type "Vector3f"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "The first corner of the triangle."
+      end
+
+      attribute 159746 "c2"
+	public explicit_type "Vector3f"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "The second corner of the triangle."
+      end
+
+      attribute 159874 "c3"
+	public explicit_type "Vector3f"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "The third corner of the triangle."
+      end
+    end
+
+    class 156674 "plane_t"
+      visibility package stereotype "struct"
+      cpp_decl "${comment}${template}struct ${name}${inherit}
+{
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl "${comment}struct ${name} {
+${members}};
+"
+      explicit_switch_type ""
+      
+      comment "A struct representing a plane."
+      attribute 160002 "normal"
+	public explicit_type "Vector3f"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "The normal of the plane."
+      end
+
+      attribute 160130 "offset"
+	public explicit_type "float"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "The plane offset ('d' in the plane's implicit equation)."
+      end
+    end
+
+    class 156802 "box_t"
+      visibility public stereotype "struct"
+      cpp_decl "${comment}${template}struct ${name}${inherit}
+{
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl "${comment}struct ${name} {
+${members}};
+"
+      explicit_switch_type ""
+      
+      comment "A struct representing a box."
+      attribute 160258 "location"
+	public explicit_type "Vector3f"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "The first corner of the box."
+      end
+
+      attribute 160386 "c2"
+	public explicit_type "Vector3f"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "The corner of the box opposite from location."
+      end
+
+      attribute 160514 "left"
+	public type class_ref 156674 // plane_t
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 160642 "right"
+	public type class_ref 156674 // plane_t
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 160770 "bottom"
+	public type class_ref 156674 // plane_t
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 160898 "top"
+	public type class_ref 156674 // plane_t
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 161026 "back"
+	public type class_ref 156674 // plane_t
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 161154 "front"
+	public type class_ref 156674 // plane_t
 	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
 "
 	java_decl ""
@@ -1074,6 +1246,114 @@ ${members}};
 	idl_decl ""
       end
     end
-  end
 
+    class 156930 "Mesh2"
+      visibility public 
+      cpp_decl "${comment}${template}class ${name}${inherit}
+{
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "A geometry object representing a triangle mesh (mesh2 in the povray format)."
+      attribute 161282 "faces"
+	protected type class_ref 149890 // Triangle
+	stereotype "vector"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "A vector containing the triangles represented by the mesh."
+      end
+
+      operation 148994 "bBox"
+	cpp_virtual public explicit_return_type "Box"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment "Gets the bounding box of the current geometry object."
+      end
+
+      classrelation 142850 // <generalisation>
+	relation 142594 ---|>
+	  a public
+	    cpp default "${type}"
+	    classrelation_ref 142850 // <generalisation>
+	  b parent class_ref 141314 // Geometry
+      end
+
+      operation 156034 "hit"
+	cpp_virtual public explicit_return_type "int"
+	nparams 5
+	  param in name "ray" type class_ref 148994 // Ray
+	  param in name "*t" explicit_type "float"
+	  param in name "*data" type class_ref 150018 // HitData
+	    defaultvalue "NULL"
+	  param in name "minT" explicit_type "float"
+	    defaultvalue "0.0f"
+	  param in name "maxT" explicit_type "float"
+	    defaultvalue "DIST_MAX"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}, ${t1} ${p1}, const ${t2} & ${p2}, ${t3} ${p3}, ${t4} ${p4}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment "Determines whether the input ray intersects the current geometry object. If it does not, returns 0. If it does, returns -1 if hit from within the object, or 1 if hit from outside the object, and correctly populates the fields of the input HitData object."
+      end
+
+      operation 156162 "getNormal"
+	cpp_virtual public explicit_return_type "Vector3f"
+	nparams 1
+	  param in name "point" explicit_type "Vector3f"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment "Returns the normal of the current geometry object at the specified point."
+      end
+    end
+
+    class 163458 "Vector3f"
+      visibility package 
+      cpp_external cpp_decl "${name}
+#include <Eigen/Dense>
+using namespace Eigen;"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 163586 "Matrix3f"
+      visibility package 
+      cpp_external cpp_decl "${name}
+#include <Eigen/Dense>
+using namespace Eigen;"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+  end
 end

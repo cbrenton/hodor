@@ -1,10 +1,10 @@
 window_sizes 1527 813 245 1276 619 120
 diagrams
   active  classdiagram_ref 128002 // terlR_classes
-    1276 751 100 4 12 0
+    1276 751 100 4 0 0
 end
 show_stereotypes
-selected operation_ref 142210 // shade
+selected class_ref 163586 // Matrix3f
 open
   class_ref 128002 // Image
   attribute_ref 149122 // clr
@@ -20,5 +20,9 @@ open
   class_ref 149762 // Plane
   class_ref 149890 // Triangle
   class_ref 150018 // HitData
+  class_ref 156546 // triangle_t
+  class_ref 156674 // plane_t
+  class_ref 156802 // box_t
+  class_ref 156930 // Mesh2
 end
 end
