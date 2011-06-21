@@ -7,6 +7,9 @@
 #ifndef _TRIANGLE_T_H
 #define _TRIANGLE_T_H
 
+#include <Eigen/Dense>
+using Eigen::Vector3f;
+
 struct triangle_t
 {
     //The first corner of the triangle.

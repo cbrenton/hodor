@@ -6,5 +6,6 @@
 
 #include "Geometry.h"
 #include "Ray.h"
+#include "Box.h"
 #include "HitData.h"
 

@@ -7,6 +7,9 @@
 #ifndef _PLANE_T_H
 #define _PLANE_T_H
 
+#include <Eigen/Dense>
+using Eigen::Vector3f;
+
 struct plane_t
 {
     //The normal of the plane.

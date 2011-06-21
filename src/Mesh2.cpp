@@ -5,5 +5,6 @@
 
 //Gets the bounding box of the current geometry object.
 Box Mesh2::bBox() {
+  return Box();
 }
 

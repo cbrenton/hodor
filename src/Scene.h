@@ -7,7 +7,14 @@
 #ifndef _SCENE_H
 #define _SCENE_H
 
+#include <vector>
 #include "Geometry.h"
+#include "Camera.h"
+#include "Box.h"
+#include "Mesh2.h"
+#include "Plane.h"
+#include "Sphere.h"
+#include "Triangle.h"
 #include "sphere_t.h"
 #include "plane_t.h"
 #include "triangle_t.h"
@@ -18,23 +25,6 @@
 
 class Scene
 {
-  public:
-    //List of geometry objects (CPU only).
-    Geometry geometry;
-
-  protected:
-    //The vector of spheres in the scene (GPU only).
-    sphere_t spheres;
-
-    //The vector of planes in the scene (GPU only).
-    plane_t planes;
-
-    //The vector of triangles in the scene (GPU only).
-    triangle_t triangles;
-
-    //The vector of boxes in the scene (GPU only).
-    box_t boxes;
-
   public:
     //Constructs a bounding volume heirarchy for the scene.
     void constructBVH();
@@ -49,7 +39,23 @@ class Scene
     Pixel castRay(Ray ray, int depth);
 
     //Calculates proper shading at the current point.
-    Pixel shade(HitData *data, const Vector3f & view);
+    Pixel shade(HitData *data, Vector3f view);
+
+  protected:
+    //List of geometry objects (CPU only).
+    std::vector<Geometry> geometry;
+    
+    //The std::vector of spheres in the scene (GPU only).
+    std::vector<sphere_t> spheres;
+
+    //The std::vector of planes in the scene (GPU only).
+    std::vector<plane_t> planes;
+
+    //The std::vector of triangles in the scene (GPU only).
+    std::vector<triangle_t> triangles;
+
+    //The std::vector of boxes in the scene (GPU only).
+    std::vector<box_t> boxes;
 
 };
 #endif

@@ -24,6 +24,6 @@ Pixel Scene::castRay(Ray ray, int depth) {
 }
 
 //Calculates proper shading at the current point.
-Pixel Scene::shade(HitData *data, const Vector3f & view) {
+Pixel Scene::shade(HitData *data, Vector3f view) {
 }
 

@@ -1,9 +1,9 @@
 #ifndef NYUPARSER_H
 #define NYUPARSER_H
 
-#include "parser.h"
+//#include "parser.h"
 #include "tokens.h"
-#include "scene.h"
+#include "Scene.h"
 
 class NYUParser : public Parser{
 	private:
@@ -16,7 +16,7 @@ class NYUParser : public Parser{
 	void ParseLeftCurly();
 	void ParseRightCurly();
 	void ParseComma();
-	void ParseVector(vect3 & v);
+	void ParseVector(Vector3f & v);
 	void ParseRGBFColor(color & c, float & f);
 	void ParseRGBColor(color & c, float & f);
 	void ParseColor(color & c, float & f);

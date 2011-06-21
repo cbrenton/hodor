@@ -7,6 +7,8 @@
 #ifndef _BOX_T_H
 #define _BOX_T_H
 
+#include <Eigen/Dense>
+using Eigen::Vector3f;
 #include "plane_t.h"
 
 struct box_t

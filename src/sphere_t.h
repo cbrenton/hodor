@@ -7,6 +7,9 @@
 #ifndef _SPHERE_T_H
 #define _SPHERE_T_H
 
+#include <Eigen/Dense>
+using Eigen::Vector3f;
+
 struct sphere_t
 {
     //The radius of the sphere.

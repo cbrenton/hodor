@@ -10,5 +10,6 @@
 
 //Gets the bounding box of the current geometry object.
 Box Box::bBox() {
+  return Box();
 }
 

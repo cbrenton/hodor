@@ -9,9 +9,12 @@
 
 #include "Pigment.h"
 #include "Finish.h"
-#include "Box.h"
+#include <Eigen/Dense>
+
+using namespace Eigen;
 
 class Ray;
+class Box;
 struct HitData;
 
 class Geometry
@@ -27,15 +30,15 @@ class Geometry
     Vector3f location;
 
     //Determines whether the input ray intersects the current geometry object. If it does not, returns 0. If it does, returns -1 if hit from within the object, or 1 if hit from outside the object, and correctly populates the fields of the input HitData object.
-    virtual int hit(const Ray & ray, float *t, const HitData & *data, float minT, float maxT) = 0;
+    virtual int hit(Ray ray, float *t, HitData *data, float minT, float maxT) = 0;
 
     //Returns the normal of the current geometry object at the specified point.
-    virtual Vector3f getNormal(const Vector3f & point) = 0;
+    virtual Vector3f getNormal(Vector3f point) = 0;
 
     //Gets the bounding box of the current geometry object.
     virtual Box bBox() = 0;
 
-    Eigen::Matrix3f transform;
+    Matrix3f transform;
 
 };
 #endif
