@@ -8,9 +8,11 @@
 #include <math.h>
 // #include <cutil.h>
 
+#include "Globals.h"
 #include "Pixel.h"
 #include "Image.h"
 #include "TgaImage.h"
+#include "PngImage.h"
 #include "Scene.h"
 
 #define POV_EXT ".pov"
@@ -253,18 +255,70 @@ int main(int argc, char **argv)
       }
    }
 
-   image = new TgaImage(width, height);
+   image = new PngImage(width, height);
 
    setOutputName();
 
    // Open input file.
    fstream inputFileStream(inputFileName.c_str(), fstream::in);
 
+   // Check if input file is valid.
+   if (inputFileStream.fail())
+   {
+      cerr << "File " << inputFileName << " does not exist." << endl;
+      exit(EXIT_FAILURE);
+   }
+
    // Parse scene.
    scene = Scene::read(inputFileStream);
 
    // Close input file.
    inputFileStream.close();
+
+   // Make array of rays.
+   /*
+      Ray ***aRayArray = new Ray **[width];
+      for (int i = 0; i < width; i++)
+      {
+      aRayArray[i] = new Ray *[height];
+      for (int j = 0; j < height; j++)
+      {
+      aRayArray[i][j] = new Ray[numAA];
+      }
+      }
+      */
+   Ray **aRayArray = new Ray *[width];
+   for (int i = 0; i < width; i++)
+   {
+      aRayArray[i] = new Ray[height];
+   }
+
+   // Generate rays.
+   for (int x = 0; x < image->width; x++)
+   {
+      for (int y = 0; y < image->height; y++)
+      {
+         Ray curRay;
+         float px, py, pz;
+         px = scene->cam.location(0);
+         py = scene->cam.location(1);
+         pz = scene->cam.location(2);
+         px += (float)(y - 0.5 * (image->width - 1.0));
+         py += (float)(y - 0.5 * (image->height - 1.0));
+         curRay.point << px, py, pz;
+         curRay.dir = scene->cam.look_at;
+         aRayArray[x][y] = curRay;
+      }
+   }
+
+   // Test for intersection.
+   for (int x = 0; x < image->width; x++)
+   {
+      for (int y = 0; y < image->height; y++)
+      {
+         image->pixelData[x][y] = scene->castRay(aRayArray[x][y], 1);
+      }
+   }
 
    // Write image out to file.
    image->write();

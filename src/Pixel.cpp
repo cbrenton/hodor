@@ -6,3 +6,9 @@
 
 #include "Pixel.h"
 
+Pixel::Pixel(double r, double g, double b)
+{
+   clr.r = r;
+   clr.g = g;
+   clr.b = b;
+}

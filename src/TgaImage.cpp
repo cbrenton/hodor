@@ -16,7 +16,6 @@ TgaImage::TgaImage(int w, int h) : Image(w, h)
 
 void TgaImage::write()
 {
-   cout << "writing out tga with dimensions " << width << "x" << height << endl;
 }
 
 void TgaImage::writePixel(const Pixel & pix)

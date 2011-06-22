@@ -16,12 +16,13 @@ KILL   = killall -9
 SHELL  = /bin/sh
 MAKE   = make
 
-LIBFLAGS = -I ./lib/
+LIBFLAGS = -I ./lib -I ./lib/pngwriter/include
+LFLAGS = -lpng -lz -DNO_FREETYPE -lpngwriter
 DEBUG = -ggdb
 OPTIMIZE = -O3
 ERROR = -Wconversion -Werror
-CFLAGS = $(OPTIMIZE) -Wall -c $(DEBUG) $(ERROR) $(LIBFLAGS)
-LDFLAGS = $(OPTIMIZE) $(DEBUG) $(ERROR)
+CFLAGS = $(OPTIMIZE) -Wall -c $(DEBUG) $(ERROR) $(LIBFLAGS) $(LFLAGS)
+LDFLAGS = $(OPTIMIZE) $(DEBUG) $(ERROR) -L ./lib/pngwriter/lib $(LFLAGS)
 
 TARGET = terlR
 INPUTEXT=pov
@@ -46,10 +47,14 @@ OBJS = $(SRCS:.cpp=.o)
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) -o $@
+	$(CC) $(OBJS) $(LDFLAGS) -o $@
 
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@
+
+.PHONY: lib
+lib:
+	$(shell) ./lib.sh
 
 run:
 	./$(TARGET) $(ARGS)
