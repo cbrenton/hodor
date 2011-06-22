@@ -9,21 +9,21 @@
 #include "Box.h"
 #include "HitData.h"
 
-int Geometry::hit(Ray ray, float *t, HitData *data, float minT, float maxT)
+Box Geometry::bBox()
+{
+  return Box();
+}
+
+int Geometry::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT)
 {
   return 0;
 }
 
-Vector3f Geometry::getNormal(Vector3f point)
+Vector3f Geometry::getNormal(const Vector3f & point)
 {
   return Vector3f();
 }
 
 void Geometry::addTransformation(Transform<float, 3, Affine> t)
 {
-}
-
-Box Geometry::bBox()
-{
-  return Box();
 }

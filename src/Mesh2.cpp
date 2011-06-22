@@ -8,12 +8,12 @@ Box Mesh2::bBox() {
   return Box();
 }
 
-int Mesh2::hit(Ray ray, float *t, HitData *data, float minT, float maxT)
+int Mesh2::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT)
 {
   return 0;
 }
 
-Vector3f Mesh2::getNormal(Vector3f point)
+Vector3f Mesh2::getNormal(const Vector3f & point)
 {
   return Vector3f();
 }

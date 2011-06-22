@@ -13,12 +13,12 @@ Box Triangle::bBox() {
   return Box();
 }
 
-int Triangle::hit(Ray ray, float *t, HitData *data, float minT, float maxT)
+int Triangle::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT)
 {
   return 0;
 }
 
-Vector3f Triangle::getNormal(Vector3f point)
+Vector3f Triangle::getNormal(const Vector3f & point)
 {
   return Vector3f();
 }

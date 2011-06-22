@@ -410,7 +410,7 @@ Sphere * NYUParser::ParseSphere() {
   //radius = 1.0;
 
   ParseLeftCurly();
-  ParseVector(s->location);
+  ParseVector(s->s_t.location);
   ParseComma();
   s->s_t.radius = ParseDouble();
 

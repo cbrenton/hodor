@@ -13,12 +13,12 @@ Box Sphere::bBox() {
   return Box();
 }
 
-int Sphere::hit(Ray ray, float *t, HitData *data, float minT, float maxT)
+int Sphere::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT)
 {
   return 0;
 }
 
-Vector3f Sphere::getNormal(Vector3f point)
+Vector3f Sphere::getNormal(const Vector3f & point)
 {
   return Vector3f();
 }
