@@ -4,6 +4,8 @@
  * @date 06/22/2011
  */
 
+#include <cstdlib>
+
 inline int randInt()
 {
    return rand();

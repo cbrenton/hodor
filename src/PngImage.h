@@ -29,5 +29,10 @@ class PngImage : public Image
       // Gets the file extension.
       string getExt();
 
+   protected:
+      int curX, curY;
+
+      pngwriter *png;
+
 };
 #endif

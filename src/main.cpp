@@ -94,6 +94,7 @@ void setOutputName()
    filename = "output/";
    filename.append(inputFileName.substr(dirIndex + 1, extIndex - dirIndex - 1));
    filename.append("." + image->getExt());
+   image->filename = filename;
 }
 
 void printProgress(struct timeval startTime, int d, int total, int freq)
