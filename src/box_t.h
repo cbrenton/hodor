@@ -13,23 +13,23 @@ using Eigen::Vector3f;
 
 struct box_t
 {
-    //The first corner of the box.
-    Vector3f c1;
+   // The first corner of the box.
+   Vector3f c1;
 
-    //The second corner of the box.
-    Vector3f c2;
+   // The second corner of the box.
+   Vector3f c2;
 
-    plane_t left;
+   plane_t left;
 
-    plane_t right;
+   plane_t right;
 
-    plane_t bottom;
+   plane_t bottom;
 
-    plane_t top;
+   plane_t top;
 
-    plane_t back;
+   plane_t back;
 
-    plane_t front;
+   plane_t front;
 
 };
 #endif

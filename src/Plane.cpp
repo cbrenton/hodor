@@ -8,17 +8,18 @@
 #include "Ray.h"
 #include "HitData.h"
 
-//Gets the bounding box of the current geometry object.
-Box Plane::bBox() {
-  return Box();
+// Gets the bounding box of the current geometry object.
+Box Plane::bBox()
+{
+   return Box();
 }
 
 int Plane::hit(Ray ray, float *t, HitData *data, float minT, float maxT)
 {
-  return 0;
+   return 0;
 }
 
 Vector3f Plane::getNormal(Vector3f point)
 {
-  return Vector3f();
+   return Vector3f();
 }

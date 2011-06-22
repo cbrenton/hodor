@@ -11,12 +11,14 @@
 
 class Ray
 {
-  public:
-    //The origin of the ray.
-    Eigen::Vector3f point;
+   public:
+      // The origin of the ray.
+      Eigen::Vector3f point;
 
-    //The direction of the ray.
-    Eigen::Vector3f dir;
+      // The direction of the ray.
+      Eigen::Vector3f dir;
+
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 };
 #endif

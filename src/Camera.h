@@ -13,6 +13,7 @@ using Eigen::Vector3f;
 
 class Camera {
    public:
+      Camera() {};
       Camera(Vector3f _loc, Vector3f _up, Vector3f _right, Vector3f _look_at);
       Vector3f location;
       Vector3f up;
@@ -20,9 +21,10 @@ class Camera {
       Vector3f look_at;
       inline void debug()
       {
-        std::cout << "Camera: <" << location(0) << ", " << location(1) <<
-          ", " << location(2) << ">" << std::endl;
+         std::cout << "Camera: <" << location(0) << ", " << location(1) <<
+            ", " << location(2) << ">" << std::endl;
       }
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 #endif

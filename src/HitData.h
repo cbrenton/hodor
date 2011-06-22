@@ -11,13 +11,13 @@ class Geometry;
 
 struct HitData
 {
-    bool hit;
+   bool hit;
 
-    Vector3f point;
+   Vector3f point;
 
-    float t;
+   float t;
 
-    Geometry *object;
+   Geometry *object;
 
 };
 #endif

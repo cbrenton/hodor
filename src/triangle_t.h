@@ -12,14 +12,14 @@ using Eigen::Vector3f;
 
 struct triangle_t
 {
-    //The first corner of the triangle.
-    Vector3f c1;
+   // The first corner of the triangle.
+   Vector3f c1;
 
-    //The second corner of the triangle.
-    Vector3f c2;
+   // The second corner of the triangle.
+   Vector3f c2;
 
-    //The third corner of the triangle.
-    Vector3f c3;
+   // The third corner of the triangle.
+   Vector3f c3;
 
 };
 #endif

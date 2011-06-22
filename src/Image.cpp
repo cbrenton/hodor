@@ -7,7 +7,18 @@
 #include "Image.h"
 #include "Pixel.h"
 
-//Writes the image out to a file.
-void Image::write() {
+Image::Image(int w, int h) :
+   width(w), height(h)
+{
+   // Initialize pixelData.
 }
 
+Image::~Image()
+{
+   // Delete pixelData.
+}
+
+string Image::getExt()
+{
+   return "out";
+}

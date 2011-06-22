@@ -11,9 +11,9 @@
 
 class Pigment
 {
-  public:
-    color c;
-    float f;
+   public:
+      color c;
+      float f;
 
 };
 #endif

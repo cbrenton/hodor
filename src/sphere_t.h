@@ -12,11 +12,11 @@ using Eigen::Vector3f;
 
 struct sphere_t
 {
-    //The radius of the sphere.
-    float radius;
+   // The radius of the sphere.
+   float radius;
 
-    //The location in world space of the sphere.
-    Vector3f location;
+   // The location in world space of the sphere.
+   Vector3f location;
 
 };
 #endif

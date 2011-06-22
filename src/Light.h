@@ -23,6 +23,7 @@ class Light {
       {
          printf("Light: (r,g,b) (%f, %f, %f)\n", r, g, b);
       }
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 #endif

@@ -8,21 +8,22 @@
 
 using namespace Eigen;
 
-Transformation::Transformation() {
-  m = Transform<float, 3, Affine>();
+Transformation::Transformation()
+{
+   m = Transform<float, 3, Affine>();
 }
 
 void Transformation::setScale(Vector3f scaleVec)
 {
-  m.scale(scaleVec);
+   m.scale(scaleVec);
 }
 
 void Transformation::setRotation(float x, float y, float z)
 {
-  ;
+   ;
 }
 
 void Transformation::setTranslation(float x, float y, float z)
 {
-  ;
+   ;
 }

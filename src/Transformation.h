@@ -11,13 +11,20 @@
 
 class Transformation
 {
-  public:
-    Transformation();
-    ~Transformation() {};
-    void setScale(Eigen::Vector3f scaleVec);
-    void setRotation(float x, float y, float z);
-    void setTranslation(float x, float y, float z);
-    Eigen::Transform<float, 3, Eigen::Affine> m;
+   public:
+      Transformation();
+      
+      ~Transformation() {};
+      
+      void setScale(Eigen::Vector3f scaleVec);
+      
+      void setRotation(float x, float y, float z);
+      
+      void setTranslation(float x, float y, float z);
+
+      Eigen::Transform<float, 3, Eigen::Affine> m;
+
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 };
 

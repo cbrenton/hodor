@@ -11,13 +11,13 @@
 
 class Pixel
 {
-  public:
-    //The color of the pixel.
-    color clr;
+   public:
+      // The color of the pixel.
+      color clr;
 
-  private:
-    //The alpha value of the current pixel. Will never be used in most image types.
-    double alpha;
+   private:
+      // The alpha value of the current pixel. Will never be used in most image types.
+      double alpha;
 
 };
 #endif

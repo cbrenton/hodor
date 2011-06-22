@@ -9,14 +9,14 @@
 
 struct color
 {
-    //The red component of the color.
-    double r;
+   // The red component of the color.
+   double r;
 
-    //The green component of the color.
-    double g;
+   // The green component of the color.
+   double g;
 
-    //The blue component of the color.
-    double b;
+   // The blue component of the color.
+   double b;
 
 };
 #endif

@@ -24,7 +24,11 @@ CFLAGS = $(OPTIMIZE) -Wall -c $(DEBUG) $(ERROR) $(LIBFLAGS)
 LDFLAGS = $(OPTIMIZE) $(DEBUG) $(ERROR)
 
 TARGET = terlR
-ARGS =
+INPUTEXT=pov
+INPUTDIR=input
+INPUTFILE=simple
+OUTPUTDIR=output
+ARGS = -w 320 -h 240 -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
 
 # Additional linker libraries
 LIBS = $(LIBFLAGS)
@@ -51,7 +55,7 @@ run:
 	./$(TARGET) $(ARGS)
 
 gdb:
-	gdb ./$(TARGET) --args $(ARGS)
+	gdb --args ./$(TARGET) $(ARGS)
 
 valgrind:
 	valgrind --tool=memcheck --leak-check=full ./$(TARGET) $(ARGS)

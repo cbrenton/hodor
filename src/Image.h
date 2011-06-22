@@ -14,21 +14,31 @@ class Pixel;
 
 class Image
 {
-  public:
-    //The height in pixels of the image.
-    int height;
+   public:
+      Image(int w, int h);
 
-    //The width in pixels of the image.
-    int width;
+      virtual ~Image();
 
-    //The name of the file to be output (minus the file extension).
-    string filename;
+      // The width in pixels of the image.
+      int width;
 
-    //Writes the image out to a file.
-    void write();
+      // The height in pixels of the image.
+      int height;
 
-    //The pixel data currently stored in the image.
-    Pixel **pixelData;
+      // The name of the file to be output (minus the file extension).
+      string filename;
+
+      // Writes the image out to a file.
+      virtual void write() {};
+
+      // The pixel data currently stored in the image.
+      Pixel **pixelData;
+
+      // Writes a single pixel to the file.
+      virtual void writePixel(const Pixel & pix) {};
+
+      // Gets the file extension.
+      virtual string getExt();
 
 };
 #endif

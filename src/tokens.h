@@ -34,8 +34,8 @@ enum TokenIDs {
   T_CYLINDER,
   T_CONE,
   T_QUADRIC,
-  T_TRIANGLE, //added by mbecker
-  T_PLANE, //added by mbecker
+  T_TRIANGLE, // added by mbecker
+  T_PLANE, // added by mbecker
 
   T_CAMERA,
   T_LOCATION,
@@ -54,11 +54,11 @@ enum TokenIDs {
   T_RGB,
   T_RGBF,
   T_REFLECTION,
-  T_REFRACTION, //added by mbecker
+  T_REFRACTION, // added by mbecker
   T_AMBIENT,
   T_DIFFUSE,
-  T_SPECULAR, //added by mbecker
-  T_ROUGHNESS, //added by mbecker
+  T_SPECULAR, // added by mbecker
+  T_ROUGHNESS, // added by mbecker
   T_PHONG,
   T_METALLIC,
   T_PHONG_SIZE,

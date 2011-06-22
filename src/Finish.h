@@ -9,21 +9,21 @@
 
 class Finish
 {
-  public:
-    double ambient;
+   public:
+      double ambient;
 
-    double specular;
+      double specular;
 
-    double diffuse;
+      double diffuse;
 
-    double roughness;
+      double roughness;
 
-    double reflection;
+      double reflection;
 
-    double refraction;
+      double refraction;
 
-    //The index of refraction of the finish.
-    float ior;
+      // The index of refraction of the finish.
+      float ior;
 
 };
 #endif
