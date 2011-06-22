@@ -13,3 +13,12 @@ Box Box::bBox() {
   return Box();
 }
 
+int Box::hit(Ray ray, float *t, HitData *data, float minT, float maxT)
+{
+  return 0;
+}
+
+Vector3f Box::getNormal(Vector3f point)
+{
+  return Vector3f();
+}

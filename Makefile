@@ -16,11 +16,12 @@ KILL   = killall -9
 SHELL  = /bin/sh
 MAKE   = make
 
-LIBFLAGS = -I ./lib/ -I ./
+LIBFLAGS = -I ./lib/
+DEBUG = -ggdb
 OPTIMIZE = -O3
 ERROR = -Wconversion -Werror
-CFLAGS = $(OPTIMIZE) -Wall -ggdb $(ERROR) $(LIBFLAGS)
-LDFLAGS = $(OPTIMIZE) -ggdb $(ERROR) $(LIBFLAGS)
+CFLAGS = $(OPTIMIZE) -Wall -c $(DEBUG) $(ERROR) $(LIBFLAGS)
+LDFLAGS = $(OPTIMIZE) $(DEBUG) $(ERROR)
 
 TARGET = terlR
 ARGS =
@@ -44,7 +45,7 @@ $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $@
 
 .cpp.o:
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 run:
 	./$(TARGET) $(ARGS)

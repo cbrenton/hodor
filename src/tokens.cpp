@@ -123,7 +123,7 @@ void Tokenizer::SkipSpaces() {
       break;
   } 
   //ungetc(c,token.infile);
-  infile.putback(c);
+  infile.putback((char)c);
 }
 
 void Tokenizer::ReadDouble() { 
@@ -145,7 +145,6 @@ void Tokenizer::ReadDouble() {
    but because our table is so small, it works ok */
 
 enum TokenIDs Tokenizer::FindReserved(const char* str) { 
-  int c;
   struct ReservedWord * ptr; 
   ptr = ReservedWords;
   while( ptr->id != T_LAST ) {
@@ -213,11 +212,11 @@ Token Tokenizer::GetToken() {
   
   if(isalpha(c)) { 
     //ungetc(c,token.infile);
-    infile.putback(c);
+    infile.putback((char)c);
     ReadName();
   } else if( isdigit(c) || c == '.' || c == '-' || c == '+' ) { 
     //ungetc(c,token.infile); 
-    infile.putback(c);
+    infile.putback((char)c);
     ReadDouble();
   } else { 
     switch(c) { 

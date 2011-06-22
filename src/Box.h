@@ -15,11 +15,10 @@ struct HitData;
 
 class Box : public Geometry
 {
-  protected:
-    //The box_t struct representing the geometry object.
-    box_t b;
-
   public:
+    //The box_t struct representing the geometry object.
+    box_t b_t;
+
     //Gets the bounding box of the current geometry object.
     Box bBox();
 

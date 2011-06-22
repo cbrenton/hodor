@@ -4,8 +4,9 @@
 //#include "parser.h"
 #include "tokens.h"
 #include "Scene.h"
+#include "Transformation.h"
 
-class NYUParser : public Parser{
+class NYUParser {
 	private:
 	Tokenizer * tokenizer;
 	
@@ -22,7 +23,7 @@ class NYUParser : public Parser{
 	void ParseColor(color & c, float & f);
 	void PrintColor(color & c, float & f);
 	void ParseMatrix();
-	void ParseTransform(Shape & s);
+	void ParseTransform(Geometry & s);
 	void ParsePigment(Pigment & p);
 	void PrintPigment(Pigment & p);
 	void ParseFinish(Finish & f);
@@ -32,8 +33,8 @@ class NYUParser : public Parser{
 	//void InitModifiers(struct ModifierStruct* modifiers);
 	//void ParseModifiers(struct ModifierStruct* modifiers);
 	//void PrintModifiers(struct ModifierStruct* modifiers);
-	void ParseModifiers(Shape & s);
-	void PrintModifiers(Shape & s);
+	void ParseModifiers(Geometry & s);
+	void PrintModifiers(Geometry & s);
 	//void ParseCamera();
 	Camera ParseCamera();
 	void ParsePolygon();
@@ -43,7 +44,7 @@ class NYUParser : public Parser{
 	Box * ParseBox();
 	void ParseCylinder();
 	//void ParseCone();
-	Cone * ParseCone();
+	//Cone * ParseCone();
 	void ParseQuadric();
 	Triangle * ParseTriangle(); //added by mbecker
 	Plane * ParsePlane(); //added by mbecker

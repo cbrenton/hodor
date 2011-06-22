@@ -27,18 +27,20 @@ class Geometry
     Finish finish;
 
     //The location of the geometry object.
-    Vector3f location;
+    Eigen::Vector3f location;
 
     //Determines whether the input ray intersects the current geometry object. If it does not, returns 0. If it does, returns -1 if hit from within the object, or 1 if hit from outside the object, and correctly populates the fields of the input HitData object.
-    virtual int hit(Ray ray, float *t, HitData *data, float minT, float maxT) = 0;
+    virtual int hit(Ray ray, float *t, HitData *data, float minT, float maxT);
 
     //Returns the normal of the current geometry object at the specified point.
-    virtual Vector3f getNormal(Vector3f point) = 0;
+    virtual Vector3f getNormal(Vector3f point);
 
     //Gets the bounding box of the current geometry object.
-    virtual Box bBox() = 0;
+    virtual Box bBox();
 
-    Matrix3f transform;
+    void addTransformation(Transform<float, 3, Affine> t);
+
+    Transform<float, 3, Affine> transform;
 
 };
 #endif

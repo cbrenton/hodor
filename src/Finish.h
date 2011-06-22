@@ -16,12 +16,14 @@ class Finish
 
     double diffuse;
 
+    double roughness;
+
     double reflection;
 
     double refraction;
 
     //The index of refraction of the finish.
-    double ior;
+    float ior;
 
 };
 #endif

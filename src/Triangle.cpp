@@ -10,5 +10,15 @@
 
 //Gets the bounding box of the current geometry object.
 Box Triangle::bBox() {
+  return Box();
 }
 
+int Triangle::hit(Ray ray, float *t, HitData *data, float minT, float maxT)
+{
+  return 0;
+}
+
+Vector3f Triangle::getNormal(Vector3f point)
+{
+  return Vector3f();
+}

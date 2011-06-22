@@ -14,9 +14,9 @@ using Eigen::Vector3f;
 struct box_t
 {
     //The first corner of the box.
-    Vector3f location;
+    Vector3f c1;
 
-    //The corner of the box opposite from location.
+    //The second corner of the box.
     Vector3f c2;
 
     plane_t left;

@@ -13,7 +13,7 @@ using Eigen::Vector3f;
 struct triangle_t
 {
     //The first corner of the triangle.
-    Vector3f location;
+    Vector3f c1;
 
     //The second corner of the triangle.
     Vector3f c2;

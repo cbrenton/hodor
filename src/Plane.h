@@ -16,19 +16,18 @@ struct HitData;
 
 class Plane : public Geometry
 {
-  protected:
-    //The plane_t struct representing the geometry object.
-    plane_t p;
-
   public:
+    //The plane_t struct representing the geometry object.
+    plane_t p_t;
+
     //Gets the bounding box of the current geometry object.
     Box bBox();
 
     //Determines whether the input ray intersects the current geometry object. If it does not, returns 0. If it does, returns -1 if hit from within the object, or 1 if hit from outside the object, and correctly populates the fields of the input HitData object.
-    int hit(Ray ray, float *t, HitData *data, float minT, float maxT) = 0;
+    int hit(Ray ray, float *t, HitData *data, float minT, float maxT);
 
     //Returns the normal of the current geometry object at the specified point.
-    Vector3f getNormal(Vector3f point) = 0;
+    Vector3f getNormal(Vector3f point);
 
 };
 #endif

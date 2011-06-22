@@ -2,6 +2,7 @@
 #define TOKENS_H
 
 #include <string>
+#include <cstring>
 #include <cstdio>
 #include <cstdlib>
 #include <assert.h>

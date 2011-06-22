@@ -7,14 +7,16 @@
 #ifndef _RAY_H
 #define _RAY_H
 
+#include <Eigen/Dense>
+
 class Ray
 {
   public:
     //The origin of the ray.
-    Vector3f point;
+    Eigen::Vector3f point;
 
     //The direction of the ray.
-    Vector3f dir;
+    Eigen::Vector3f dir;
 
 };
 #endif

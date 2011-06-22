@@ -11,11 +11,9 @@
 
 class Pigment
 {
-  private:
-    color c;
-
   public:
-    double f;
+    color c;
+    float f;
 
 };
 #endif

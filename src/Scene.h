@@ -10,6 +10,7 @@
 #include <vector>
 #include "Geometry.h"
 #include "Camera.h"
+#include "Light.h"
 #include "Box.h"
 #include "Mesh2.h"
 #include "Plane.h"
@@ -41,21 +42,25 @@ class Scene
     //Calculates proper shading at the current point.
     Pixel shade(HitData *data, Vector3f view);
 
-  protected:
+    Camera cam;
+
     //List of geometry objects (CPU only).
-    std::vector<Geometry> geometry;
+    std::vector<Geometry*> geometry;
     
-    //The std::vector of spheres in the scene (GPU only).
+    //The vector of spheres in the scene (GPU only).
     std::vector<sphere_t> spheres;
 
-    //The std::vector of planes in the scene (GPU only).
+    //The vector of planes in the scene (GPU only).
     std::vector<plane_t> planes;
 
-    //The std::vector of triangles in the scene (GPU only).
+    //The vector of triangles in the scene (GPU only).
     std::vector<triangle_t> triangles;
 
-    //The std::vector of boxes in the scene (GPU only).
+    //The vector of boxes in the scene (GPU only).
     std::vector<box_t> boxes;
+
+    //The vector of lights in the scene.
+    std::vector<Light*> lights;
 
 };
 #endif

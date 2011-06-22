@@ -4,8 +4,8 @@
  * 4/3/11
  */
 
-#ifndef __CAMERA_H__
-#define __CAMERA_H__
+#ifndef _CAMERA_H
+#define _CAMERA_H
 
 #include <iostream>
 #include <Eigen/Dense>
@@ -13,14 +13,15 @@ using Eigen::Vector3f;
 
 class Camera {
    public:
-      Camera(std::istream& input);
+      Camera(Vector3f _loc, Vector3f _up, Vector3f _right, Vector3f _look_at);
       Vector3f location;
       Vector3f up;
       Vector3f right;
       Vector3f look_at;
       inline void debug()
       {
-         printf("Camera: <%f, %f, %f>\n", location.x(), location.y(), location.z());
+        std::cout << "Camera: <" << location(0) << ", " << location(1) <<
+          ", " << location(2) << ">" << std::endl;
       }
 };
 

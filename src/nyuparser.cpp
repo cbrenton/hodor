@@ -90,68 +90,41 @@ void NYUParser::PrintColor(color & c, float & f) {
 }
 
 
-//void NYUParser::ParseMatrix( struct Matrix4d* m) {
 void NYUParser::ParseMatrix() {
   cout << "Error: Cannot Parse Matrix" << endl;
   exit(0);
-  /*
-  SetIdentity4d(m);
-  ParseLeftAngle();
-  m->val[4*0] = ParseDouble(); ParseComma(); 
-  m->val[4*1] = ParseDouble(); ParseComma();
-  m->val[4*2] = ParseDouble(); ParseComma();
-
-  m->val[4*0+1] = ParseDouble(); ParseComma(); 
-  m->val[4*1+1] = ParseDouble(); ParseComma();
-  m->val[4*2+1] = ParseDouble(); ParseComma();
-
-  m->val[4*0+2] = ParseDouble(); ParseComma(); 
-  m->val[4*1+2] = ParseDouble(); ParseComma();
-  m->val[4*2+2] = ParseDouble(); ParseComma();
-
-  m->val[4*0+3] = ParseDouble(); ParseComma(); 
-  m->val[4*1+3] = ParseDouble(); ParseComma();
-  m->val[4*2+3] = ParseDouble(); 
-  ParseRightAngle();
-  */
 }
 
 
-void NYUParser::ParseTransform(Shape & s) { 
+void NYUParser::ParseTransform(Geometry & s) { 
   /* if there is nothing to parse, this is not our problem: 
      this should be handled by the caller */
   Vector3f v;
-  //struct Matrix4d m;
   Token t;
-  Transformation * trans;
+  Transformation trans = Transformation();
   //while(1) {
   for(;;){
-    //GetToken();
     t = tokenizer->GetToken();
     switch( t.id ) { 
     case T_SCALE: 
       ParseVector(v);
-      trans = new Scale(v(0),v(1),v(2));
-      s.addTransformation(trans);
-      //ScaleMatrix4d(transf, &v);
+      trans.setScale(v);
+      s.addTransformation(trans.m);
       break;
     case T_ROTATE:
       ParseVector(v);
-      trans = new Rotation(v(0),v(1),v(2));
-      s.addTransformation(trans);
-      //RotateMatrix4d(transf, &v);
+      trans.setRotation(v(0),v(1),v(2));
+      s.addTransformation(trans.m);
       break;
     case T_TRANSLATE:
       ParseVector(v);
-      trans = new Translation(v(0),v(1),v(2));
-      s.addTransformation(trans);
-      //TranslateMatrix4d(transf, &v);
+      trans.setTranslation(v(0),v(1),v(2));
+      s.addTransformation(trans.m);
       break;
       /* once we run into an unknown token, we assume there are no 
          more  transforms to parse and we return to caller */
     case T_MATRIX:
       ParseMatrix();
-      //MultMatrix4d(transf, &m, transf); 
       break;
     default: tokenizer->UngetToken(); return; 
     }    
@@ -278,7 +251,7 @@ void NYUParser::InitModifiers(struct ModifierStruct* modifiers) {
 */
 
 
-void NYUParser::ParseModifiers(Shape & s) {
+void NYUParser::ParseModifiers(Geometry & s) {
   Token t; 
   //while(1) {
   for(;;){
@@ -295,22 +268,22 @@ void NYUParser::ParseModifiers(Shape & s) {
       break;
     case T_PIGMENT:
       //ParsePigment(&(modifiers->pigment));
-      ParsePigment(s.p);
+      ParsePigment(s.pigment);
       break;
     case T_FINISH:
       //ParseFinish(&(modifiers->finish));
-      ParseFinish(s.f);
+      ParseFinish(s.finish);
       break;
     case T_INTERIOR:
       //ParseInterior(&(modifiers->interior));
-      ParseInterior(s.f.ior);
+      ParseInterior(s.finish.ior);
       break;      
     default: tokenizer->UngetToken(); return;
     }
   }
 }
 
-void NYUParser::PrintModifiers(Shape & s) {
+void NYUParser::PrintModifiers(Geometry & s) {
   /*
   printf("\tmatrix "); PrintMatrix4d(modifiers->transform);
   printf("\n"); 
@@ -319,9 +292,9 @@ void NYUParser::PrintModifiers(Shape & s) {
   PrintFinish(&(modifiers->finish));
   printf("\tinterior { ior %.3g }\n", modifiers->interior.ior);
   */
-  PrintPigment(s.p);
+  PrintPigment(s.pigment);
   cout << "\n" << endl;
-  PrintFinish(s.f);
+  PrintFinish(s.finish);
   cout << "\n" << endl;
 }
 
@@ -437,9 +410,9 @@ Sphere * NYUParser::ParseSphere() {
   //radius = 1.0;
 
   ParseLeftCurly();
-  ParseVector(s->center);
+  ParseVector(s->location);
   ParseComma();
-  s->radius = ParseDouble();
+  s->s_t.radius = ParseDouble();
 
   ParseModifiers(*s);
   ParseRightCurly();
@@ -467,9 +440,9 @@ Box * NYUParser::ParseBox() {
   //SetVect(&corner2, 0,0,0);
 
   ParseLeftCurly();
-  ParseVector(b->corner1);
+  ParseVector(b->b_t.c1);
   ParseComma();
-  ParseVector(b->corner2);
+  ParseVector(b->b_t.c2);
   ParseModifiers(*b);
   ParseRightCurly();
  
@@ -517,6 +490,7 @@ void NYUParser::ParseCylinder() {
   */
 }
 
+/*
 Cone * NYUParser::ParseCone() {
   //struct Vector base_point, cap_point;
   Vector3f base_point, cap_point;
@@ -542,8 +516,8 @@ Cone * NYUParser::ParseCone() {
   ParseModifiers(*c);
   ParseRightCurly();
 
-  /* TODO: assignment to the cone object fields should happen here;
-     for now, we just print the values */
+  // TODO: assignment to the cone object fields should happen here;
+  // for now, we just print the values
 
   //printf("cone {\n\t");
   //PrintVect(base_point); printf(", %.3g, ", base_radius); 
@@ -551,6 +525,7 @@ Cone * NYUParser::ParseCone() {
   //PrintModifiers(&modifiers);
   //printf("\n}\n");
 }
+*/
 
 void NYUParser::ParseQuadric() {
   cout << "Error: Cannot parse cylinder" << endl;
@@ -592,11 +567,11 @@ Triangle * NYUParser::ParseTriangle(){
   Triangle * t = new Triangle();
 
   ParseLeftCurly();
-  ParseVector(t->corner1);
+  ParseVector(t->t_t.c1);
   ParseComma();
-  ParseVector(t->corner2);
+  ParseVector(t->t_t.c2);
   ParseComma();
-  ParseVector(t->corner3);
+  ParseVector(t->t_t.c3);
   
   ParseModifiers(*t);
   ParseRightCurly();
@@ -607,9 +582,9 @@ Plane * NYUParser::ParsePlane(){
   Plane * p = new Plane();
 
   ParseLeftCurly();
-  ParseVector(p->normal);
+  ParseVector(p->p_t.normal);
   ParseComma();
-  p->distance = ParseDouble();
+  p->p_t.offset = ParseDouble();
 
   ParseModifiers(*p);
   ParseRightCurly();
@@ -625,7 +600,7 @@ Light * NYUParser::ParseLightSource() {
     Vector3f pos;
     
     c.r = 0; c.g = 0; c.b = 0; f =0; 
-    pos.x = 0; pos.y = 0; pos.z = 0;
+    pos(0) = 0; pos(1) = 0; pos(2) = 0;
     ParseLeftCurly();
     ParseVector(pos);
     t = tokenizer->GetToken();
@@ -637,7 +612,7 @@ Light * NYUParser::ParseLightSource() {
     //printf("\t"); PrintVect(pos); printf("\n");
     //printf("\t"); PrintColor(c); 
     //printf("\n}\n");
-    return new Light(pos.x,pos.y,pos.z,c.r,c.g,c.b);
+    return new Light(pos,c.r,c.g,c.b);
 } 
 
 void NYUParser::ParseGlobalSettings() {
@@ -674,7 +649,7 @@ void NYUParser::parse(std::fstream & input, Scene & s) {
   Token t = tokenizer->GetToken();
   Sphere * sphere;
   Box * box;
-  Cone * cone;
+  //Cone * cone;
   
   //added by mbecker
   Triangle * triangle;
@@ -685,7 +660,7 @@ void NYUParser::parse(std::fstream & input, Scene & s) {
   while(t.id != T_EOF) {  
     switch(t.id) { 
     case T_CAMERA:
-      s.camera = ParseCamera();
+      s.cam = ParseCamera();
       break;
     case T_POLYGON:
       ParsePolygon();
@@ -693,36 +668,36 @@ void NYUParser::parse(std::fstream & input, Scene & s) {
     case T_SPHERE:
       //ParseSphere();
       sphere = ParseSphere();
-      s.shapes.push_back(sphere);
-      s.spheres.push_back(sphere);
+      s.geometry.push_back(sphere);
+      s.spheres.push_back(sphere->s_t);
       break;
     case T_BOX:
       //ParseBox();
       box = ParseBox();
-      s.shapes.push_back(box);
-      s.boxes.push_back(box);
+      s.geometry.push_back(box);
+      s.boxes.push_back(box->b_t);
       break;
     case T_CYLINDER:
       ParseCylinder();
       break;
     case T_CONE:
       //ParseCone();
-      cone = ParseCone();
-      s.shapes.push_back(cone);
-      s.cones.push_back(cone);
+      //cone = ParseCone();
+      //s.shapes.push_back(cone);
+      //s.cones.push_back(cone);
       break;
     case T_QUADRIC:
       ParseQuadric();
       break;
     case T_TRIANGLE:
       triangle = ParseTriangle();
-      s.shapes.push_back(triangle);
-      s.triangles.push_back(triangle);
+      s.geometry.push_back(triangle);
+      s.triangles.push_back(triangle->t_t);
       break;
     case T_PLANE:
       plane = ParsePlane();
-      s.shapes.push_back(plane);
-      s.planes.push_back(plane);
+      s.geometry.push_back(plane);
+      s.planes.push_back(plane->p_t);
       break;
     case T_LIGHT_SOURCE:
       //ParseLightSource();
