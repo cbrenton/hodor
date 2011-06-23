@@ -17,7 +17,7 @@ class Pixel
       Pixel(double r, double g, double b);
 
       // The color of the pixel.
-      color clr;
+      color c;
 
 };
 #endif

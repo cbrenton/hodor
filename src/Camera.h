@@ -21,8 +21,14 @@ class Camera {
       Vector3f look_at;
       inline void debug()
       {
-         std::cout << "Camera: <" << location(0) << ", " << location(1) <<
-            ", " << location(2) << ">" << std::endl;
+         std::cout << "Camera: <" << location.x() << ", " << location.y() <<
+            ", " << location.z() << ">" << std::endl;
+         std::cout << "\t<" << up.x() << ", " << up.y() <<
+            ", " << up.z() << ">" << std::endl;
+         std::cout << "\t<" << right.x() << ", " << right.y() <<
+            ", " << right.z() << ">" << std::endl;
+         std::cout << "\t<" << look_at.x() << ", " << look_at.y() <<
+            ", " << look_at.z() << ">" << std::endl;
       }
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };

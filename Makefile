@@ -29,6 +29,7 @@ INPUTEXT=pov
 INPUTDIR=input
 INPUTFILE=simple
 OUTPUTDIR=output
+OUTPUTEXT=png
 ARGS = -w 320 -h 240 -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
 
 # Additional linker libraries
@@ -58,6 +59,14 @@ lib:
 
 run:
 	./$(TARGET) $(ARGS)
+
+eog:
+	eog ./$(OUTPUTDIR)/$(INPUTFILE).$(OUTPUTEXT)
+
+test:	run eog
+
+pov:
+	vim ./$(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
 
 gdb:
 	gdb --args ./$(TARGET) $(ARGS)

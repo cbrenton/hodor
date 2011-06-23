@@ -36,15 +36,15 @@ class Scene
       static Scene* read(std::fstream & input);
 
       // Checks if a ray intersects any geometry in the scene.
-      bool hit(Ray ray, HitData *data);
+      bool hit(const Ray & ray, HitData *data);
 
       // Casts a ray into the scene and returns a correctly colored pixel.
-      Pixel castRay(Ray ray, int depth);
+      Pixel castRay(const Ray & ray, int depth);
 
       // Calculates proper shading at the current point.
       Pixel shade(HitData *data, Vector3f view);
 
-      Camera cam;
+      Camera camera;
 
       // List of geometry objects (CPU only).
       std::vector<Geometry*> geometry;

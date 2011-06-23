@@ -11,7 +11,7 @@ class Geometry;
 
 struct HitData
 {
-   bool hit;
+   int hit;
 
    Vector3f point;
 

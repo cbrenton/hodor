@@ -11,16 +11,18 @@
 
 using namespace std;
 
-PngImage::PngImage(int w, int h) : Image(w, h)
+PngImage::PngImage(int w, int h, string name) : Image(w, h)
 {
+   filename = name;
    curX = 0;
    curY = 0;
+   cout << "filename: " << filename << endl;
+   png = new pngwriter(width, height, 0, filename.c_str());
 }
 
 void PngImage::write()
 {
-   cout << "filename: " << filename << endl;
-   png = new pngwriter(width, height, 0, filename.c_str());
+   /*
    for (int x = 0; x < width; x++)
    {
       curX = x;
@@ -30,12 +32,17 @@ void PngImage::write()
          writePixel(pixelData[x][y]);
       }
    }
-   png->close();
+   */
 }
 
-void PngImage::writePixel(const Pixel & pix)
+void PngImage::writePixel(int x, int y, const Pixel & pix)
 {
-   png->plot(curX, curY, (double)curX / (double)width, (double)curY / (double)height, randFloat());
+   png->plot(x, y, pix.c.r, pix.c.g, pix.c.b);
+}
+
+void PngImage::close()
+{
+   png->close();
 }
 
 string PngImage::getExt()

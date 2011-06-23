@@ -289,15 +289,15 @@ void NYUParser::ParseModifiers(Geometry & s){
          break;
       case T_PIGMENT:
          // ParsePigment(&(modifiers->pigment));
-         ParsePigment(s.pigment);
+         ParsePigment(s.p);
          break;
       case T_FINISH:
          // ParseFinish(&(modifiers->finish));
-         ParseFinish(s.finish);
+         ParseFinish(s.f);
          break;
       case T_INTERIOR:
          // ParseInterior(&(modifiers->interior));
-         ParseInterior(s.finish.ior);
+         ParseInterior(s.f.ior);
          break;
       default: tokenizer->UngetToken(); return;
       }
@@ -313,9 +313,9 @@ void NYUParser::PrintModifiers(Geometry & s){
       PrintFinish(&(modifiers->finish));
       printf("\tinterior { ior %.3g }\n", modifiers->interior.ior);
       */
-   PrintPigment(s.pigment);
+   PrintPigment(s.p);
    cout << "\n" << endl;
-   PrintFinish(s.finish);
+   PrintFinish(s.f);
    cout << "\n" << endl;
 }
 
@@ -615,6 +615,7 @@ Plane * NYUParser::ParsePlane(){
 
    ParseModifiers(*p);
    ParseRightCurly();
+   
    return p;
 }
 
@@ -692,7 +693,7 @@ void NYUParser::parse(std::fstream & input, Scene & s){
       switch(t.id)
       {
       case T_CAMERA:
-         s.cam = ParseCamera();
+         s.camera = ParseCamera();
          break;
       case T_POLYGON:
          ParsePolygon();

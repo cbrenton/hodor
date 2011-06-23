@@ -85,16 +85,11 @@ void setFilename(char* strIn)
       name = strIn;
    }
    inputFileName = name;
-}
-
-void setOutputName()
-{
    int dirIndex = (int)inputFileName.rfind('/');
    int extIndex = (int)inputFileName.rfind(POV_EXT);
    filename = "output/";
    filename.append(inputFileName.substr(dirIndex + 1, extIndex - dirIndex - 1));
-   filename.append("." + image->getExt());
-   image->filename = filename;
+   filename.append(".png");
 }
 
 void printProgress(struct timeval startTime, int d, int total, int freq)
@@ -256,9 +251,7 @@ int main(int argc, char **argv)
       }
    }
 
-   image = new PngImage(width, height);
-
-   setOutputName();
+   image = new PngImage(width, height, filename);
 
    // Open input file.
    fstream inputFileStream(inputFileName.c_str(), fstream::in);
@@ -294,33 +287,101 @@ int main(int argc, char **argv)
       aRayArray[i] = new Ray[height];
    }
 
+   float l = -scene->camera.right.norm() / 2;
+   float r = scene->camera.right.norm() / 2;
+   float b = -scene->camera.up.norm() / 2;
+   float t = scene->camera.up.norm() / 2;
+
    // Generate rays.
+   cout << "Generating rays...";
    for (int x = 0; x < image->width; x++)
    {
       for (int y = 0; y < image->height; y++)
       {
-         Ray curRay;
-         float px, py, pz;
-         px = scene->cam.location(0);
-         py = scene->cam.location(1);
-         pz = scene->cam.location(2);
-         px += (float)(y - 0.5 * (image->width - 1.0));
-         py += (float)(y - 0.5 * (image->height - 1.0));
-         curRay.point << px, py, pz;
-         curRay.dir = scene->cam.look_at;
+         float jitter = 0.5f;
+         if (numAA > 1)
+         {
+            //jitter = randFloat();
+         }
+
+         float uScale = (float)(l + (r - l) * ((float)x + jitter)
+               / (float)image->width);
+         float vScale = (float)(b + (t - b) * ((float)y + jitter)
+               / (float)image->height);
+         float wScale = -1;
+         Vector3f sVector = scene->camera.location;
+         Vector3f uVector = scene->camera.right;
+         Vector3f vVector = scene->camera.up;
+         Vector3f wVector = scene->camera.look_at - scene->camera.location;
+         uVector.normalize();
+         vVector.normalize();
+         wVector.normalize();
+         // Left-handed.
+         wVector *= -1;
+         uVector *= uScale;
+         vVector *= vScale;
+         wVector *= wScale;
+         sVector += uVector;
+         sVector += vVector;
+         sVector += wVector;
+         Vector3f rayDir = uVector + vVector + wVector;
+         rayDir.normalize();
+         Vector3f curPoint = Vector3f(scene->camera.location);
+         //Ray *curRay = new Ray(curPoint, rayDir);
+         Ray curRay(curPoint, rayDir);
+         //aRayArray[i][j][k] = *curRay;
          aRayArray[x][y] = curRay;
       }
    }
+   cout << "done." << endl;
+   
+   if (numAA > 1)
+   {
+      cout << "Using " << numAA << "x AA." << endl;
+   }
+   else
+   {
+      cout << "Antialiasing is turned off." << endl;
+   }
+
+   if (useBVH)
+   {
+      cout << "Using bounding volume heirarchy." << endl;
+   }
+   else
+   {
+      cout << "Not using bounding volume heirarchy." << endl;
+   }
+
+   // Initialize variables for timekeeping.
+   struct timeval startTime;
+   gettimeofday(&startTime, NULL);
 
    // Test for intersection.
+   cout << "Testing intersections." << endl;
    for (int x = 0; x < image->width; x++)
    {
       for (int y = 0; y < image->height; y++)
       {
-         image->pixelData[x][y] = scene->castRay(aRayArray[x][y], 1);
+         //image->pixelData[x][y] = scene->castRay(aRayArray[x][y], RECURSION_DEPTH);
+         Pixel curPix = scene->castRay(aRayArray[x][y], RECURSION_DEPTH);
+         // Write pixel out to file.
+         image->writePixel(x, y, curPix);
+         // Print out progress bar.
+         if (showProgress)
+         {
+            // Set the frequency of ticks to update every .01%, if possible.
+            int tick = max(image->width*image->height/numAA / 10000, 100);
+            printProgress(startTime, x * image->height + y,
+                  image->width * image->height, tick);
+         }
       }
    }
+   if (showProgress)
+   {
+      cout << endl;
+   }
 
-   // Write image out to file.
-   image->write();
+   // Finish writing image out to file.
+   image->close();
 }

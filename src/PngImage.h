@@ -18,13 +18,16 @@ class Pixel;
 class PngImage : public Image
 {
    public:
-      PngImage(int w, int h);
+      PngImage(int w, int h, string name);
 
       // Writes the image out to a file.
       void write();
 
       // Writes a single pixel to the file.
-      void writePixel(const Pixel & pix);
+      void writePixel(int x, int y, const Pixel & pix);
+
+      // Closes the file.
+      void close();
 
       // Gets the file extension.
       string getExt();

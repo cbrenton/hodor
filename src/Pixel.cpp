@@ -8,7 +8,7 @@
 
 Pixel::Pixel(double r, double g, double b)
 {
-   clr.r = r;
-   clr.g = g;
-   clr.b = b;
+   c.r = r;
+   c.g = g;
+   c.b = b;
 }
