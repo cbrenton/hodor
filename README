@@ -4,6 +4,12 @@ terlR exists to please its namesake.
 
 terlR is a CUDA-accelerated raytracer written by Chris Brenton.
 
+To build:
+   make lib all
+
+To run:
+   ./terlR -w [width] -h [height] -i [input file]
+
 Copyright (c) 2011, Chris Brenton
 All rights reserved.
 

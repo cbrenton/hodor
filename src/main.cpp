@@ -87,7 +87,7 @@ void setFilename(char* strIn)
    inputFileName = name;
    int dirIndex = (int)inputFileName.rfind('/');
    int extIndex = (int)inputFileName.rfind(POV_EXT);
-   filename = "output/";
+   filename = "images/";
    filename.append(inputFileName.substr(dirIndex + 1, extIndex - dirIndex - 1));
    filename.append(".png");
 }
