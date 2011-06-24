@@ -47,3 +47,9 @@ plane {<0, 1, 0>, -4
       finish {ambient 0.3 diffuse 0.8}
 }
 
+box {
+   <-1, -1, -1>,
+   <1, 1, 1>
+   pigment {color rgb <1.0, 0.0, 0.0>}
+   finish {ambient 0.2 diffuse 0.3 specular 0.7}
+}

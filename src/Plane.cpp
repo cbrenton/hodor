@@ -8,6 +8,12 @@
 #include "Ray.h"
 #include "HitData.h"
 
+Plane::Plane(Vector3f normal, float offset)
+{
+   p_t.normal = normal;
+   p_t.offset = offset;
+}
+
 // Gets the bounding box of the current geometry object.
 Box Plane::bBox()
 {

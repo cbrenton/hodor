@@ -17,6 +17,10 @@ struct HitData;
 class Plane : public Geometry
 {
    public:
+      Plane() {};
+
+      Plane(Vector3f normal, float offset);
+
       // The plane_t struct representing the geometry object.
       plane_t p_t;
 

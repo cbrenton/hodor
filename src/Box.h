@@ -9,6 +9,7 @@
 
 #include "box_t.h"
 #include "Geometry.h"
+#include "Plane.h"
 
 class Ray;
 struct HitData;
