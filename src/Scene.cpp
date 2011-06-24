@@ -114,9 +114,23 @@ Pixel Scene::shade(HitData *data, Vector3f view)
       if (!isShadow)
       {
          // Diffuse.
-         result.c.r = 1.0;
-         result.c.g = 1.0;
-         result.c.b = 1.0;
+         Vector3f n = data->object->getNormal(data->point);
+         n.normalize();
+         Vector3f l = curLight->location - data->point;
+         l.normalize();
+         float nDotL = n.dot(l);
+         nDotL = min(nDotL, 1.0f);
+         if (nDotL < 0)
+         {
+            nDotL *= -1;
+         }
+         
+         result.c.r += data->object->f.diffuse*data->object->p.c.r * nDotL *
+            curLight->r;
+         result.c.g += data->object->f.diffuse*data->object->p.c.g * nDotL *
+            curLight->g;
+         result.c.b += data->object->f.diffuse*data->object->p.c.b * nDotL *
+            curLight->b;
       }
    }
    return result;
