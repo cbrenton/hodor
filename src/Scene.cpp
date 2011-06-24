@@ -124,15 +124,37 @@ Pixel Scene::shade(HitData *data, Vector3f view)
          {
             nDotL *= -1;
          }
-         
+
          result.c.r += data->object->f.diffuse*data->object->p.c.r * nDotL *
             curLight->r;
          result.c.g += data->object->f.diffuse*data->object->p.c.g * nDotL *
             curLight->g;
          result.c.b += data->object->f.diffuse*data->object->p.c.b * nDotL *
             curLight->b;
+
+         // Specular (Phong).
+         Vector3f r = reflect(l, n);
+         r.normalize();
+         Vector3f v = view;
+         v.normalize();
+         float rDotV = r.dot(v);
+         rDotV = (float)pow(rDotV, 1.0f / data->object->f.roughness);
+         rDotV = min(rDotV, 1.0f);
+         if (rDotV > 0)
+         {
+            result.c.r += data->object->f.specular*data->object->p.c.r * rDotV *
+               curLight->r;
+            result.c.g += data->object->f.specular*data->object->p.c.g * rDotV *
+               curLight->g;
+            result.c.b += data->object->f.specular*data->object->p.c.b * rDotV *
+               curLight->b;
+         }
       }
    }
    return result;
 }
 
+Vector3f Scene::reflect(Vector3f d, Vector3f n)
+{
+   return n * (2 * (-d.dot(n))) + d;
+}

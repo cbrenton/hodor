@@ -44,6 +44,8 @@ class Scene
       // Calculates proper shading at the current point.
       Pixel shade(HitData *data, Vector3f view);
 
+      Vector3f reflect(Vector3f incident, Vector3f normal);
+
       Camera camera;
 
       // List of geometry objects (CPU only).

@@ -57,5 +57,7 @@ int Sphere::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT
 
 Vector3f Sphere::getNormal(const Vector3f & point)
 {
-   return Vector3f();
+   Vector3f n = point - s_t.location;
+   n.normalize();
+   return n;
 }

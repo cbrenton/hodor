@@ -27,10 +27,10 @@ LDFLAGS = $(OPTIMIZE) $(DEBUG) $(ERROR) -L ./lib/pngwriter/lib $(LFLAGS)
 TARGET = terlR
 INPUTEXT=pov
 INPUTDIR=input
-INPUTFILE=simple
+INPUTFILE=simple_spec
 OUTPUTDIR=images
 OUTPUTEXT=png
-ARGS = -w 320 -h 240 -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
+ARGS = -w 640 -h 480 -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
 
 # Additional linker libraries
 LIBS = $(LIBFLAGS)
