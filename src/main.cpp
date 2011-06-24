@@ -384,4 +384,14 @@ int main(int argc, char **argv)
 
    // Finish writing image out to file.
    image->close();
+   
+   for (int i = 0; i < width; i++)
+   {
+      delete[] aRayArray[i];
+   }
+   delete[] aRayArray;
+   
+   delete image;
+
+   delete scene;
 }

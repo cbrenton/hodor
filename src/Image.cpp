@@ -23,6 +23,9 @@ Image::Image(int w, int h) :
 Image::~Image()
 {
    // Delete pixelData.
+   for (int x = 0; x < width; x++) {
+      delete[] pixelData[width];
+   }
 }
 
 string Image::getExt()

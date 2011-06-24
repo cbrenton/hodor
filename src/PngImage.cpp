@@ -14,25 +14,17 @@ using namespace std;
 PngImage::PngImage(int w, int h, string name) : Image(w, h)
 {
    filename = name;
-   curX = 0;
-   curY = 0;
    cout << "filename: " << filename << endl;
    png = new pngwriter(width, height, 0, filename.c_str());
 }
 
+PngImage::~PngImage()
+{
+   delete png;
+}
+
 void PngImage::write()
 {
-   /*
-   for (int x = 0; x < width; x++)
-   {
-      curX = x;
-      for (int y = 0; y < height; y++)
-      {
-         curY = y;
-         writePixel(pixelData[x][y]);
-      }
-   }
-   */
 }
 
 void PngImage::writePixel(int x, int y, const Pixel & pix)

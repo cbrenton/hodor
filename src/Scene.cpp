@@ -25,12 +25,15 @@ void Scene::constructBVH()
 Scene* Scene::read(std::fstream & input)
 {
    Scene* curScene = new Scene();
-   NYUParser parser;
-   parser.parse(input, *curScene);
+   NYUParser *parser = new NYUParser;
+   parser->parse(input, *curScene);
+   /*
    for (int geomNdx = 0; geomNdx < (int)curScene->geometry.size(); geomNdx++)
    {
       curScene->geometry[geomNdx]->debug();
    }
+   */
+   delete parser;
    return curScene;
 }
 
@@ -63,6 +66,7 @@ bool Scene::hit(const Ray & ray, HitData *data)
          // ENDIF
       }
       // ENDIF
+      delete geomData;
    }
    // ENDFOR
    // IF data is not null
@@ -72,6 +76,7 @@ bool Scene::hit(const Ray & ray, HitData *data)
       *data = *closestData;
    }
    // ENDIF
+   delete closestData;
    // RETURN true if closestT is less than or equal to MAX_DIST
    return (closestT <= MAX_DIST);
 }

@@ -27,10 +27,13 @@ LDFLAGS = $(OPTIMIZE) $(DEBUG) $(ERROR) -L ./lib/pngwriter/lib $(LFLAGS)
 TARGET = terlR
 INPUTEXT=pov
 INPUTDIR=input
-INPUTFILE=simple_spec
+INPUTFILE=bunny_small
+#INPUTFILE=simple_spec
 OUTPUTDIR=images
 OUTPUTEXT=png
-ARGS = -w 640 -h 480 -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
+WIDTH=320
+HEIGHT=240
+ARGS = -w $(WIDTH) -h $(HEIGHT) -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
 
 # Additional linker libraries
 LIBS = $(LIBFLAGS)
@@ -70,6 +73,8 @@ pov:
 
 gdb:
 	gdb --args ./$(TARGET) $(ARGS)
+
+vg:	valgrind
 
 valgrind:
 	valgrind --tool=memcheck --leak-check=full ./$(TARGET) $(ARGS)

@@ -20,6 +20,8 @@ class PngImage : public Image
    public:
       PngImage(int w, int h, string name);
 
+      ~PngImage();
+
       // Writes the image out to a file.
       void write();
 
@@ -33,8 +35,6 @@ class PngImage : public Image
       string getExt();
 
    protected:
-      int curX, curY;
-
       pngwriter *png;
 
 };
