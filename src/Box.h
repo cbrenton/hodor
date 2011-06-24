@@ -16,6 +16,10 @@ struct HitData;
 class Box : public Geometry
 {
    public:
+      Box() {};
+
+      Box(Vector3f c1, Vector3f c2);
+
       // The box_t struct representing the geometry object.
       box_t b_t;
 

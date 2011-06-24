@@ -8,6 +8,12 @@
 #include "Ray.h"
 #include "HitData.h"
 
+Box::Box(Vector3f c1, Vector3f c2)
+{
+   b_t.c1 = c1;
+   b_t.c2 = c2;
+}
+
 // Gets the bounding box of the current geometry object.
 Box Box::bBox()
 {
