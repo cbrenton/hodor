@@ -261,18 +261,18 @@ Pixel Scene::shade(HitData *data, Vector3f view)
       // GPU.
       if (useGPU)
       {
-         result.c.r = (hitF.ambient*hitP.c.r) * curLight->r;
-         result.c.g = (hitF.ambient*hitP.c.g) * curLight->g;
-         result.c.b = (hitF.ambient*hitP.c.b) * curLight->b;
+         result.c.r += (hitF.ambient*hitP.c.r) * curLight->r;
+         result.c.g += (hitF.ambient*hitP.c.g) * curLight->g;
+         result.c.b += (hitF.ambient*hitP.c.b) * curLight->b;
       }
       // CPU.
       else
       {
-         result.c.r = (data->object->f.ambient*data->object->p.c.r) *
+         result.c.r += (data->object->f.ambient*data->object->p.c.r) *
             curLight->r;
-         result.c.g = (data->object->f.ambient*data->object->p.c.g) *
+         result.c.g += (data->object->f.ambient*data->object->p.c.g) *
             curLight->g;
-         result.c.b = (data->object->f.ambient*data->object->p.c.b) *
+         result.c.b += (data->object->f.ambient*data->object->p.c.b) *
             curLight->b;
       }
 
