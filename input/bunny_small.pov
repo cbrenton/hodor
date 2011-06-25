@@ -9,8 +9,9 @@ light_source { <300, 100, 300> color rgb <1.0, 1.0, 1.0> }
 
 plane { <0, 1, 0>, -3
     pigment { color rgb <0.5, 0.3, 0.3> }
-    finish { ambient 0.2 diffuse 0.6 specular 0.2 roughness 0.05 }
+    finish { ambient 0.2 diffuse 0.6 specular 0.0 roughness 0.05 }
 }
+    //finish { ambient 0.2 diffuse 0.6 specular 0.2 roughness 0.05 }
 
 // ===== begin export of bun_zipper_res4.obj (453 verts) to spheres =====
 

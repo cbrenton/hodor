@@ -16,6 +16,8 @@ class Pixel
 
       Pixel(double r, double g, double b);
 
+      void clamp();
+
       // The color of the pixel.
       color c;
 

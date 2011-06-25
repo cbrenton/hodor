@@ -42,7 +42,7 @@ int Plane::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT)
    return 0;
 }
 
-Vector3f Plane::getNormal(Vector3f point)
+Vector3f Plane::getNormal(const Vector3f & point)
 {
    return p_t.normal;
 }

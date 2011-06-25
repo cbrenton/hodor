@@ -16,19 +16,19 @@ KILL   = killall -9
 SHELL  = /bin/sh
 MAKE   = make
 
-LIBFLAGS = -I ./lib -I ./lib/pngwriter/include
-LFLAGS = -lpng -lz -DNO_FREETYPE -lpngwriter
+IFLAGS = -I./lib -I./lib/pngwriter/include -DNO_FREETYPE
+LFLAGS = -lpng -lz -lpngwriter -L./lib/pngwriter/lib
 DEBUG = -ggdb
 OPTIMIZE = -O3
 ERROR = -Wconversion -Werror
-CFLAGS = $(OPTIMIZE) -Wall -c $(DEBUG) $(ERROR) $(LIBFLAGS) $(LFLAGS)
-LDFLAGS = $(OPTIMIZE) $(DEBUG) $(ERROR) -L ./lib/pngwriter/lib $(LFLAGS)
+CFLAGS = $(OPTIMIZE) -Wall -c $(DEBUG) $(ERROR) $(IFLAGS)
+LDFLAGS = $(OPTIMIZE) $(DEBUG) $(ERROR) $(LFLAGS)
 
 TARGET = terlR
 INPUTEXT=pov
 INPUTDIR=input
-#INPUTFILE=bunny_small
-INPUTFILE=simple_tri
+INPUTFILE=bunny_small
+#INPUTFILE=simple_spec
 OUTPUTDIR=images
 OUTPUTEXT=png
 WIDTH=640

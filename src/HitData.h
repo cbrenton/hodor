@@ -19,5 +19,9 @@ struct HitData
 
    Geometry *object;
 
+   Vector3f *reflect;
+   
+   Vector3f *refract;
+
 };
 #endif
