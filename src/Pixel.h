@@ -18,6 +18,10 @@ class Pixel
 
       void clamp();
 
+      void add(Pixel other);
+
+      void multiply(double factor);
+
       // The color of the pixel.
       color c;
 

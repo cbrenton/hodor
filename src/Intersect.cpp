@@ -69,10 +69,19 @@ int box_hit(const box_t & b_t, const Ray & ray, float *t, HitData *data)
    data->point = ray.point + ray.dir * (*t);
    data->t = (*t);
    data->hitType = BOX_HIT;
+   if (b_t.f.reflection > 0.0)
+   {
+      data->reflect = new Vector3f();
+      *data->reflect = mReflect(ray.dir, box_normal(b_t, data));
+   }
+   else
+   {
+      data->reflect = NULL;
+   }
    return 1;
 }
 
-Vector3f boxNormal(const box_t & b_t, HitData *data)
+Vector3f box_normal(const box_t & b_t, HitData *data)
 {
    if (closeEnough(data->point.x(), b_t.left.offset))
    {
@@ -119,12 +128,21 @@ int plane_hit(const plane_t & p_t, const Ray & ray, float *t, HitData *data)
       data->point = ray.point + ray.dir * (*t);
       data->t = (*t);
       data->hitType = PLANE_HIT;
+      if (p_t.f.reflection > 0.0)
+      {
+         data->reflect = new Vector3f();
+         *data->reflect = mReflect(ray.dir, plane_normal(p_t));
+      }
+      else
+      {
+         data->reflect = NULL;
+      }
       return 1;
    }
    return 0;
 }
 
-Vector3f planeNormal(const plane_t & p_t)
+Vector3f plane_normal(const plane_t & p_t)
 {
    return p_t.normal;
 }
@@ -161,16 +179,34 @@ int sphere_hit(const sphere_t & s_t, const Ray & ray, float *t, HitData *data)
    if (l2 < r2)
    {
       data->hit = -1;
+      if (s_t.f.reflection > 0.0)
+      {
+         data->reflect = new Vector3f();
+         *data->reflect = mReflect(ray.dir, sphere_normal(s_t, data));
+      }
+      else
+      {
+         data->reflect = NULL;
+      }
       return -1;
    }
    else
    {
       data->hit = 1;
+      if (s_t.f.reflection > 0.0)
+      {
+         data->reflect = new Vector3f();
+         *data->reflect = mReflect(ray.dir, sphere_normal(s_t, data));
+      }
+      else
+      {
+         data->reflect = NULL;
+      }
       return 1;
    }
 }
 
-Vector3f sphereNormal(const sphere_t & s_t, HitData *data)
+Vector3f sphere_normal(const sphere_t & s_t, HitData *data)
 {
    Vector3f n = data->point - s_t.location;
    n.normalize();
@@ -184,9 +220,9 @@ int triangle_hit(const triangle_t & t_t, const Ray & ray, float *t, HitData *dat
 
    Matrix3f A;
    A <<
-     t_t.c1.x()-t_t.c2.x(), t_t.c1.x()-t_t.c3.x(), ray.dir.x(),
-     t_t.c1.y()-t_t.c2.y(), t_t.c1.y()-t_t.c3.y(), ray.dir.y(),
-     t_t.c1.z()-t_t.c2.z(), t_t.c1.z()-t_t.c3.z(), ray.dir.z();
+      t_t.c1.x()-t_t.c2.x(), t_t.c1.x()-t_t.c3.x(), ray.dir.x(),
+      t_t.c1.y()-t_t.c2.y(), t_t.c1.y()-t_t.c3.y(), ray.dir.y(),
+      t_t.c1.z()-t_t.c2.z(), t_t.c1.z()-t_t.c3.z(), ray.dir.z();
    float detA = A.determinant();
 
    Matrix3f baryT;
@@ -231,7 +267,7 @@ int triangle_hit(const triangle_t & t_t, const Ray & ray, float *t, HitData *dat
          }
       }
    }
-  
+
    if (result != 0)
    {
       result = bT;
@@ -248,7 +284,7 @@ int triangle_hit(const triangle_t & t_t, const Ray & ray, float *t, HitData *dat
    return 0;
 }
 
-Vector3f triangleNormal(const triangle_t & t_t)
+Vector3f triangle_normal(const triangle_t & t_t)
 {
    Vector3f s1 = t_t.c2 - t_t.c1;
    Vector3f s2 = t_t.c3 - t_t.c1;

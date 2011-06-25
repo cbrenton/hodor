@@ -22,3 +22,17 @@ void Pixel::clamp()
    c.g = min(max(c.g, 0.0), 1.0);
    c.b = min(max(c.b, 0.0), 1.0);
 }
+
+void Pixel::add(Pixel other)
+{
+   c.r += other.c.r;
+   c.g += other.c.g;
+   c.b += other.c.b;
+}
+
+void Pixel::multiply(double factor)
+{
+   c.r *= factor;
+   c.g *= factor;
+   c.b *= factor;
+}
