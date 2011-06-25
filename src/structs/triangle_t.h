@@ -8,6 +8,9 @@
 #define _TRIANGLE_T_H
 
 #include <Eigen/Dense>
+#include "structs/Pigment.h"
+#include "structs/Finish.h"
+
 using Eigen::Vector3f;
 
 struct triangle_t
@@ -20,6 +23,10 @@ struct triangle_t
 
    // The third corner of the triangle.
    Vector3f c3;
+
+   Pigment p;
+
+   Finish f;
 
 };
 #endif

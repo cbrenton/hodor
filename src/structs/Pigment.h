@@ -9,11 +9,11 @@
 
 #include "structs/color.h"
 
-class Pigment
+struct Pigment
 {
-   public:
-      color c;
-      float f;
+   color c;
+   
+   float f;
 
 };
 #endif

@@ -25,6 +25,12 @@ struct HitData
 
    Geometry *object;
 
+   int hitType;
+
+   int objIndex;
+
+   int faceIndex;
+
    Vector3f *reflect;
 
    Vector3f *refract;

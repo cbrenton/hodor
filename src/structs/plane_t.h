@@ -8,6 +8,9 @@
 #define _PLANE_T_H
 
 #include <Eigen/Dense>
+#include "structs/Pigment.h"
+#include "structs/Finish.h"
+
 using Eigen::Vector3f;
 
 struct plane_t
@@ -17,6 +20,10 @@ struct plane_t
 
    // The plane offset ('d' in the plane's implicit equation).
    float offset;
+
+   Pigment p;
+
+   Finish f;
 
 };
 #endif

@@ -31,6 +31,7 @@ Scene *scene;
 string inputFileName;
 string filename;
 bool useBVH = false;
+bool useGPU = false;
 bool showProgress = true;
 int width = DEFAULT_W;
 int height = DEFAULT_H;
@@ -215,7 +216,7 @@ int main(int argc, char **argv)
    srand((int)time(NULL));
 
    int c;
-   while ((c = getopt(argc, argv, "a::A::bBi:I:h:H:pPw:W:")) != -1)
+   while ((c = getopt(argc, argv, "a::A::bBgGi:I:h:H:pPw:W:")) != -1)
    {
       switch (c)
       {
@@ -231,6 +232,9 @@ int main(int argc, char **argv)
          break;
       case 'b': case 'B':
          useBVH = true;
+         break;
+      case 'g': case 'G':
+         useGPU = true;
          break;
       case 'h': case 'H':
          setHeight(optarg);
@@ -265,6 +269,7 @@ int main(int argc, char **argv)
 
    // Parse scene.
    scene = Scene::read(inputFileStream);
+   scene->useGPU = useGPU;
 
    // Close input file.
    inputFileStream.close();

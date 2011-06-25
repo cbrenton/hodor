@@ -442,6 +442,8 @@ Sphere * NYUParser::ParseSphere()
    s->s_t.radius = ParseDouble();
 
    ParseModifiers(*s);
+   s->s_t.p = s->p;
+   s->s_t.f = s->f;
    ParseRightCurly();
 
 
@@ -471,6 +473,8 @@ Box * NYUParser::ParseBox(){
    ParseComma();
    ParseVector(b->b_t.c2);
    ParseModifiers(*b);
+   b->b_t.p = b->p;
+   b->b_t.f = b->f;
    ParseRightCurly();
 
    /* TODO: assignment to the box object fields should happen here;
@@ -601,6 +605,8 @@ Triangle * NYUParser::ParseTriangle(){
    ParseVector(t->t_t.c3);
 
    ParseModifiers(*t);
+   t->t_t.p = t->p;
+   t->t_t.f = t->f;
    ParseRightCurly();
    return t;
 }
@@ -614,6 +620,8 @@ Plane * NYUParser::ParsePlane(){
    p->p_t.offset = ParseDouble();
 
    ParseModifiers(*p);
+   p->p_t.p = p->p;
+   p->p_t.f = p->f;
    ParseRightCurly();
    
    return p;

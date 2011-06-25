@@ -30,7 +30,8 @@ int Triangle::hit(const Ray & ray, float *t, HitData *data, float minT, float ma
    float bBeta, bGamma, bT;
 
    Matrix3f A;
-   A << t_t.c1.x()-t_t.c2.x(), t_t.c1.x()-t_t.c3.x(), ray.dir.x(),
+   A <<
+     t_t.c1.x()-t_t.c2.x(), t_t.c1.x()-t_t.c3.x(), ray.dir.x(),
      t_t.c1.y()-t_t.c2.y(), t_t.c1.y()-t_t.c3.y(), ray.dir.y(),
      t_t.c1.z()-t_t.c2.z(), t_t.c1.z()-t_t.c3.z(), ray.dir.z();
    float detA = A.determinant();

@@ -7,13 +7,12 @@
 #ifndef _GEOMETRY_H
 #define _GEOMETRY_H
 
-#include "geom/Pigment.h"
-#include "geom/Finish.h"
+#include "structs/Pigment.h"
+#include "structs/Finish.h"
 #include <iostream>
 #include <Eigen/Dense>
 
 #define MAX_DIST 10000.0f
-#define EPSILON 0.001f
 
 using namespace Eigen;
 using namespace std;

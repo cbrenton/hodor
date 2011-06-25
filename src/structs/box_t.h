@@ -8,8 +8,11 @@
 #define _BOX_T_H
 
 #include <Eigen/Dense>
-using Eigen::Vector3f;
 #include "structs/plane_t.h"
+#include "structs/Pigment.h"
+#include "structs/Finish.h"
+
+using Eigen::Vector3f;
 
 struct box_t
 {
@@ -30,6 +33,10 @@ struct box_t
    plane_t back;
 
    plane_t front;
+
+   Pigment p;
+
+   Finish f;
 
 };
 #endif

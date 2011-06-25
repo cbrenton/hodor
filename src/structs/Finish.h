@@ -7,14 +7,9 @@
 #ifndef _FINISH_H
 #define _FINISH_H
 
-class Finish
+struct Finish
 {
    public:
-      Finish() :
-         ambient(0.0), specular(0.0), diffuse(0.0), roughness(0.0),
-         reflection(0.0), refraction(0.0), ior(0.0)
-      {};
-
       double ambient;
 
       double specular;

@@ -8,6 +8,9 @@
 #define _SPHERE_T_H
 
 #include <Eigen/Dense>
+#include "structs/Pigment.h"
+#include "structs/Finish.h"
+
 using Eigen::Vector3f;
 
 struct sphere_t
@@ -17,6 +20,10 @@ struct sphere_t
 
    // The location in world space of the sphere.
    Vector3f location;
+
+   Pigment p;
+
+   Finish f;
 
 };
 #endif
