@@ -8,7 +8,7 @@
 #define _TGAIMAGE_H
 
 #include <string>
-#include "Image.h"
+#include "img/Image.h"
 using namespace std;
 
 class Pixel;

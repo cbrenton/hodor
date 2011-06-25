@@ -10,9 +10,9 @@
 
 #include "Globals.h"
 #include "Pixel.h"
-#include "Image.h"
-#include "TgaImage.h"
-#include "PngImage.h"
+#include "img/Image.h"
+#include "img/TgaImage.h"
+#include "img/PngImage.h"
 #include "Scene.h"
 
 #define POV_EXT ".pov"

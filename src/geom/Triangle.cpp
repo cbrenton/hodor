@@ -4,9 +4,9 @@
  * @date 06/20/2011
  */
 
-#include "Triangle.h"
+#include "geom/Triangle.h"
 #include "Ray.h"
-#include "HitData.h"
+#include "structs/HitData.h"
 #include "Globals.h"
 
 // Gets the bounding box of the current geometry object.

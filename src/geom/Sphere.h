@@ -7,9 +7,9 @@
 #ifndef _SPHERE_H
 #define _SPHERE_H
 
-#include "sphere_t.h"
-#include "Geometry.h"
-#include "Box.h"
+#include "structs/sphere_t.h"
+#include "geom/Geometry.h"
+#include "geom/Box.h"
 
 class Ray;
 struct HitData;

@@ -4,9 +4,9 @@
  * @date 06/20/2011
  */
 
-#include "Plane.h"
+#include "geom/Plane.h"
 #include "Ray.h"
-#include "HitData.h"
+#include "structs/HitData.h"
 
 Plane::Plane(Vector3f normal, float offset)
 {

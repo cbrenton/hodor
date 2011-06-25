@@ -8,7 +8,7 @@
 #define _PNGIMAGE_H
 
 #include <string>
-#include "Image.h"
+#include "img/Image.h"
 #include <pngwriter.h>
 
 using namespace std;

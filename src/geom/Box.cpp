@@ -4,9 +4,9 @@
  * @date 06/20/2011
  */
 
-#include "Box.h"
+#include "geom/Box.h"
 #include "Ray.h"
-#include "HitData.h"
+#include "structs/HitData.h"
 
 Box::Box(Vector3f c1, Vector3f c2)
 {

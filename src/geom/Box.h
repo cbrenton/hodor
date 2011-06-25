@@ -1,28 +1,28 @@
 /**
- * A geometry object representing a plane.
+ * A geometry object representing a box.
  * @author Chris Brenton
  * @date 06/20/2011
  */
 
-#ifndef _PLANE_H
-#define _PLANE_H
+#ifndef _BOX_H
+#define _BOX_H
 
-#include "plane_t.h"
-#include "Geometry.h"
-#include "Box.h"
+#include "structs/box_t.h"
+#include "geom/Geometry.h"
+#include "Plane.h"
 
 class Ray;
 struct HitData;
 
-class Plane : public Geometry
+class Box : public Geometry
 {
    public:
-      Plane() {};
+      Box() {};
 
-      Plane(Vector3f normal, float offset);
+      Box(Vector3f c1, Vector3f c2);
 
-      // The plane_t struct representing the geometry object.
-      plane_t p_t;
+      // The box_t struct representing the geometry object.
+      box_t b_t;
 
       // Gets the bounding box of the current geometry object.
       Box bBox();
@@ -32,11 +32,6 @@ class Plane : public Geometry
 
       // Returns the normal of the current geometry object at the specified point.
       Vector3f getNormal(const Vector3f & point);
-
-      inline void debug()
-      {
-         cout << "Plane: <" << p_t.normal.x() << ", " << p_t.normal.y() << ", " << p_t.normal.z() << ">, " << p_t.offset << endl;
-      }
 
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

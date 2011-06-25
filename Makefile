@@ -16,7 +16,7 @@ KILL   = killall -9
 SHELL  = /bin/sh
 MAKE   = make
 
-IFLAGS = -I./lib -I./lib/pngwriter/include -DNO_FREETYPE
+IFLAGS = -I./src -I./lib -I./lib/pngwriter/include -DNO_FREETYPE
 LFLAGS = -lpng -lz -lpngwriter -L./lib/pngwriter/lib
 DEBUG = -ggdb
 OPTIMIZE = -O3
@@ -42,7 +42,7 @@ LIBS = $(LIBFLAGS)
 # Nothing should need changing below this line
 
 # The source files
-SRCS = $(wildcard src/*.cpp)
+SRCS = $(wildcard src/*.cpp src/*/*.cpp)
 #SRCS = $(wildcard *.cpp)
 
 OBJS = $(SRCS:.cpp=.o)

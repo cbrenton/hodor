@@ -7,7 +7,7 @@
 #ifndef _PIXEL_H
 #define _PIXEL_H
 
-#include "color.h"
+#include "structs/color.h"
 
 class Pixel
 {

@@ -7,7 +7,7 @@
 #ifndef _PIGMENT_H
 #define _PIGMENT_H
 
-#include "color.h"
+#include "structs/color.h"
 
 class Pigment
 {

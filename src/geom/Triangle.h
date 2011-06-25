@@ -1,27 +1,25 @@
 /**
- * A geometry object representing a triangle mesh (mesh2 in the povray format).
+ * A geometry object representing a triangle.
  * @author Chris Brenton
  * @date 06/20/2011
  */
 
-#ifndef _MESH2_H
-#define _MESH2_H
+#ifndef _TRIANGLE_H
+#define _TRIANGLE_H
 
-#include "Triangle.h"
-#include "Box.h"
-#include "Geometry.h"
-#include <vector>
+#include "structs/triangle_t.h"
+#include "geom/Geometry.h"
+#include "geom/Box.h"
 
 class Ray;
 struct HitData;
 
-class Mesh2 : public Geometry
+class Triangle : public Geometry
 {
-   protected:
-      // A vector containing the triangles represented by the mesh.
-      std::vector<Triangle> faces;
-
    public:
+      // The triangle_t struct representing the geometry object.
+      triangle_t t_t;
+
       // Gets the bounding box of the current geometry object.
       Box bBox();
 
@@ -30,6 +28,13 @@ class Mesh2 : public Geometry
 
       // Returns the normal of the current geometry object at the specified point.
       Vector3f getNormal(const Vector3f & point);
+
+      inline void debug()
+      {
+         cout << "Triangle: <" << t_t.c1.x() << ", " << t_t.c1.y() << ", " << t_t.c1.z() << ">" << endl;
+         cout << "\t<" << t_t.c2.x() << ", " << t_t.c2.y() << ", " << t_t.c2.z() << ">" << endl;
+         cout << "\t<" << t_t.c3.x() << ", " << t_t.c3.y() << ", " << t_t.c3.z() << ">" << endl;
+      }
 
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

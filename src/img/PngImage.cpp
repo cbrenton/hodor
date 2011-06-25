@@ -5,7 +5,7 @@
  */
 
 #include <iostream>
-#include "PngImage.h"
+#include "img/PngImage.h"
 #include "Pixel.h"
 #include "Globals.h"
 

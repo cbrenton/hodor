@@ -4,7 +4,7 @@
  * @date 06/22/2011
  */
 
-#include "TgaImage.h"
+#include "img/TgaImage.h"
 #include "Pixel.h"
 #include <iostream>
 

@@ -1,24 +1,28 @@
 /**
- * A geometry object representing a triangle.
+ * A geometry object representing a plane.
  * @author Chris Brenton
  * @date 06/20/2011
  */
 
-#ifndef _TRIANGLE_H
-#define _TRIANGLE_H
+#ifndef _PLANE_H
+#define _PLANE_H
 
-#include "triangle_t.h"
-#include "Geometry.h"
-#include "Box.h"
+#include "structs/plane_t.h"
+#include "geom/Geometry.h"
+#include "geom/Box.h"
 
 class Ray;
 struct HitData;
 
-class Triangle : public Geometry
+class Plane : public Geometry
 {
    public:
-      // The triangle_t struct representing the geometry object.
-      triangle_t t_t;
+      Plane() {};
+
+      Plane(Vector3f normal, float offset);
+
+      // The plane_t struct representing the geometry object.
+      plane_t p_t;
 
       // Gets the bounding box of the current geometry object.
       Box bBox();
@@ -31,9 +35,7 @@ class Triangle : public Geometry
 
       inline void debug()
       {
-         cout << "Triangle: <" << t_t.c1.x() << ", " << t_t.c1.y() << ", " << t_t.c1.z() << ">" << endl;
-         cout << "\t<" << t_t.c2.x() << ", " << t_t.c2.y() << ", " << t_t.c2.z() << ">" << endl;
-         cout << "\t<" << t_t.c3.x() << ", " << t_t.c3.y() << ", " << t_t.c3.z() << ">" << endl;
+         cout << "Plane: <" << p_t.normal.x() << ", " << p_t.normal.y() << ", " << p_t.normal.z() << ">, " << p_t.offset << endl;
       }
 
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW

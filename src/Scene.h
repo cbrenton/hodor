@@ -8,20 +8,20 @@
 #define _SCENE_H
 
 #include <vector>
-#include "Geometry.h"
+#include "geom/Geometry.h"
 #include "Camera.h"
 #include "Light.h"
-#include "Box.h"
-#include "Mesh2.h"
-#include "Plane.h"
-#include "Sphere.h"
-#include "Triangle.h"
-#include "sphere_t.h"
-#include "plane_t.h"
-#include "triangle_t.h"
-#include "box_t.h"
+#include "geom/Box.h"
+#include "geom/Mesh2.h"
+#include "geom/Plane.h"
+#include "geom/Sphere.h"
+#include "geom/Triangle.h"
+#include "structs/sphere_t.h"
+#include "structs/plane_t.h"
+#include "structs/triangle_t.h"
+#include "structs//box_t.h"
 #include "Ray.h"
-#include "HitData.h"
+#include "structs/HitData.h"
 #include "Pixel.h"
 
 class NYUParser;

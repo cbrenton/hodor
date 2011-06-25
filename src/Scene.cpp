@@ -7,7 +7,7 @@
 #include <iostream>
 #include "Scene.h"
 #include "Globals.h"
-#include "nyuparser.h"
+#include "parse/nyuparser.h"
 
 using namespace std;
 
@@ -102,9 +102,12 @@ Pixel Scene::shade(HitData *data, Vector3f view)
    {
       Light *curLight = lights[lightNdx];
       // Ambient.
-      result.c.r = (data->object->f.ambient*data->object->p.c.r) * curLight->r;
-      result.c.g = (data->object->f.ambient*data->object->p.c.g) * curLight->g;
-      result.c.b = (data->object->f.ambient*data->object->p.c.b) * curLight->b;
+      result.c.r = (data->object->f.ambient*data->object->p.c.r) *
+         curLight->r;
+      result.c.g = (data->object->f.ambient*data->object->p.c.g) *
+         curLight->g;
+      result.c.b = (data->object->f.ambient*data->object->p.c.b) *
+         curLight->b;
 
       // Cast light feeler ray.
       Ray feeler;
@@ -133,12 +136,12 @@ Pixel Scene::shade(HitData *data, Vector3f view)
 
          if (nDotL > 0)
          {
-            result.c.r += data->object->f.diffuse*data->object->p.c.r * nDotL *
-               curLight->r;
-            result.c.g += data->object->f.diffuse*data->object->p.c.g * nDotL *
-               curLight->g;
-            result.c.b += data->object->f.diffuse*data->object->p.c.b * nDotL *
-               curLight->b;
+            result.c.r += data->object->f.diffuse*data->object->p.c.r *
+               nDotL * curLight->r;
+            result.c.g += data->object->f.diffuse*data->object->p.c.g *
+               nDotL * curLight->g;
+            result.c.b += data->object->f.diffuse*data->object->p.c.b *
+               nDotL * curLight->b;
          }
 
          // Specular (Phong).
@@ -152,12 +155,12 @@ Pixel Scene::shade(HitData *data, Vector3f view)
          
          if (rDotV > 0)
          {
-            result.c.r += data->object->f.specular*data->object->p.c.r * rDotV *
-               curLight->r;
-            result.c.g += data->object->f.specular*data->object->p.c.g * rDotV *
-               curLight->g;
-            result.c.b += data->object->f.specular*data->object->p.c.b * rDotV *
-               curLight->b;
+            result.c.r += data->object->f.specular*data->object->p.c.r *
+               rDotV * curLight->r;
+            result.c.g += data->object->f.specular*data->object->p.c.g *
+               rDotV * curLight->g;
+            result.c.b += data->object->f.specular*data->object->p.c.b *
+               rDotV * curLight->b;
          }
       }
    }

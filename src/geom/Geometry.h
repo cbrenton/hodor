@@ -7,8 +7,8 @@
 #ifndef _GEOMETRY_H
 #define _GEOMETRY_H
 
-#include "Pigment.h"
-#include "Finish.h"
+#include "geom/Pigment.h"
+#include "geom/Finish.h"
 #include <iostream>
 #include <Eigen/Dense>
 

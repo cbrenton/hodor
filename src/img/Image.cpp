@@ -4,7 +4,7 @@
  * @date 06/20/2011
  */
 
-#include "Image.h"
+#include "img/Image.h"
 #include "Pixel.h"
 
 Image::Image(int w, int h) :

@@ -9,7 +9,7 @@
 
 #include <Eigen/Dense>
 using Eigen::Vector3f;
-#include "plane_t.h"
+#include "structs/plane_t.h"
 
 struct box_t
 {

@@ -1,10 +1,9 @@
 #ifndef NYUPARSER_H
 #define NYUPARSER_H
 
-// #include "parser.h"
-#include "tokens.h"
+#include "parse/tokens.h"
 #include "Scene.h"
-#include "Transformation.h"
+#include "geom/Transformation.h"
 
 class NYUParser{
    private:

@@ -4,10 +4,10 @@
  * @date 06/20/2011
  */
 
-#include "Geometry.h"
+#include "geom/Geometry.h"
 #include "Ray.h"
 #include "Box.h"
-#include "HitData.h"
+#include "structs/HitData.h"
 
 Box Geometry::bBox()
 {

@@ -1,29 +1,27 @@
 /**
- * A geometry object representing a box.
+ * A geometry object representing a triangle mesh (mesh2 in the povray format).
  * @author Chris Brenton
  * @date 06/20/2011
  */
 
-#ifndef _BOX_H
-#define _BOX_H
+#ifndef _MESH2_H
+#define _MESH2_H
 
-#include "box_t.h"
-#include "Geometry.h"
-#include "Plane.h"
+#include "geom/Triangle.h"
+#include "geom/Box.h"
+#include "geom/Geometry.h"
+#include <vector>
 
 class Ray;
 struct HitData;
 
-class Box : public Geometry
+class Mesh2 : public Geometry
 {
+   protected:
+      // A vector containing the triangles represented by the mesh.
+      std::vector<Triangle> faces;
+
    public:
-      Box() {};
-
-      Box(Vector3f c1, Vector3f c2);
-
-      // The box_t struct representing the geometry object.
-      box_t b_t;
-
       // Gets the bounding box of the current geometry object.
       Box bBox();
 
