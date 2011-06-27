@@ -7,23 +7,31 @@
 #include "geom/Box.h"
 #include "Ray.h"
 #include "structs/HitData.h"
+#include "Globals.h"
 
 Box::Box(Vector3f c1, Vector3f c2)
 {
-   b_t.c1 = c1;
-   b_t.c2 = c2;
-   b_t.left.normal = Vector3f(1, 0, 0);
-   b_t.left.offset = c1.x();
-   b_t.right.normal = Vector3f(-1, 0, 0);
-   b_t.right.offset = -c2.x();
-   b_t.bottom.normal = Vector3f(0, 1, 0);
-   b_t.bottom.offset = c1.y();
-   b_t.top.normal = Vector3f(0, -1, 0);
-   b_t.top.offset = -c2.y();
-   b_t.front.normal = Vector3f(0, 0, 1);
-   b_t.front.offset = c1.z();
+   Vector3f tmpC1(0.0, 0.0, 0.0);
+   Vector3f tmpC2(0.0, 0.0, 0.0);
+   for (int dim = 0; dim < 3; dim++)
+   {
+      tmpC1[dim] = min(c1[dim], c2[dim]);
+      tmpC2[dim] = max(c1[dim], c2[dim]);
+   }
+   b_t.c1 = tmpC1;
+   b_t.c2 = tmpC2;
+   b_t.left.normal = Vector3f(-1, 0, 0);
+   b_t.left.offset = b_t.c1.x();
+   b_t.right.normal = Vector3f(1, 0, 0);
+   b_t.right.offset = b_t.c2.x();
+   b_t.bottom.normal = Vector3f(0, -1, 0);
+   b_t.bottom.offset = b_t.c1.y();
+   b_t.top.normal = Vector3f(0, 1, 0);
+   b_t.top.offset = b_t.c2.y();
    b_t.back.normal = Vector3f(0, 0, -1);
-   b_t.back.offset = -c2.z();
+   b_t.back.offset = b_t.c1.z();
+   b_t.front.normal = Vector3f(0, 0, 1);
+   b_t.front.offset = b_t.c2.z();
 }
 
 // Gets the bounding box of the current geometry object.
@@ -97,5 +105,31 @@ int Box::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT)
 
 Vector3f Box::getNormal(const Vector3f & point)
 {
-   return Vector3f();
+   cout << "box normal" << endl;
+   if (closeEnough(point.x(), b_t.left.offset))
+   {
+      return b_t.left.normal;
+   }
+   if (closeEnough(point.x(), b_t.right.offset))
+   {
+      return b_t.right.normal;
+   }
+   if (closeEnough(point.y(), b_t.bottom.offset))
+   {
+      return b_t.bottom.normal;
+   }
+   if (closeEnough(point.y(), b_t.top.offset))
+   {
+      return b_t.top.normal;
+   }
+   if (closeEnough(point.z(), b_t.back.offset))
+   {
+      return b_t.back.normal;
+   }
+   if (closeEnough(point.z(), b_t.front.offset))
+   {
+      return b_t.front.normal;
+   }
+   cerr << "Error: point not on box." << endl;
+   return Vector3f(0, 0, 0);
 }

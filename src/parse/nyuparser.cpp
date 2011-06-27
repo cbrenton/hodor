@@ -169,6 +169,7 @@ void NYUParser::ParseFinish(Finish & f)
 {
    Token t;
    ParseLeftCurly();
+   f.roughness = 0.05;
    // while(1) {
    for(;;)
    {
@@ -463,15 +464,18 @@ Box * NYUParser::ParseBox(){
    // Vector3f corner1, corner2;
    // InitModifiers(&modifiers);
 
-   Box * b = new Box();
+   Box * b;
 
    // SetVect(&corner1, 0,0,0);
    // SetVect(&corner2, 0,0,0);
 
    ParseLeftCurly();
-   ParseVector(b->b_t.c1);
+   Vector3f c1;
+   Vector3f c2;
+   ParseVector(c1);
    ParseComma();
-   ParseVector(b->b_t.c2);
+   ParseVector(c2);
+   b = new Box(c1, c2);
    ParseModifiers(*b);
    b->b_t.p = b->p;
    b->b_t.f = b->f;

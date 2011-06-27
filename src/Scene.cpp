@@ -351,10 +351,6 @@ Pixel Scene::shade(HitData *data, Vector3f view)
             l.normalize();
             float nDotL = n.dot(l);
             nDotL = min(nDotL, 1.0f);
-            if (nDotL < 0)
-            {
-               nDotL *= -1;
-            }
 
             if (nDotL > 0)
             {

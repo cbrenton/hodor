@@ -47,7 +47,7 @@ inline float min3(float a, float b, float c)
 
 inline bool closeEnough(float a, float b)
 {
-   return abs(a - b) >= EPSILON;
+   return abs(a - b) <= EPSILON;
 }
 
 #define mReflect(d, n) ((n) * (2 * (-(d).dot(n))) + d)
