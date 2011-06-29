@@ -6,7 +6,6 @@
 #include <sys/time.h>
 #include <sys/ioctl.h>
 #include <math.h>
-// #include <cutil.h>
 
 #include "Globals.h"
 #include "Pixel.h"

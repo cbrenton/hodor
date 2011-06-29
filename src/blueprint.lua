@@ -10,12 +10,15 @@ default "debug"
 -- define a debug config, where debugging options are turned on, profiling
 -- options are turned off, and optimizing is turned off
 config "debug"
-    output "build-debug" -- the output name of our executable
+    output "build-debug"
     debugging "on"
-    defines {"DEBUG"} -- comma separated list of defines, enclosed in curly brackets
-    cflags {"-Wall"} -- flags to pass through to the final compiler (gcc)
-    libs {"m"} -- link with the math library
-    compute_capability "2.0" -- build for CUDA devices of compute capability 2.0+
+    defines {"DEBUG"}
+    libdirs {"../lib/pngwriter/lib"}
+    includes {"./", "../lib", "../lib/pngwriter/include"}
+    cflags {"-Wall -DNO_FREETYPE -O3"}
+    lflags {"-O3"}
+    libs {"m", "png", "z", "pngwriter"}
+    compute_capability "2.0"
 
 -- same as above, but define a "profile" config
 config "profile"
@@ -32,5 +35,6 @@ config "release"
     optimizing "on"
     defines {"RELEASE"}
     cflags {"-Wall"}
+    cflags {"-Wall -Wconversion -Werror"}
     libs {"m"}
     compute_capability "2.0"

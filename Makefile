@@ -60,6 +60,9 @@ $(TARGET): $(OBJS)
 lib:
 	$(shell) ./lib.sh
 
+cuda:
+	./src/cubuild
+
 run:
 	./$(TARGET) $(ARGS)
 
