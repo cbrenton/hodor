@@ -61,7 +61,7 @@ lib:
 	$(shell) ./lib.sh
 
 cuda:
-	./src/cubuild
+	cd ./src && ./cubuild
 
 run:
 	./$(TARGET) $(ARGS)
@@ -83,7 +83,7 @@ valgrind:
 	valgrind --tool=memcheck --leak-check=full ./$(TARGET) $(ARGS)
 
 clean:
-	$(RM) $(TARGET) $(OBJS)
+	$(RM) $(TARGET) $(OBJS) main.o
 
 killall:
 	$(KILL) $(TARGET)

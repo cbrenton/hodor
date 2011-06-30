@@ -13,7 +13,7 @@ config "debug"
     output "build-debug"
     debugging "on"
     defines {"DEBUG"}
-    libdirs {"../lib/pngwriter/lib", "/tmp2/shirsh/NVIDIA_GPU_Computing_SDK/C/lib"}
+    libdirs {"../lib/pngwriter/lib", "../lib"}
     includes {"./", "../lib", "../lib/pngwriter/include"}
     cflags {"-Wall -DNO_FREETYPE"}
     libs {"m", "png", "z", "pngwriter"}
