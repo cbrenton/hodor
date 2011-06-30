@@ -7,16 +7,14 @@
 #ifndef _PLANE_T_H
 #define _PLANE_T_H
 
-#include <Eigen/Dense>
+#include "structs/vector.h"
 #include "structs/Pigment.h"
 #include "structs/Finish.h"
-
-using Eigen::Vector3f;
 
 struct plane_t
 {
    // The normal of the plane.
-   Vector3f normal;
+   vec3_t normal;
 
    // The plane offset ('d' in the plane's implicit equation).
    float offset;

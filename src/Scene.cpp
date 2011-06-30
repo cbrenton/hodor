@@ -43,7 +43,7 @@ Scene* Scene::read(std::fstream & input)
  * Checks if a ray intersects any geometry in the scene, using structs.
  * @returns true if an intersection is found.
  */
-bool Scene::gpuHit(const Ray & ray, HitData *data)
+bool Scene::gpuHit(Ray & ray, HitData *data)
 {
    // INITIALIZE closestT to MAX_DIST + 0.1
    float closestT = MAX_DIST + 0.1f;
@@ -163,7 +163,7 @@ bool Scene::gpuHit(const Ray & ray, HitData *data)
  * Checks if a ray intersects any geometry in the scene, using Geometry.
  * @returns true if an intersection is found.
  */
-bool Scene::hit(const Ray & ray, HitData *data)
+bool Scene::hit(Ray & ray, HitData *data)
 {
    // INITIALIZE closestT to MAX_DIST + 0.1
    float closestT = MAX_DIST + 0.1f;
@@ -204,7 +204,7 @@ bool Scene::hit(const Ray & ray, HitData *data)
 }
 
 // Casts a ray into the scene and returns a correctly colored pixel.
-Pixel Scene::castRay(const Ray & ray, int depth)
+Pixel Scene::castRay(Ray & ray, int depth)
 {
    Pixel result(0.0, 0.0, 0.0);
    Pixel reflectPix(0.0, 0.0, 0.0);
@@ -220,41 +220,43 @@ Pixel Scene::castRay(const Ray & ray, int depth)
          {
             Pigment hitP = {};
             Finish hitF = {};
-            Vector3f hitNormal(0.0, 0.0, 0.0);
-            box_t b_t;
-            plane_t p_t;
-            sphere_t s_t;
-            triangle_t t_t;
+            vec3_t hitNormal(0.0, 0.0, 0.0);
+            box_t *b_t;
+            plane_t *p_t;
+            sphere_t *s_t;
+            triangle_t *t_t;
             switch (rayData.hitType) {
             case BOX_HIT:
                b_t = boxes[rayData.objIndex];
-               hitP = b_t.p;
-               hitF = b_t.f;
+               hitP = b_t->p;
+               hitF = b_t->f;
                hitNormal = box_normal(b_t, &rayData);
                break;
             case PLANE_HIT:
                p_t = planes[rayData.objIndex];
-               hitP = p_t.p;
-               hitF = p_t.f;
+               hitP = p_t->p;
+               hitF = p_t->f;
                hitNormal = plane_normal(p_t);
                break;
             case SPHERE_HIT:
                s_t = spheres[rayData.objIndex];
-               hitP = s_t.p;
-               hitF = s_t.f;
+               hitP = s_t->p;
+               hitF = s_t->f;
                hitNormal = sphere_normal(s_t, &rayData);
                break;
             case TRIANGLE_HIT:
                t_t = triangles[rayData.objIndex];
-               hitP = t_t.p;
-               hitF = t_t.f;
+               hitP = t_t->p;
+               hitF = t_t->f;
                hitNormal = triangle_normal(t_t);
                break;
             }
 
-            Vector3f reflectVec = *rayData.reflect;
+            vec3_t reflectVec = *rayData.reflect;
             reflectVec.normalize();
-            Ray reflectRay(rayData.point + reflectVec * EPSILON, reflectVec);
+            vec3_t reflectOrig = reflectVec * EPSILON;
+            reflectOrig += rayData.point;
+            Ray reflectRay(reflectOrig, reflectVec);
 
             reflectPix = castRay(reflectRay, depth - 1);
 
@@ -269,39 +271,39 @@ Pixel Scene::castRay(const Ray & ray, int depth)
 }
 
 // Calculates proper shading at the current point.
-Pixel Scene::shade(HitData *data, Vector3f view)
+Pixel Scene::shade(HitData *data, vec3_t view)
 {
    Pixel result(0.0, 0.0, 0.0);
    Pigment hitP = {};
    Finish hitF = {0};
-   Vector3f hitNormal(0.0, 0.0, 0.0);
-   box_t b_t;
-   plane_t p_t;
-   sphere_t s_t;
-   triangle_t t_t;
+   vec3_t hitNormal(0.0, 0.0, 0.0);
+   box_t *b_t;
+   plane_t *p_t;
+   sphere_t *s_t;
+   triangle_t *t_t;
    switch (data->hitType) {
    case BOX_HIT:
       b_t = boxes[data->objIndex];
-      hitP = b_t.p;
-      hitF = b_t.f;
+      hitP = b_t->p;
+      hitF = b_t->f;
       hitNormal = box_normal(b_t, data);
       break;
    case PLANE_HIT:
       p_t = planes[data->objIndex];
-      hitP = p_t.p;
-      hitF = p_t.f;
+      hitP = p_t->p;
+      hitF = p_t->f;
       hitNormal = plane_normal(p_t);
       break;
    case SPHERE_HIT:
       s_t = spheres[data->objIndex];
-      hitP = s_t.p;
-      hitF = s_t.f;
+      hitP = s_t->p;
+      hitF = s_t->f;
       hitNormal = sphere_normal(s_t, data);
       break;
    case TRIANGLE_HIT:
       t_t = triangles[data->objIndex];
-      hitP = t_t.p;
-      hitF = t_t.f;
+      hitP = t_t->p;
+      hitF = t_t->f;
       hitNormal = triangle_normal(t_t);
       break;
    }
@@ -332,7 +334,8 @@ Pixel Scene::shade(HitData *data, Vector3f view)
       Ray feeler;
       feeler.dir = curLight->location - data->point;
       feeler.dir.normalize();
-      feeler.point = data->point + feeler.dir * EPSILON;
+      feeler.point = feeler.dir * EPSILON;
+      feeler.point += data->point;
 
       HitData tmpHit;
 
@@ -345,9 +348,9 @@ Pixel Scene::shade(HitData *data, Vector3f view)
          if (useGPU)
          {
             // Diffuse.
-            Vector3f n = hitNormal;
+            vec3_t n = hitNormal;
             n.normalize();
-            Vector3f l = curLight->location - data->point;
+            vec3_t l = curLight->location - data->point;
             l.normalize();
             float nDotL = n.dot(l);
             nDotL = min(nDotL, 1.0f);
@@ -360,9 +363,9 @@ Pixel Scene::shade(HitData *data, Vector3f view)
             }
 
             // Specular (Phong).
-            Vector3f r = mReflect(l, n);
+            vec3_t r = mReflect(l, n);
             r.normalize();
-            Vector3f v = view;
+            vec3_t v = view;
             v.normalize();
             float rDotV = r.dot(v);
             rDotV = (float)pow(rDotV, 1.0f / hitF.roughness);
@@ -379,9 +382,9 @@ Pixel Scene::shade(HitData *data, Vector3f view)
          else
          {
             // Diffuse.
-            Vector3f n = data->object->getNormal(data->point);
+            vec3_t n = data->object->getNormal(data->point);
             n.normalize();
-            Vector3f l = curLight->location - data->point;
+            vec3_t l = curLight->location - data->point;
             l.normalize();
             float nDotL = n.dot(l);
             nDotL = min(nDotL, 1.0f);
@@ -401,9 +404,9 @@ Pixel Scene::shade(HitData *data, Vector3f view)
             }
 
             // Specular (Phong).
-            Vector3f r = mReflect(l, n);
+            vec3_t r = mReflect(l, n);
             r.normalize();
-            Vector3f v = view;
+            vec3_t v = view;
             v.normalize();
             float rDotV = r.dot(v);
             rDotV = (float)pow(rDotV, 1.0f / data->object->f.roughness);
@@ -425,7 +428,7 @@ Pixel Scene::shade(HitData *data, Vector3f view)
 }
 
 /*
-   Vector3f Scene::reflect(Vector3f d, Vector3f n)
+   vec3_t Scene::reflect(vec3_t d, vec3_t n)
    {
    return n * (2 * (-d.dot(n))) + d;
    }

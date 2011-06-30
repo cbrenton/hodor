@@ -4,6 +4,7 @@
 #include "parse/tokens.h"
 #include "Scene.h"
 #include "geom/Transformation.h"
+#include "structs/vector.h"
 
 class NYUParser{
    private:
@@ -16,7 +17,7 @@ class NYUParser{
       void ParseLeftCurly();
       void ParseRightCurly();
       void ParseComma();
-      void ParseVector(Vector3f & v);
+      void ParseVector(vec3_t & v);
       void ParseRGBFColor(color & c, float & f);
       void ParseRGBColor(color & c, float & f);
       void ParseColor(color & c, float & f);
@@ -35,7 +36,7 @@ class NYUParser{
       void ParseModifiers(Geometry & s);
       void PrintModifiers(Geometry & s);
       // void ParseCamera();
-      Camera ParseCamera();
+      Camera * ParseCamera();
       void ParsePolygon();
       // void ParseSphere();
       Sphere * ParseSphere();

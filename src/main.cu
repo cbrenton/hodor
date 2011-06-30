@@ -313,10 +313,10 @@ int main(int argc, char **argv)
          float vScale = (float)(b + (t - b) * ((float)y + jitter)
                / (float)image->height);
          float wScale = -1;
-         Vector3f sVector = scene->camera.location;
-         Vector3f uVector = scene->camera.right;
-         Vector3f vVector = scene->camera.up;
-         Vector3f wVector = scene->camera.look_at - scene->camera.location;
+         vec3_t sVector = scene->camera.location;
+         vec3_t uVector = scene->camera.right;
+         vec3_t vVector = scene->camera.up;
+         vec3_t wVector = scene->camera.look_at - scene->camera.location;
          uVector.normalize();
          vVector.normalize();
          wVector.normalize();
@@ -328,9 +328,9 @@ int main(int argc, char **argv)
          sVector += uVector;
          sVector += vVector;
          sVector += wVector;
-         Vector3f rayDir = uVector + vVector + wVector;
+         vec3_t rayDir = uVector + vVector + wVector;
          rayDir.normalize();
-         Vector3f curPoint = Vector3f(scene->camera.location);
+         vec3_t curPoint = vec3_t(scene->camera.location);
          //Ray *curRay = new Ray(curPoint, rayDir);
          Ray curRay(curPoint, rayDir);
          //aRayArray[i][j][k] = *curRay;

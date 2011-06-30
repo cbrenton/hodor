@@ -35,7 +35,7 @@ class Image
       Pixel **pixelData;
 
       // Writes a single pixel to the file.
-      virtual void writePixel(int x, int y, const Pixel & pix) {};
+      virtual void writePixel(int x, int y, Pixel & pix) {};
 
       // Closes the file.
       virtual void close() {};

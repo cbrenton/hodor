@@ -8,7 +8,7 @@
 #define _GLOBALS_H
 
 #include <cstdlib>
-#include <Eigen/Dense>
+#include <cmath>
 #include "structs/box_t.h"
 #include "structs/plane_t.h"
 #include "structs/sphere_t.h"

@@ -7,9 +7,7 @@
 #ifndef _HITDATA_H
 #define _HITDATA_H
 
-#include <Eigen/Dense>
-
-using Eigen::Vector3f;
+#include "structs/vector.h"
 
 class Geometry;
 
@@ -19,7 +17,7 @@ struct HitData
 
    int hitIndex;
 
-   Vector3f point;
+   vec3_t point;
 
    float t;
 
@@ -31,9 +29,9 @@ struct HitData
 
    int faceIndex;
 
-   Vector3f *reflect;
+   vec3_t *reflect;
 
-   Vector3f *refract;
+   vec3_t *refract;
 
 };
 #endif

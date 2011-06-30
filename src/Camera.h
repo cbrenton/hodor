@@ -8,17 +8,16 @@
 #define _CAMERA_H
 
 #include <iostream>
-#include <Eigen/Dense>
-using Eigen::Vector3f;
+#include <structs/vector.h>
 
 class Camera {
    public:
       Camera() {};
-      Camera(Vector3f _loc, Vector3f _up, Vector3f _right, Vector3f _look_at);
-      Vector3f location;
-      Vector3f up;
-      Vector3f right;
-      Vector3f look_at;
+      Camera(vec3_t _loc, vec3_t _up, vec3_t _right, vec3_t _look_at);
+      vec3_t location;
+      vec3_t up;
+      vec3_t right;
+      vec3_t look_at;
       inline void debug()
       {
          std::cout << "Camera: <" << location.x() << ", " << location.y() <<
@@ -30,7 +29,6 @@ class Camera {
          std::cout << "\t<" << look_at.x() << ", " << look_at.y() <<
             ", " << look_at.z() << ">" << std::endl;
       }
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 #endif

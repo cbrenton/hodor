@@ -19,7 +19,7 @@ class Box : public Geometry
    public:
       Box() {};
 
-      Box(Vector3f c1, Vector3f c2);
+      Box(vec3_t c1, vec3_t c2);
 
       // The box_t struct representing the geometry object.
       box_t b_t;
@@ -28,12 +28,10 @@ class Box : public Geometry
       Box bBox();
 
       // Determines whether the input ray intersects the current geometry object. If it does not, returns 0. If it does, returns -1 if hit from within the object, or 1 if hit from outside the object, and correctly populates the fields of the input HitData object.
-      int hit(const Ray & ray, float *t, HitData *data = NULL, float minT = 0.0, float maxT = MAX_DIST);
+      int hit(Ray & ray, float *t, HitData *data = NULL, float minT = 0.0, float maxT = MAX_DIST);
 
       // Returns the normal of the current geometry object at the specified point.
-      Vector3f getNormal(const Vector3f & point);
-
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      vec3_t getNormal(vec3_t & point);
 
 };
 #endif

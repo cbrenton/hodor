@@ -27,7 +27,7 @@ void PngImage::write()
 {
 }
 
-void PngImage::writePixel(int x, int y, const Pixel & pix)
+void PngImage::writePixel(int x, int y, Pixel & pix)
 {
    png->plot(x, y, pix.c.r, pix.c.g, pix.c.b);
 }

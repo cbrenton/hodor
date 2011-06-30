@@ -11,19 +11,23 @@
 
 Box Geometry::bBox()
 {
-   return Box();
+   //return Box();
+   Box result;
+   return result;
 }
 
-int Geometry::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT)
+int Geometry::hit(Ray & ray, float *t, HitData *data, float minT, float maxT)
 {
    return 0;
 }
 
-Vector3f Geometry::getNormal(const Vector3f & point)
+vec3_t Geometry::getNormal(vec3_t & point)
 {
-   return Vector3f();
+   return vec3_t();
 }
 
+/*
 void Geometry::addTransformation(Transform<float, 3, Affine> t)
 {
 }
+*/

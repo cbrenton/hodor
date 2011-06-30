@@ -7,7 +7,7 @@
 #ifndef _TRANSFORMATION_H
 #define _TRANSFORMATION_H
 
-#include <Eigen/Dense>
+#include "structs/vector.h"
 
 class Transformation
 {
@@ -16,15 +16,13 @@ class Transformation
       
       ~Transformation() {};
       
-      void setScale(Eigen::Vector3f scaleVec);
+      void setScale(vec3_t scaleVec);
       
       void setRotation(float x, float y, float z);
       
       void setTranslation(float x, float y, float z);
 
-      Eigen::Transform<float, 3, Eigen::Affine> m;
-
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      //Transform<float, 3, Affine> m;
 
 };
 

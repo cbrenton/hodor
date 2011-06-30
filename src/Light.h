@@ -9,13 +9,12 @@
 
 #include <iostream>
 #include <stdio.h>
-#include <Eigen/Dense>
-using Eigen::Vector3f;
+#include "structs/vector.h"
 
 class Light {
    public:
-      Light(Vector3f loc, double red, double green, double blue);
-      Vector3f location;
+      Light(vec3_t loc, double red, double green, double blue);
+      vec3_t location;
       double r;
       double g;
       double b;
@@ -23,7 +22,6 @@ class Light {
       {
          printf("Light: (r,g,b) (%f, %f, %f)\n", r, g, b);
       }
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 #endif

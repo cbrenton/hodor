@@ -22,7 +22,7 @@ class TgaImage : public Image
       void write();
 
       // Writes a single pixel to the file.
-      void writePixel(const Pixel & pix);
+      void writePixel(Pixel & pix);
 
       // Gets the file extension.
       string getExt();

@@ -8,7 +8,7 @@
 #include "Ray.h"
 #include "structs/HitData.h"
 
-Plane::Plane(Vector3f normal, float offset)
+Plane::Plane(vec3_t normal, float offset)
 {
    p_t.normal = normal;
    p_t.offset = offset;
@@ -17,24 +17,26 @@ Plane::Plane(Vector3f normal, float offset)
 // Gets the bounding box of the current geometry object.
 Box Plane::bBox()
 {
-   return Box();
+   Box result;
+   return result;
 }
 
-int Plane::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT)
+int Plane::hit(Ray & ray, float *t, HitData *data, float minT, float maxT)
 {
    float denominator = ray.dir.dot(p_t.normal);
    if (denominator == 0.0)
    {
       return 0;
    }
-   Vector3f p = p_t.normal * p_t.offset;
-   Vector3f pMinusL = p - ray.point;
+   vec3_t p = p_t.normal * p_t.offset;
+   vec3_t pMinusL = p - ray.point;
    float numerator = pMinusL.dot(p_t.normal);
    *t = numerator / denominator;
    if (*t >= minT && *t <= maxT)
    {
       data->hit = 1;
-      data->point = ray.point + ray.dir * (*t);
+      data->point = ray.dir * (*t);
+      data->point += ray.point;
       data->t = (*t);
       data->object = this;
       return 1;
@@ -42,7 +44,7 @@ int Plane::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT)
    return 0;
 }
 
-Vector3f Plane::getNormal(const Vector3f & point)
+vec3_t Plane::getNormal(vec3_t & point)
 {
    return p_t.normal;
 }

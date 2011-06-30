@@ -26,7 +26,7 @@ class PngImage : public Image
       void write();
 
       // Writes a single pixel to the file.
-      void writePixel(int x, int y, const Pixel & pix);
+      void writePixel(int x, int y, Pixel & pix);
 
       // Closes the file.
       void close();

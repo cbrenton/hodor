@@ -18,7 +18,7 @@ void TgaImage::write()
 {
 }
 
-void TgaImage::writePixel(const Pixel & pix)
+void TgaImage::writePixel(Pixel & pix)
 {
 }
 

@@ -6,7 +6,7 @@
 
 #include "Ray.h"
 
-Ray::Ray(Eigen::Vector3f _point, Eigen::Vector3f _dir) :
+Ray::Ray(vec3_t _point, vec3_t _dir) :
    point(_point), dir(_dir)
 {
 }

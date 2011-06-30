@@ -36,18 +36,18 @@ class Scene
       static Scene* read(std::fstream & input);
 
       // Checks if a ray intersects any geometry in the scene, using structs.
-      bool gpuHit(const Ray & ray, HitData *data);
+      bool gpuHit(Ray & ray, HitData *data);
 
       // Checks if a ray intersects any geometry in the scene, using Geometry.
-      bool hit(const Ray & ray, HitData *data);
+      bool hit(Ray & ray, HitData *data);
 
       // Casts a ray into the scene and returns a correctly colored pixel.
-      Pixel castRay(const Ray & ray, int depth);
+      Pixel castRay(Ray & ray, int depth);
 
       // Calculates proper shading at the current point.
-      Pixel shade(HitData *data, Vector3f view);
+      Pixel shade(HitData *data, vec3_t view);
 
-      //Vector3f reflect(Vector3f incident, Vector3f normal);
+      //vec3_t reflect(vec3_t incident, vec3_t normal);
 
       Camera camera;
 
@@ -55,16 +55,16 @@ class Scene
       std::vector<Geometry*> geometry;
 
       // The vector of boxes in the scene (GPU only).
-      std::vector<box_t> boxes;
+      std::vector<box_t*> boxes;
 
       // The vector of planes in the scene (GPU only).
-      std::vector<plane_t> planes;
+      std::vector<plane_t*> planes;
 
       // The vector of spheres in the scene (GPU only).
-      std::vector<sphere_t> spheres;
+      std::vector<sphere_t*> spheres;
 
       // The vector of triangles in the scene (GPU only).
-      std::vector<triangle_t> triangles;
+      std::vector<triangle_t*> triangles;
 
       // The vector of lights in the scene.
       std::vector<Light*> lights;

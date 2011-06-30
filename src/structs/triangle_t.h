@@ -7,22 +7,20 @@
 #ifndef _TRIANGLE_T_H
 #define _TRIANGLE_T_H
 
-#include <Eigen/Dense>
+#include "structs/vector.h"
 #include "structs/Pigment.h"
 #include "structs/Finish.h"
-
-using Eigen::Vector3f;
 
 struct triangle_t
 {
    // The first corner of the triangle.
-   Vector3f c1;
+   vec3_t c1;
 
    // The second corner of the triangle.
-   Vector3f c2;
+   vec3_t c2;
 
    // The third corner of the triangle.
-   Vector3f c3;
+   vec3_t c3;
 
    Pigment p;
 
