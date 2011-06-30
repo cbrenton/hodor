@@ -6,6 +6,7 @@
 #include <sys/time.h>
 #include <sys/ioctl.h>
 #include <math.h>
+#include <cutil.h>
 
 #include "Globals.h"
 #include "Pixel.h"
@@ -291,10 +292,10 @@ int main(int argc, char **argv)
       aRayArray[i] = new Ray[height];
    }
 
-   float l = -scene->camera.right.norm() / 2;
-   float r = scene->camera.right.norm() / 2;
-   float b = -scene->camera.up.norm() / 2;
-   float t = scene->camera.up.norm() / 2;
+   float l = -scene->camera.right.length() / 2;
+   float r = scene->camera.right.length() / 2;
+   float b = -scene->camera.up.length() / 2;
+   float t = scene->camera.up.length() / 2;
 
    // Generate rays.
    cout << "Generating rays...";
