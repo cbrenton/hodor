@@ -5,8 +5,8 @@
  */
 
 #include "geom/Box.h"
-#include "Ray.h"
-#include "structs/HitData.h"
+#include "structs/ray_t.h"
+#include "structs/hit_t.h"
 #include "Globals.h"
 
 Box::Box(vec3_t c1, vec3_t c2)
@@ -41,7 +41,7 @@ Box Box::bBox()
    return result;
 }
 
-int Box::hit(Ray & ray, float *t, HitData *data, float minT, float maxT)
+int Box::hit(ray_t & ray, float *t, hit_t *data, float minT, float maxT)
 {
    return 0;
 }

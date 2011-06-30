@@ -9,8 +9,8 @@
 
 #include "structs/vector.h"
 #include "structs/plane_t.h"
-#include "structs/Pigment.h"
-#include "structs/Finish.h"
+#include "structs/pigment_t.h"
+#include "structs/finish_t.h"
 
 struct box_t
 {
@@ -32,9 +32,9 @@ struct box_t
 
    plane_t front;
 
-   Pigment p;
+   pigment_t p;
 
-   Finish f;
+   finish_t f;
 
 };
 #endif

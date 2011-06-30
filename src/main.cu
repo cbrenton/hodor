@@ -29,7 +29,6 @@ Scene *scene;
 string inputFileName;
 string filename;
 bool useBVH = false;
-bool useGPU = false;
 int width = DEFAULT_W;
 int height = DEFAULT_H;
 int numAA = 1;
@@ -100,7 +99,7 @@ int main(int argc, char **argv)
    srand((int)time(NULL));
 
    int c;
-   while ((c = getopt(argc, argv, "a::A::bBgGi:I:h:H:w:W:")) != -1)
+   while ((c = getopt(argc, argv, "a::A::bBi:I:h:H:w:W:")) != -1)
    {
       switch (c)
       {
@@ -116,9 +115,6 @@ int main(int argc, char **argv)
          break;
       case 'b': case 'B':
          useBVH = true;
-         break;
-      case 'g': case 'G':
-         useGPU = true;
          break;
       case 'h': case 'H':
          setHeight(optarg);
@@ -150,27 +146,26 @@ int main(int argc, char **argv)
 
    // Parse scene.
    scene = Scene::read(inputFileStream);
-   scene->useGPU = useGPU;
 
    // Close input file.
    inputFileStream.close();
 
    // Make array of rays.
    /*
-      Ray ***aRayArray = new Ray **[width];
+      ray_t ***aray_tArray = new ray_t **[width];
       for (int i = 0; i < width; i++)
       {
-      aRayArray[i] = new Ray *[height];
+      aray_tArray[i] = new ray_t *[height];
       for (int j = 0; j < height; j++)
       {
-      aRayArray[i][j] = new Ray[numAA];
+      aray_tArray[i][j] = new ray_t[numAA];
       }
       }
       */
-   Ray **aRayArray = new Ray *[width];
+   ray_t **aray_tArray = new ray_t *[width];
    for (int i = 0; i < width; i++)
    {
-      aRayArray[i] = new Ray[height];
+      aray_tArray[i] = new ray_t[height];
    }
 
    float l = -scene->camera.right.length() / 2;
@@ -213,10 +208,10 @@ int main(int argc, char **argv)
          vec3_t rayDir = uVector + vVector + wVector;
          rayDir.normalize();
          vec3_t curPoint = vec3_t(scene->camera.location);
-         //Ray *curRay = new Ray(curPoint, rayDir);
-         Ray curRay(curPoint, rayDir);
-         //aRayArray[i][j][k] = *curRay;
-         aRayArray[x][y] = curRay;
+         //ray_t *curray_t = new ray_t(curPoint, rayDir);
+         ray_t curray_t = {curPoint, rayDir};
+         //aray_tArray[i][j][k] = *curray_t;
+         aray_tArray[x][y] = curray_t;
       }
    }
    cout << "done." << endl;
@@ -249,21 +244,23 @@ int main(int argc, char **argv)
    {
       for (int y = 0; y < image->height; y++)
       {
-         //image->pixelData[x][y] = scene->castRay(aRayArray[x][y], RECURSION_DEPTH);
-         Pixel curPix = scene->castRay(aRayArray[x][y], RECURSION_DEPTH);
+         //image->pixelData[x][y] = scene->castray_t(aray_tArray[x][y], RECURSION_DEPTH);
+         Pixel curPix = scene->castray_t(aray_tArray[x][y], RECURSION_DEPTH);
          // Write pixel out to file.
          image->writePixel(x, y, curPix);
       }
    }
 
-   // Finish writing image out to file.
+   cout << "Writing to file...";
+   // finish_t writing image out to file.
    image->close();
+   cout << "done." << endl;
    
    for (int i = 0; i < width; i++)
    {
-      delete[] aRayArray[i];
+      delete[] aray_tArray[i];
    }
-   delete[] aRayArray;
+   delete[] aray_tArray;
    
    delete image;
 

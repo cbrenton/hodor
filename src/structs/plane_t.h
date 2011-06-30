@@ -8,8 +8,8 @@
 #define _PLANE_T_H
 
 #include "structs/vector.h"
-#include "structs/Pigment.h"
-#include "structs/Finish.h"
+#include "structs/pigment_t.h"
+#include "structs/finish_t.h"
 
 struct plane_t
 {
@@ -19,9 +19,9 @@ struct plane_t
    // The plane offset ('d' in the plane's implicit equation).
    float offset;
 
-   Pigment p;
+   pigment_t p;
 
-   Finish f;
+   finish_t f;
 
 };
 #endif

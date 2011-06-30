@@ -57,7 +57,7 @@ void NYUParser::ParseVector(vec3_t & v)
    ParseRightAngle();
 }
 
-void NYUParser::ParseRGBFColor(color & c, float & f)
+void NYUParser::ParseRGBFColor(color_t & c, float & f)
 {
    ParseLeftAngle();
    c.r = ParseDouble();
@@ -70,7 +70,7 @@ void NYUParser::ParseRGBFColor(color & c, float & f)
    ParseRightAngle();
 }
 
-void NYUParser::ParseRGBColor(color & c, float & f)
+void NYUParser::ParseRGBColor(color_t & c, float & f)
 {
    ParseLeftAngle();
    c.r = ParseDouble();
@@ -82,7 +82,7 @@ void NYUParser::ParseRGBColor(color & c, float & f)
    ParseRightAngle();
 }
 
-void NYUParser::ParseColor(color & c, float & f)
+void NYUParser::ParseColor(color_t & c, float & f)
 {
    // GetToken();
    Token t = tokenizer->GetToken();
@@ -93,7 +93,7 @@ void NYUParser::ParseColor(color & c, float & f)
    else tokenizer->Error("Expected rgb or rgbf");
 }
 
-void NYUParser::PrintColor(color & c, float & f)
+void NYUParser::PrintColor(color_t & c, float & f)
 {
    // printf("rgbf <%.3g,%.3g,%.3g,%.3g>", c->r, c->g, c->b, c->f);
    cout << "rgbf <" << c.r << "," << c.g << "," << c.b << "," << f << ">" << endl;
@@ -143,7 +143,7 @@ void NYUParser::ParseTransform(Geometry & s)
    }
 }
 
-void NYUParser::ParsePigment(Pigment & p)
+void NYUParser::Parsepigment_t(pigment_t & p)
 {
    Token t;
    ParseLeftCurly();
@@ -159,13 +159,13 @@ void NYUParser::ParsePigment(Pigment & p)
    }
 }
 
-void NYUParser::PrintPigment(Pigment & p){
+void NYUParser::Printpigment_t(pigment_t & p){
    printf("\tpigment { color ");
    PrintColor(p.c,p.f);
    printf("}");
 }
 
-void NYUParser::ParseFinish(Finish & f)
+void NYUParser::Parsefinish_t(finish_t & f)
 {
    Token t;
    ParseLeftCurly();
@@ -214,7 +214,7 @@ void NYUParser::ParseFinish(Finish & f)
    }
 }
 
-void NYUParser::PrintFinish(Finish & f){
+void NYUParser::Printfinish_t(finish_t & f){
    /*
       printf("\tfinish { ambient %.3g diffuse %.3g phong %.3g phong_size %.3g reflection %.3g metallic %d }\n",
       finish->ambient, finish->diffuse,
@@ -289,12 +289,12 @@ void NYUParser::ParseModifiers(Geometry & s){
          ParseTransform(s);
          break;
       case T_PIGMENT:
-         // ParsePigment(&(modifiers->pigment));
-         ParsePigment(s.p);
+         // Parsepigment_t(&(modifiers->pigment));
+         Parsepigment_t(s.p);
          break;
       case T_FINISH:
-         // ParseFinish(&(modifiers->finish));
-         ParseFinish(s.f);
+         // Parsefinish_t(&(modifiers->finish));
+         Parsefinish_t(s.f);
          break;
       case T_INTERIOR:
          // ParseInterior(&(modifiers->interior));
@@ -309,14 +309,14 @@ void NYUParser::PrintModifiers(Geometry & s){
    /*
       printf("\tmatrix "); PrintMatrix4d(modifiers->transform);
       printf("\n");
-      PrintPigment(&(modifiers->pigment));
+      Printpigment_t(&(modifiers->pigment));
       printf("\n");
-      PrintFinish(&(modifiers->finish));
+      Printfinish_t(&(modifiers->finish));
       printf("\tinterior { ior %.3g }\n", modifiers->interior.ior);
       */
-   PrintPigment(s.p);
+   Printpigment_t(s.p);
    cout << "\n" << endl;
-   PrintFinish(s.f);
+   Printfinish_t(s.f);
    cout << "\n" << endl;
 }
 
@@ -636,7 +636,7 @@ Light * NYUParser::ParseLightSource()
    // struct Color c;
    // struct Vector pos;
    Token t;
-   color c;
+   color_t c;
    float f;
    vec3_t pos;
 

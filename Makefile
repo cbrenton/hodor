@@ -28,22 +28,20 @@ TARGET = terlR
 INPUTEXT=pov
 INPUTDIR=input
 #INPUTFILE=bunny_small
-INPUTFILE=simple_box
+INPUTFILE=simple_spec
 OUTPUTDIR=images
 OUTPUTEXT=png
-WIDTH=640
-HEIGHT=480
-ARGS = -g -w $(WIDTH) -h $(HEIGHT) -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
+WIDTH=320
+HEIGHT=240
+ARGS = -w $(WIDTH) -h $(HEIGHT) -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
 
 # Additional linker libraries
 LIBS = $(LIBFLAGS)
 
 # -------------------------------------------------------------
-# Nothing should need changing below this line
 
 # The source files
 SRCS = $(wildcard src/*.cpp src/*/*.cpp)
-#SRCS = $(wildcard *.cpp)
 
 OBJS = $(SRCS:.cpp=.o)
 
@@ -60,11 +58,13 @@ $(TARGET): $(OBJS)
 lib:
 	$(shell) ./lib.sh
 
-cuda:
+cuda:	gpu
+
+gpu:
 	cd ./src && ./cubuild
 
 run:
-	./$(TARGET) $(ARGS)
+	./src/build-debug $(ARGS)
 
 eog:
 	eog ./$(OUTPUTDIR)/$(INPUTFILE).$(OUTPUTEXT)
@@ -83,7 +83,7 @@ valgrind:
 	valgrind --tool=memcheck --leak-check=full ./$(TARGET) $(ARGS)
 
 clean:
-	$(RM) $(TARGET) $(OBJS) src/main.o src/build-debug src/build-profile src/build-release
+	$(RM) $(TARGET) $(OBJS) src/*.o src/build-debug src/build-profile src/build-release
 
 killall:
 	$(KILL) $(TARGET)

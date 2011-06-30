@@ -1,12 +1,12 @@
 /**
- * This holds scene geometry data. Ray casting and shading take place here.
+ * This holds scene geometry data. ray_t casting and shading take place here.
  * @author Chris Brenton
  * @date 06/20/2011
  */
 
 #include <iostream>
 #include "Scene.h"
-#include "Intersect.h"
+#include "hit_kernel.h"
 #include "parse/nyuparser.h"
 #include "Globals.h"
 
@@ -43,19 +43,19 @@ Scene* Scene::read(std::fstream & input)
  * Checks if a ray intersects any geometry in the scene, using structs.
  * @returns true if an intersection is found.
  */
-bool Scene::gpuHit(Ray & ray, HitData *data)
+bool Scene::gpuHit(ray_t & ray, hit_t *data)
 {
    // INITIALIZE closestT to MAX_DIST + 0.1
    float closestT = MAX_DIST + 0.1f;
-   // INITIALIZE closestData to empty HitData
-   HitData *closestData = new HitData();
+   // INITIALIZE closestData to empty hit_t
+   hit_t *closestData = new hit_t();
 
    // Find hit for boxes.
    // FOR each item in boxes
    for (int boxNdx = 0; boxNdx < (int)boxes.size(); boxNdx++)
    {
       float boxT = -1;
-      HitData *boxData = new HitData();
+      hit_t *boxData = new hit_t();
       // IF current item is hit by ray
       if (box_hit(boxes[boxNdx], ray, &boxT, boxData) != 0)
       {
@@ -79,7 +79,7 @@ bool Scene::gpuHit(Ray & ray, HitData *data)
    for (int planeNdx = 0; planeNdx < (int)planes.size(); planeNdx++)
    {
       float planeT = -1;
-      HitData *planeData = new HitData();
+      hit_t *planeData = new hit_t();
       // IF current item is hit by ray
       if (plane_hit(planes[planeNdx], ray, &planeT, planeData) != 0)
       {
@@ -103,7 +103,7 @@ bool Scene::gpuHit(Ray & ray, HitData *data)
    for (int sphereNdx = 0; sphereNdx < (int)spheres.size(); sphereNdx++)
    {
       float sphereT = -1;
-      HitData *sphereData = new HitData();
+      hit_t *sphereData = new hit_t();
       // IF current item is hit by ray
       if (sphere_hit(spheres[sphereNdx], ray, &sphereT, sphereData) != 0)
       {
@@ -127,7 +127,7 @@ bool Scene::gpuHit(Ray & ray, HitData *data)
    for (int triNdx = 0; triNdx < (int)triangles.size(); triNdx++)
    {
       float triT = -1;
-      HitData *triData = new HitData();
+      hit_t *triData = new hit_t();
       // IF current item is hit by ray
       if (triangle_hit(triangles[triNdx], ray, &triT, triData) != 0)
       {
@@ -163,17 +163,17 @@ bool Scene::gpuHit(Ray & ray, HitData *data)
  * Checks if a ray intersects any geometry in the scene, using Geometry.
  * @returns true if an intersection is found.
  */
-bool Scene::hit(Ray & ray, HitData *data)
+bool Scene::hit(ray_t & ray, hit_t *data)
 {
    // INITIALIZE closestT to MAX_DIST + 0.1
    float closestT = MAX_DIST + 0.1f;
-   // INITIALIZE closestData to empty HitData
-   HitData *closestData = new HitData();
+   // INITIALIZE closestData to empty hit_t
+   hit_t *closestData = new hit_t();
    // FOR each item in geometry
    for (int geomNdx = 0; geomNdx < (int)geometry.size(); geomNdx++)
    {
       float geomT = -1;
-      HitData *geomData = new HitData();
+      hit_t *geomData = new hit_t();
       // IF current item is hit by ray
       if (geometry[geomNdx]->hit(ray, &geomT, geomData) != 0)
       {
@@ -203,13 +203,13 @@ bool Scene::hit(Ray & ray, HitData *data)
    return (closestT <= MAX_DIST);
 }
 
-// Casts a ray into the scene and returns a correctly colored pixel.
-Pixel Scene::castRay(Ray & ray, int depth)
+// Casts a ray into the scene and returns a correctly color_ted pixel.
+Pixel Scene::castray_t(ray_t & ray, int depth)
 {
    Pixel result(0.0, 0.0, 0.0);
    Pixel reflectPix(0.0, 0.0, 0.0);
    Pixel refractPix(0.0, 0.0, 0.0);
-   HitData rayData;
+   hit_t rayData;
    //if (hit(ray, &rayData))
    if (gpuHit(ray, &rayData))
    {
@@ -218,8 +218,8 @@ Pixel Scene::castRay(Ray & ray, int depth)
       {
          if (rayData.reflect != NULL && depth > 0)
          {
-            Pigment hitP = {};
-            Finish hitF = {};
+            pigment_t hitP = {};
+            finish_t hitF = {};
             vec3_t hitNormal(0.0, 0.0, 0.0);
             box_t *b_t;
             plane_t *p_t;
@@ -256,9 +256,9 @@ Pixel Scene::castRay(Ray & ray, int depth)
             reflectVec.normalize();
             vec3_t reflectOrig = reflectVec * EPSILON;
             reflectOrig += rayData.point;
-            Ray reflectRay(reflectOrig, reflectVec);
+            ray_t reflectray_t = {reflectOrig, reflectVec};
 
-            reflectPix = castRay(reflectRay, depth - 1);
+            reflectPix = castray_t(reflectray_t, depth - 1);
 
             reflectPix.multiply(hitF.reflection);
             result.multiply(1 - hitF.reflection);
@@ -271,11 +271,11 @@ Pixel Scene::castRay(Ray & ray, int depth)
 }
 
 // Calculates proper shading at the current point.
-Pixel Scene::shade(HitData *data, vec3_t view)
+Pixel Scene::shade(hit_t *data, vec3_t view)
 {
    Pixel result(0.0, 0.0, 0.0);
-   Pigment hitP = {};
-   Finish hitF = {0};
+   pigment_t hitP = {};
+   finish_t hitF = {0};
    vec3_t hitNormal(0.0, 0.0, 0.0);
    box_t *b_t;
    plane_t *p_t;
@@ -312,115 +312,53 @@ Pixel Scene::shade(HitData *data, vec3_t view)
    {
       Light *curLight = lights[lightNdx];
       // Ambient.
-      // GPU.
-      if (useGPU)
-      {
-         result.c.r += (hitF.ambient*hitP.c.r) * curLight->r;
-         result.c.g += (hitF.ambient*hitP.c.g) * curLight->g;
-         result.c.b += (hitF.ambient*hitP.c.b) * curLight->b;
-      }
-      // CPU.
-      else
-      {
-         result.c.r += (data->object->f.ambient*data->object->p.c.r) *
-            curLight->r;
-         result.c.g += (data->object->f.ambient*data->object->p.c.g) *
-            curLight->g;
-         result.c.b += (data->object->f.ambient*data->object->p.c.b) *
-            curLight->b;
-      }
+      result.c.r += (hitF.ambient*hitP.c.r) * curLight->r;
+      result.c.g += (hitF.ambient*hitP.c.g) * curLight->g;
+      result.c.b += (hitF.ambient*hitP.c.b) * curLight->b;
 
       // Cast light feeler ray.
-      Ray feeler;
+      ray_t feeler;
       feeler.dir = curLight->location - data->point;
       feeler.dir.normalize();
       feeler.point = feeler.dir * EPSILON;
       feeler.point += data->point;
 
-      HitData tmpHit;
+      hit_t tmpHit;
 
       // If feeler hits any object, current point is in shadow.
       bool isShadow = gpuHit(feeler, &tmpHit);
 
       if (!isShadow)
       {
-         // GPU.
-         if (useGPU)
+         // Diffuse.
+         vec3_t n = hitNormal;
+         n.normalize();
+         vec3_t l = curLight->location - data->point;
+         l.normalize();
+         float nDotL = n.dot(l);
+         nDotL = min(nDotL, 1.0f);
+
+         if (nDotL > 0)
          {
-            // Diffuse.
-            vec3_t n = hitNormal;
-            n.normalize();
-            vec3_t l = curLight->location - data->point;
-            l.normalize();
-            float nDotL = n.dot(l);
-            nDotL = min(nDotL, 1.0f);
-
-            if (nDotL > 0)
-            {
-               result.c.r += hitF.diffuse*hitP.c.r * nDotL * curLight->r;
-               result.c.g += hitF.diffuse*hitP.c.g * nDotL * curLight->g;
-               result.c.b += hitF.diffuse*hitP.c.b * nDotL * curLight->b;
-            }
-
-            // Specular (Phong).
-            vec3_t r = mReflect(l, n);
-            r.normalize();
-            vec3_t v = view;
-            v.normalize();
-            float rDotV = r.dot(v);
-            rDotV = (float)pow(rDotV, 1.0f / hitF.roughness);
-            rDotV = min(rDotV, 1.0f);
-
-            if (rDotV > 0)
-            {
-               result.c.r += hitF.specular*hitP.c.r * rDotV * curLight->r;
-               result.c.g += hitF.specular*hitP.c.g * rDotV * curLight->g;
-               result.c.b += hitF.specular*hitP.c.b * rDotV * curLight->b;
-            }
+            result.c.r += hitF.diffuse*hitP.c.r * nDotL * curLight->r;
+            result.c.g += hitF.diffuse*hitP.c.g * nDotL * curLight->g;
+            result.c.b += hitF.diffuse*hitP.c.b * nDotL * curLight->b;
          }
-         // CPU.
-         else
+
+         // Specular (Phong).
+         vec3_t r = mReflect(l, n);
+         r.normalize();
+         vec3_t v = view;
+         v.normalize();
+         float rDotV = r.dot(v);
+         rDotV = (float)pow(rDotV, 1.0f / hitF.roughness);
+         rDotV = min(rDotV, 1.0f);
+
+         if (rDotV > 0)
          {
-            // Diffuse.
-            vec3_t n = data->object->getNormal(data->point);
-            n.normalize();
-            vec3_t l = curLight->location - data->point;
-            l.normalize();
-            float nDotL = n.dot(l);
-            nDotL = min(nDotL, 1.0f);
-            if (nDotL < 0)
-            {
-               nDotL *= -1;
-            }
-
-            if (nDotL > 0)
-            {
-               result.c.r += data->object->f.diffuse*data->object->p.c.r *
-                  nDotL * curLight->r;
-               result.c.g += data->object->f.diffuse*data->object->p.c.g *
-                  nDotL * curLight->g;
-               result.c.b += data->object->f.diffuse*data->object->p.c.b *
-                  nDotL * curLight->b;
-            }
-
-            // Specular (Phong).
-            vec3_t r = mReflect(l, n);
-            r.normalize();
-            vec3_t v = view;
-            v.normalize();
-            float rDotV = r.dot(v);
-            rDotV = (float)pow(rDotV, 1.0f / data->object->f.roughness);
-            rDotV = min(rDotV, 1.0f);
-
-            if (rDotV > 0)
-            {
-               result.c.r += data->object->f.specular*data->object->p.c.r *
-                  rDotV * curLight->r;
-               result.c.g += data->object->f.specular*data->object->p.c.g *
-                  rDotV * curLight->g;
-               result.c.b += data->object->f.specular*data->object->p.c.b *
-                  rDotV * curLight->b;
-            }
+            result.c.r += hitF.specular*hitP.c.r * rDotV * curLight->r;
+            result.c.g += hitF.specular*hitP.c.g * rDotV * curLight->g;
+            result.c.b += hitF.specular*hitP.c.b * rDotV * curLight->b;
          }
       }
    }

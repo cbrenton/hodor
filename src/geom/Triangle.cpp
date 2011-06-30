@@ -5,8 +5,8 @@
  */
 
 #include "geom/Triangle.h"
-#include "Ray.h"
-#include "structs/HitData.h"
+#include "structs/ray_t.h"
+#include "structs/hit_t.h"
 #include "Globals.h"
 
 // Gets the bounding box of the current geometry object.
@@ -25,7 +25,7 @@ Box Triangle::bBox()
    return result;
 }
 
-int Triangle::hit(Ray & ray, float *t, HitData *data, float minT, float maxT)
+int Triangle::hit(ray_t & ray, float *t, hit_t *data, float minT, float maxT)
 {
    return 0;
 }

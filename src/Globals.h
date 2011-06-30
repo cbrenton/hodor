@@ -13,8 +13,8 @@
 #include "structs/plane_t.h"
 #include "structs/sphere_t.h"
 #include "structs/triangle_t.h"
-#include "structs/HitData.h"
-#include "Ray.h"
+#include "structs/hit_t.h"
+#include "structs/ray_t.h"
 
 #define EPSILON 0.001f
 #define MIN_T 0.0f

@@ -1,5 +1,5 @@
 /**
- * Holds color data for a single pixel.
+ * Holds color_t data for a single pixel.
  * @author Chris Brenton
  * @date 06/20/2011
  */

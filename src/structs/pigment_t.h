@@ -4,14 +4,14 @@
  * @date 06/20/2011
  */
 
-#ifndef _PIGMENT_H
-#define _PIGMENT_H
+#ifndef _PIGMENT_T_H
+#define _PIGMENT_T_H
 
-#include "structs/color.h"
+#include "structs/color_t.h"
 
-struct Pigment
+struct pigment_t
 {
-   color c;
+   color_t c;
    
    float f;
 

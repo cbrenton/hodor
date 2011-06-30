@@ -4,10 +4,10 @@
  * @date 06/20/2011
  */
 
-#ifndef _FINISH_H
-#define _FINISH_H
+#ifndef _FINISH_T_H
+#define _FINISH_T_H
 
-struct Finish
+struct finish_t
 {
    public:
       double ambient;

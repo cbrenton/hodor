@@ -1,5 +1,5 @@
 /**
- * This holds scene geometry data. Ray casting and shading take place here.
+ * This holds scene geometry data. ray_t casting and shading take place here.
  * @author Chris Brenton
  * @date 06/20/2011
  */
@@ -8,6 +8,8 @@
 #define _SCENE_H
 
 #include <vector>
+#include <thrust/host_vector.h>
+#include <thrust/device_vector.h>
 #include "geom/Geometry.h"
 #include "Camera.h"
 #include "Light.h"
@@ -20,8 +22,8 @@
 #include "structs/plane_t.h"
 #include "structs/triangle_t.h"
 #include "structs/box_t.h"
-#include "Ray.h"
-#include "structs/HitData.h"
+#include "structs/ray_t.h"
+#include "structs/hit_t.h"
 #include "Pixel.h"
 
 class NYUParser;
@@ -36,16 +38,16 @@ class Scene
       static Scene* read(std::fstream & input);
 
       // Checks if a ray intersects any geometry in the scene, using structs.
-      bool gpuHit(Ray & ray, HitData *data);
+      bool gpuHit(ray_t & ray, hit_t *data);
 
       // Checks if a ray intersects any geometry in the scene, using Geometry.
-      bool hit(Ray & ray, HitData *data);
+      bool hit(ray_t & ray, hit_t *data);
 
-      // Casts a ray into the scene and returns a correctly colored pixel.
-      Pixel castRay(Ray & ray, int depth);
+      // Casts a ray into the scene and returns a correctly color_ted pixel.
+      Pixel castray_t(ray_t & ray, int depth);
 
       // Calculates proper shading at the current point.
-      Pixel shade(HitData *data, vec3_t view);
+      Pixel shade(hit_t *data, vec3_t view);
 
       //vec3_t reflect(vec3_t incident, vec3_t normal);
 
@@ -55,16 +57,16 @@ class Scene
       std::vector<Geometry*> geometry;
 
       // The vector of boxes in the scene (GPU only).
-      std::vector<box_t*> boxes;
+      thrust::host_vector<box_t*> boxes;
 
       // The vector of planes in the scene (GPU only).
-      std::vector<plane_t*> planes;
+      thrust::host_vector<plane_t*> planes;
 
       // The vector of spheres in the scene (GPU only).
-      std::vector<sphere_t*> spheres;
+      thrust::host_vector<sphere_t*> spheres;
 
       // The vector of triangles in the scene (GPU only).
-      std::vector<triangle_t*> triangles;
+      thrust::host_vector<triangle_t*> triangles;
 
       // The vector of lights in the scene.
       std::vector<Light*> lights;

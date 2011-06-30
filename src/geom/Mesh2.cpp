@@ -1,7 +1,7 @@
 
 #include "geom/Mesh2.h"
-#include "Ray.h"
-#include "structs/HitData.h"
+#include "structs/ray_t.h"
+#include "structs/hit_t.h"
 
 // Gets the bounding box of the current geometry object.
 Box Mesh2::bBox()
@@ -10,7 +10,7 @@ Box Mesh2::bBox()
    return result;
 }
 
-int Mesh2::hit(Ray & ray, float *t, HitData *data, float minT, float maxT)
+int Mesh2::hit(ray_t & ray, float *t, hit_t *data, float minT, float maxT)
 {
    return 0;
 }

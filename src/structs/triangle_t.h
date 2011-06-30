@@ -8,8 +8,8 @@
 #define _TRIANGLE_T_H
 
 #include "structs/vector.h"
-#include "structs/Pigment.h"
-#include "structs/Finish.h"
+#include "structs/pigment_t.h"
+#include "structs/finish_t.h"
 
 struct triangle_t
 {
@@ -22,9 +22,9 @@ struct triangle_t
    // The third corner of the triangle.
    vec3_t c3;
 
-   Pigment p;
+   pigment_t p;
 
-   Finish f;
+   finish_t f;
 
 };
 #endif

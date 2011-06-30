@@ -5,8 +5,8 @@
  */
 
 #include "geom/Plane.h"
-#include "Ray.h"
-#include "structs/HitData.h"
+#include "structs/ray_t.h"
+#include "structs/hit_t.h"
 
 Plane::Plane(vec3_t normal, float offset)
 {
@@ -21,7 +21,7 @@ Box Plane::bBox()
    return result;
 }
 
-int Plane::hit(Ray & ray, float *t, HitData *data, float minT, float maxT)
+int Plane::hit(ray_t & ray, float *t, hit_t *data, float minT, float maxT)
 {
    float denominator = ray.dir.dot(p_t.normal);
    if (denominator == 0.0)

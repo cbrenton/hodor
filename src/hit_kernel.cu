@@ -4,11 +4,11 @@
  * @date 6/24/2011
  */
 
-#include "Intersect.h"
+#include "hit_kernel.h"
 #include "Globals.h"
 #include "structs/vector.h"
 
-int box_hit(box_t *b_t, Ray & ray, float *t, HitData *data)
+int box_hit(box_t *b_t, ray_t & ray, float *t, hit_t *data)
 {
    float tNear = MIN_T - 1;
    float tFar = MAX_DIST + 1;
@@ -81,7 +81,7 @@ int box_hit(box_t *b_t, Ray & ray, float *t, HitData *data)
    return 1;
 }
 
-vec3_t box_normal(box_t *b_t, HitData *data)
+vec3_t box_normal(box_t *b_t, hit_t *data)
 {
    if (closeEnough(data->point.x(), b_t->left.offset))
    {
@@ -111,7 +111,7 @@ vec3_t box_normal(box_t *b_t, HitData *data)
    return vec3_t();
 }
 
-int plane_hit(plane_t *p_t, Ray & ray, float *t, HitData *data)
+int plane_hit(plane_t *p_t, ray_t & ray, float *t, hit_t *data)
 {
    float denominator = ray.dir.dot(p_t->normal);
    if (denominator == 0.0)
@@ -149,7 +149,7 @@ vec3_t plane_normal(plane_t *p_t)
    return p_t->normal;
 }
 
-int sphere_hit(sphere_t *s_t, Ray & ray, float *t, HitData *data)
+int sphere_hit(sphere_t *s_t, ray_t & ray, float *t, hit_t *data)
 {
    // Optimized algorithm courtesy of "Real-Time Rendering, Third Edition".
    vec3_t l = s_t->location - ray.point;
@@ -211,14 +211,14 @@ int sphere_hit(sphere_t *s_t, Ray & ray, float *t, HitData *data)
    }
 }
 
-vec3_t sphere_normal(sphere_t *s_t, HitData *data)
+vec3_t sphere_normal(sphere_t *s_t, hit_t *data)
 {
    vec3_t n = data->point - s_t->location;
    n.normalize();
    return n;
 }
 
-int triangle_hit(triangle_t *t_t, Ray & ray, float *t, HitData *data)
+int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hit_t *data)
 {
    float result = -1;
    float bBeta, bGamma, bT;

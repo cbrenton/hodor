@@ -1,5 +1,5 @@
 /**
- * Holds color data for a single pixel.
+ * Holds color_t data for a single pixel.
  * @author Chris Brenton
  * @date 06/20/2011
  */
@@ -7,7 +7,7 @@
 #ifndef _PIXEL_H
 #define _PIXEL_H
 
-#include "structs/color.h"
+#include "structs/color_t.h"
 
 class Pixel
 {
@@ -22,8 +22,8 @@ class Pixel
 
       void multiply(double factor);
 
-      // The color of the pixel.
-      color c;
+      // The color_t of the pixel.
+      color_t c;
 
 };
 #endif

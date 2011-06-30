@@ -4,14 +4,14 @@
  * @date 06/20/2011
  */
 
-#ifndef _HITDATA_H
-#define _HITDATA_H
+#ifndef _HIT_T_H
+#define _HIT_T_H
 
 #include "structs/vector.h"
 
 class Geometry;
 
-struct HitData
+struct hit_t
 {
    int hit;
 

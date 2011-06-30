@@ -5,9 +5,9 @@
  */
 
 #include "geom/Geometry.h"
-#include "Ray.h"
+#include "structs/ray_t.h"
 #include "Box.h"
-#include "structs/HitData.h"
+#include "structs/hit_t.h"
 
 Box Geometry::bBox()
 {
@@ -16,7 +16,7 @@ Box Geometry::bBox()
    return result;
 }
 
-int Geometry::hit(Ray & ray, float *t, HitData *data, float minT, float maxT)
+int Geometry::hit(ray_t & ray, float *t, hit_t *data, float minT, float maxT)
 {
    return 0;
 }
