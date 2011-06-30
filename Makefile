@@ -83,7 +83,7 @@ valgrind:
 	valgrind --tool=memcheck --leak-check=full ./$(TARGET) $(ARGS)
 
 clean:
-	$(RM) $(TARGET) $(OBJS) main.o
+	$(RM) $(TARGET) $(OBJS) src/main.o src/build-debug src/build-profile src/build-release
 
 killall:
 	$(KILL) $(TARGET)
