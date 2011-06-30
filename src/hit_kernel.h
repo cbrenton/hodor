@@ -4,7 +4,7 @@
  * @date 6/24/2011
  */
 
-#include <structs/vector.h>
+#include "structs/vector.h"
 
 struct box_t;
 struct plane_t;
@@ -30,4 +30,12 @@ int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hit_t *data);
 
 vec3_t triangle_normal(triangle_t *t_t);
 
-//__global__ void hitSpheres(sphere_t *sData, 
+__global__ void hitSpheres(sphere_t *spheres, int sphere_size,
+      ray_t **rays, hit_t *results);
+
+//__global__ void cuda_test(float *a, int N);
+__global__ void cuda_test(ray_t **rays, int width, int height);
+
+void initPrintf();
+
+void endPrintf();

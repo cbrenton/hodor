@@ -31,8 +31,8 @@ INPUTDIR=input
 INPUTFILE=simple_spec
 OUTPUTDIR=images
 OUTPUTEXT=png
-WIDTH=320
-HEIGHT=240
+WIDTH=32
+HEIGHT=24
 ARGS = -w $(WIDTH) -h $(HEIGHT) -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
 
 # Additional linker libraries

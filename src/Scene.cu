@@ -6,7 +6,6 @@
 
 #include <iostream>
 #include "Scene.h"
-#include "hit_kernel.h"
 #include "parse/nyuparser.h"
 #include "Globals.h"
 
@@ -34,7 +33,7 @@ Scene* Scene::read(std::fstream & input)
       {
       curScene->geometry[geomNdx]->debug();
       }
-      */
+    */
    delete parser;
    return curScene;
 }
@@ -203,8 +202,40 @@ bool Scene::hit(ray_t & ray, hit_t *data)
    return (closestT <= MAX_DIST);
 }
 
+Pixel** Scene::castRays(ray_t **rays, int width, int height, int depth)
+{
+   sphere_t **sphereArray = thrust::raw_pointer_cast(&spheres[0]);
+   hit_t *results = new hit_t[width * height];
+   //hitSpheres(*sphereArray, spheres.size(), rays, results);
+
+
+
+   cout << "cuda_test: (" << width << ", " << height << ")" << endl;
+   ray_t **r_d;
+   size_t size = width * height * sizeof(ray_t);
+   cudaMalloc((void **) &r_d, size);
+   cudaMemcpy(r_d, rays, size, cudaMemcpyHostToDevice);
+   int block_size = 4;
+   int n_blocks = width * height / block_size +
+      (width * height % block_size > 0 ? 1 : 0);
+   cout << "n_blocks: " << n_blocks << endl;
+
+   initPrintf();
+
+   cuda_test <<< block_size, n_blocks >>> (r_d, width, height);
+
+   cudaMemcpy(rays, r_d, sizeof(ray_t)*width*height, cudaMemcpyDeviceToHost);
+
+   endPrintf();
+
+   cudaFree(r_d);
+
+
+   return NULL;
+}
+
 // Casts a ray into the scene and returns a correctly color_ted pixel.
-Pixel Scene::castray_t(ray_t & ray, int depth)
+Pixel Scene::castRay(ray_t & ray, int depth)
 {
    Pixel result(0.0, 0.0, 0.0);
    Pixel reflectPix(0.0, 0.0, 0.0);
@@ -218,7 +249,7 @@ Pixel Scene::castray_t(ray_t & ray, int depth)
       {
          if (rayData.reflect != NULL && depth > 0)
          {
-            pigment_t hitP = {};
+            //pigment_t hitP = {};
             finish_t hitF = {};
             vec3_t hitNormal(0.0, 0.0, 0.0);
             box_t *b_t;
@@ -228,25 +259,25 @@ Pixel Scene::castray_t(ray_t & ray, int depth)
             switch (rayData.hitType) {
             case BOX_HIT:
                b_t = boxes[rayData.objIndex];
-               hitP = b_t->p;
+               //hitP = b_t->p;
                hitF = b_t->f;
                hitNormal = box_normal(b_t, &rayData);
                break;
             case PLANE_HIT:
                p_t = planes[rayData.objIndex];
-               hitP = p_t->p;
+               //hitP = p_t->p;
                hitF = p_t->f;
                hitNormal = plane_normal(p_t);
                break;
             case SPHERE_HIT:
                s_t = spheres[rayData.objIndex];
-               hitP = s_t->p;
+               //hitP = s_t->p;
                hitF = s_t->f;
                hitNormal = sphere_normal(s_t, &rayData);
                break;
             case TRIANGLE_HIT:
                t_t = triangles[rayData.objIndex];
-               hitP = t_t->p;
+               //hitP = t_t->p;
                hitF = t_t->f;
                hitNormal = triangle_normal(t_t);
                break;
@@ -258,7 +289,7 @@ Pixel Scene::castray_t(ray_t & ray, int depth)
             reflectOrig += rayData.point;
             ray_t reflectray_t = {reflectOrig, reflectVec};
 
-            reflectPix = castray_t(reflectray_t, depth - 1);
+            reflectPix = castRay(reflectray_t, depth - 1);
 
             reflectPix.multiply(hitF.reflection);
             result.multiply(1 - hitF.reflection);
@@ -370,4 +401,4 @@ Pixel Scene::shade(hit_t *data, vec3_t view)
    {
    return n * (2 * (-d.dot(n))) + d;
    }
-   */
+ */

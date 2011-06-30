@@ -6,8 +6,6 @@
 #include <sys/time.h>
 #include <sys/ioctl.h>
 #include <math.h>
-#include <thrust/host_vector.h>
-#include <thrust/device_vector.h>
 
 #include "Globals.h"
 #include "Pixel.h"
@@ -152,20 +150,20 @@ int main(int argc, char **argv)
 
    // Make array of rays.
    /*
-      ray_t ***aray_tArray = new ray_t **[width];
+      ray_t ***aRayArray = new ray_t **[width];
       for (int i = 0; i < width; i++)
       {
-      aray_tArray[i] = new ray_t *[height];
+      aRayArray[i] = new ray_t *[height];
       for (int j = 0; j < height; j++)
       {
-      aray_tArray[i][j] = new ray_t[numAA];
+      aRayArray[i][j] = new ray_t[numAA];
       }
       }
       */
-   ray_t **aray_tArray = new ray_t *[width];
+   ray_t **aRayArray = new ray_t *[width];
    for (int i = 0; i < width; i++)
    {
-      aray_tArray[i] = new ray_t[height];
+      aRayArray[i] = new ray_t[height];
    }
 
    float l = -scene->camera.right.length() / 2;
@@ -208,10 +206,10 @@ int main(int argc, char **argv)
          vec3_t rayDir = uVector + vVector + wVector;
          rayDir.normalize();
          vec3_t curPoint = vec3_t(scene->camera.location);
-         //ray_t *curray_t = new ray_t(curPoint, rayDir);
-         ray_t curray_t = {curPoint, rayDir};
-         //aray_tArray[i][j][k] = *curray_t;
-         aray_tArray[x][y] = curray_t;
+         //ray_t *curRay = new ray_t(curPoint, rayDir);
+         ray_t curRay = {curPoint, rayDir};
+         //aRayArray[i][j][k] = *curRay;
+         aRayArray[x][y] = curRay;
       }
    }
    cout << "done." << endl;
@@ -240,16 +238,19 @@ int main(int argc, char **argv)
 
    // Test for intersection.
    cout << "Testing intersections." << endl;
+
+   scene->castRays(aRayArray, image->width, image->height, RECURSION_DEPTH);
+   /*
    for (int x = 0; x < image->width; x++)
    {
       for (int y = 0; y < image->height; y++)
       {
-         //image->pixelData[x][y] = scene->castray_t(aray_tArray[x][y], RECURSION_DEPTH);
-         Pixel curPix = scene->castray_t(aray_tArray[x][y], RECURSION_DEPTH);
+         Pixel curPix = scene->castRay(aRayArray[x][y], RECURSION_DEPTH);
          // Write pixel out to file.
          image->writePixel(x, y, curPix);
       }
    }
+   */
 
    cout << "Writing to file...";
    // finish_t writing image out to file.
@@ -258,9 +259,9 @@ int main(int argc, char **argv)
    
    for (int i = 0; i < width; i++)
    {
-      delete[] aray_tArray[i];
+      delete[] aRayArray[i];
    }
-   delete[] aray_tArray;
+   delete[] aRayArray;
    
    delete image;
 

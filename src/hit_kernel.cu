@@ -4,6 +4,7 @@
  * @date 6/24/2011
  */
 
+#include "cuPrintf.cu"
 #include "hit_kernel.h"
 #include "Globals.h"
 #include "structs/vector.h"
@@ -344,4 +345,69 @@ vec3_t triangle_normal(triangle_t *t_t)
    vec3_t s2 = t_t->c3 - t_t->c1;
    s1.cross(s1, s2);
    return s1;
+}
+
+__global__ void hitSpheres(sphere_t *spheres, int sphere_size, ray_t **rays, hit_t *results)
+{
+   /*
+      int thread_id = (blockIdx.y * BLOCKS_PER_ROW * THREADS_PER_BLOCK) +
+      blockIdx.x * THREADS_PER_BLOCK + threadIdx.x;
+
+      cuPrintf("%d\n", thread_id);
+    */
+
+   /*
+   // INITIALIZE closestT to MAX_DIST + 0.1
+   float closestT = MAX_DIST + 0.1f;
+   // INITIALIZE closestData to empty hit_t
+   hit_t *closestData = results[thread_id];
+
+   // FOR each item in spheres
+   for (int sphereNdx = 0; sphereNdx < (int)spheres.size(); sphereNdx++)
+   {
+   float sphereT = -1;
+   hit_t *sphereData = new hit_t();
+   // IF current item is hit by ray
+   if (sphere_hit(spheres[sphereNdx], ray, &sphereT, sphereData) != 0)
+   {
+   // IF intersection is closer than closestT
+   if (sphereT < closestT)
+   {
+   // SET closestT to intersection
+   closestT = sphereT;
+   // SET closestData to intersection data
+    *closestData = *sphereData;
+    closestData->objIndex = sphereNdx;
+    }
+   // ENDIF
+   }
+   // ENDIF
+   delete sphereData;
+   }
+    */
+}
+
+//__global__ void cuda_test(float *a, int N)
+__global__ void cuda_test(ray_t **rays, int width, int height)
+{
+   int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+   int x = (idx % width);
+   int y = idx / width;
+   if (idx >= width * height) return;
+   if (x == 0)
+   {
+      cuPrintf("id %d: (%d, %d)\n", idx, x, y);
+   }
+}
+
+void initPrintf()
+{
+   cudaPrintfInit();
+}
+   
+void endPrintf()
+{
+   cudaPrintfDisplay(stdout, true);
+   cudaPrintfEnd();
 }

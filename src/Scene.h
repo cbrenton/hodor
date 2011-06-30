@@ -1,5 +1,5 @@
 /**
- * This holds scene geometry data. ray_t casting and shading take place here.
+ * This holds scene geometry data. Ray casting and shading take place here.
  * @author Chris Brenton
  * @date 06/20/2011
  */
@@ -25,6 +25,7 @@
 #include "structs/ray_t.h"
 #include "structs/hit_t.h"
 #include "Pixel.h"
+#include "hit_kernel.h"
 
 class NYUParser;
 
@@ -42,9 +43,11 @@ class Scene
 
       // Checks if a ray intersects any geometry in the scene, using Geometry.
       bool hit(ray_t & ray, hit_t *data);
+      
+      Pixel** castRays(ray_t **ray, int height, int width, int depth);
 
       // Casts a ray into the scene and returns a correctly color_ted pixel.
-      Pixel castray_t(ray_t & ray, int depth);
+      Pixel castRay(ray_t & ray, int depth);
 
       // Calculates proper shading at the current point.
       Pixel shade(hit_t *data, vec3_t view);
