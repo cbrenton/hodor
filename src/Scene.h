@@ -66,7 +66,7 @@ class Scene
       thrust::host_vector<plane_t*> planes;
 
       // The vector of spheres in the scene (GPU only).
-      thrust::host_vector<sphere_t*> spheres;
+      thrust::host_vector<sphere_t> spheres;
 
       // The vector of triangles in the scene (GPU only).
       thrust::host_vector<triangle_t*> triangles;

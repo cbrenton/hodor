@@ -204,31 +204,57 @@ bool Scene::hit(ray_t & ray, hit_t *data)
 
 Pixel** Scene::castRays(ray_t **rays, int width, int height, int depth)
 {
-   sphere_t **sphereArray = thrust::raw_pointer_cast(&spheres[0]);
-   hit_t *results = new hit_t[width * height];
-   //hitSpheres(*sphereArray, spheres.size(), rays, results);
-
-
-
    cout << "cuda_test: (" << width << ", " << height << ")" << endl;
-   ray_t **r_d;
-   size_t size = width * height * sizeof(ray_t);
-   cudaMalloc((void **) &r_d, size);
-   cudaMemcpy(r_d, rays, size, cudaMemcpyHostToDevice);
+   thrust::device_vector<sphere_t*> spheres_d = spheres;
+   sphere_t **sphereArray = thrust::raw_pointer_cast(&spheres_d[0]);
+
+   int num = width * height;
+
+   // Create hit data array on host.
+   hit_t *results = new hit_t[num];
+   // Create hit data array on device.
+   hit_t *results_d;
+   size_t results_size = num * sizeof(hit_t);
+   cudaMalloc((void **) &results_d, results_size);
+
+   // Create ray array on device.
+   ray_t **rays_d;
+   size_t rays_size = num * sizeof(ray_t);
+   cudaMalloc((void **) &rays_d, rays_size);
+   // Copy rays to device.
+   cudaMemcpy(rays_d, rays, rays_size, cudaMemcpyHostToDevice);
+   // Calculate block size and number of blocks.
    int block_size = 4;
-   int n_blocks = width * height / block_size +
-      (width * height % block_size > 0 ? 1 : 0);
+   //int n_blocks = num / block_size + (num % block_size > 0 ? 1 : 0);
+   int n_blocks = 100;
+
    cout << "n_blocks: " << n_blocks << endl;
 
    initPrintf();
 
-   cuda_test <<< block_size, n_blocks >>> (r_d, width, height);
+   /*
+   // Test for intersection.
+   cuda_test <<< block_size, n_blocks >>>
+      (rays_d, width, height, *sphereArray, spheres_d.size(), results_d);
 
-   cudaMemcpy(rays, r_d, sizeof(ray_t)*width*height, cudaMemcpyDeviceToHost);
+   // Copy hit data to host.
+   cudaMemcpy(results, results_d, results_size, cudaMemcpyDeviceToHost);
+   */
+   cuda_test <<< block_size, n_blocks >>>
+      (rays_d, width, height, *sphereArray, spheres_d.size());
 
    endPrintf();
 
-   cudaFree(r_d);
+   // Print results.
+   /*
+   for (int i = 0; i < results_size; i++)
+   {
+      cout << "results[" << i << "]: " << results[i].hit << endl;
+   }
+   */
+
+   cudaFree(rays_d);
+   delete[] results;
 
 
    return NULL;
@@ -254,7 +280,7 @@ Pixel Scene::castRay(ray_t & ray, int depth)
             vec3_t hitNormal(0.0, 0.0, 0.0);
             box_t *b_t;
             plane_t *p_t;
-            sphere_t *s_t;
+            sphere_t s_t;
             triangle_t *t_t;
             switch (rayData.hitType) {
             case BOX_HIT:
@@ -272,7 +298,7 @@ Pixel Scene::castRay(ray_t & ray, int depth)
             case SPHERE_HIT:
                s_t = spheres[rayData.objIndex];
                //hitP = s_t->p;
-               hitF = s_t->f;
+               hitF = s_t.f;
                hitNormal = sphere_normal(s_t, &rayData);
                break;
             case TRIANGLE_HIT:
@@ -310,7 +336,7 @@ Pixel Scene::shade(hit_t *data, vec3_t view)
    vec3_t hitNormal(0.0, 0.0, 0.0);
    box_t *b_t;
    plane_t *p_t;
-   sphere_t *s_t;
+   sphere_t s_t;
    triangle_t *t_t;
    switch (data->hitType) {
    case BOX_HIT:
@@ -327,8 +353,8 @@ Pixel Scene::shade(hit_t *data, vec3_t view)
       break;
    case SPHERE_HIT:
       s_t = spheres[data->objIndex];
-      hitP = s_t->p;
-      hitF = s_t->f;
+      hitP = s_t.p;
+      hitF = s_t.f;
       hitNormal = sphere_normal(s_t, data);
       break;
    case TRIANGLE_HIT:

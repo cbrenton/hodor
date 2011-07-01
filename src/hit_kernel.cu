@@ -150,13 +150,13 @@ vec3_t plane_normal(plane_t *p_t)
    return p_t->normal;
 }
 
-int sphere_hit(sphere_t *s_t, ray_t & ray, float *t, hit_t *data)
+int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hit_t *data)
 {
    // Optimized algorithm courtesy of "Real-Time Rendering, Third Edition".
-   vec3_t l = s_t->location - ray.point;
+   vec3_t l = s_t.location - ray.point;
    float s = l.dot(ray.dir);
    float l2 = l.dot(l);
-   float r2 = s_t->radius * s_t->radius;
+   float r2 = s_t.radius * s_t.radius;
    if (s < MIN_T && l2 > r2)
    {
       return 0;
@@ -183,7 +183,7 @@ int sphere_hit(sphere_t *s_t, ray_t & ray, float *t, hit_t *data)
    if (l2 < r2)
    {
       data->hit = -1;
-      if (s_t->f.reflection > 0.0)
+      if (s_t.f.reflection > 0.0)
       {
          data->reflect = new vec3_t();
          vec3_t n = sphere_normal(s_t, data);
@@ -198,7 +198,7 @@ int sphere_hit(sphere_t *s_t, ray_t & ray, float *t, hit_t *data)
    else
    {
       data->hit = 1;
-      if (s_t->f.reflection > 0.0)
+      if (s_t.f.reflection > 0.0)
       {
          data->reflect = new vec3_t();
          vec3_t n = sphere_normal(s_t, data);
@@ -212,9 +212,9 @@ int sphere_hit(sphere_t *s_t, ray_t & ray, float *t, hit_t *data)
    }
 }
 
-vec3_t sphere_normal(sphere_t *s_t, hit_t *data)
+vec3_t sphere_normal(sphere_t & s_t, hit_t *data)
 {
-   vec3_t n = data->point - s_t->location;
+   vec3_t n = data->point - s_t.location;
    n.normalize();
    return n;
 }
@@ -387,8 +387,8 @@ __global__ void hitSpheres(sphere_t *spheres, int sphere_size, ray_t **rays, hit
     */
 }
 
-//__global__ void cuda_test(float *a, int N)
-__global__ void cuda_test(ray_t **rays, int width, int height)
+//__global__ void cuda_test(ray_t **rays, int width, int height, sphere_t *spheres, int sphere_size, hit_t* results)
+__global__ void cuda_test(ray_t **rays, int width, int height, sphere_t *spheres, int sphere_size)
 {
    int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -399,6 +399,7 @@ __global__ void cuda_test(ray_t **rays, int width, int height)
    {
       cuPrintf("id %d: (%d, %d)\n", idx, x, y);
    }
+   //results[idx].hit = x;
 }
 
 void initPrintf()
