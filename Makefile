@@ -28,11 +28,11 @@ TARGET = terlR
 INPUTEXT=pov
 INPUTDIR=input
 #INPUTFILE=bunny_small
-INPUTFILE=simple_spec
+INPUTFILE=test
 OUTPUTDIR=images
 OUTPUTEXT=png
-WIDTH=32
-HEIGHT=24
+WIDTH=20
+HEIGHT=10
 ARGS = -w $(WIDTH) -h $(HEIGHT) -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
 
 # Additional linker libraries

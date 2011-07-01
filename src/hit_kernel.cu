@@ -4,10 +4,10 @@
  * @date 6/24/2011
  */
 
-#include "cuPrintf.cu"
 #include "hit_kernel.h"
 #include "Globals.h"
 #include "structs/vector.h"
+#include "structs/hitd_t.h"
 
 int box_hit(box_t *b_t, ray_t & ray, float *t, hit_t *data)
 {
@@ -72,8 +72,8 @@ int box_hit(box_t *b_t, ray_t & ray, float *t, hit_t *data)
    /*
    if (b_t->f.reflection > 0.0)
    {
-      data->reflect = new vec3_t();
-      vec3_t n = box_normal(b_t, data);
+      data->reflect = new vec3d_t();
+      vec3d_t n = box_normal(b_t, data);
       *data->reflect = mReflect(ray.dir, n);
    }
    else
@@ -84,45 +84,46 @@ int box_hit(box_t *b_t, ray_t & ray, float *t, hit_t *data)
    return 1;
 }
 
-vec3_t box_normal(box_t *b_t, hit_t *data)
+vec3d_t box_normal(box_t *b_t, hit_t *data)
 {
    if (closeEnough(data->point.x(), b_t->left.offset))
    {
-      return b_t->left.normal;
+      return vec3d_t(b_t->left.normal);
    }
    if (closeEnough(data->point.x(), b_t->right.offset))
    {
-      return b_t->right.normal;
+      return vec3d_t(b_t->right.normal);
    }
    if (closeEnough(data->point.y(), b_t->bottom.offset))
    {
-      return b_t->bottom.normal;
+      return vec3d_t(b_t->bottom.normal);
    }
    if (closeEnough(data->point.y(), b_t->top.offset))
    {
-      return b_t->top.normal;
+      return vec3d_t(b_t->top.normal);
    }
    if (closeEnough(data->point.z(), b_t->back.offset))
    {
-      return b_t->back.normal;
+      return vec3d_t(b_t->back.normal);
    }
    if (closeEnough(data->point.z(), b_t->front.offset))
    {
-      return b_t->front.normal;
+      return vec3d_t(b_t->front.normal);
    }
    cout << "shouldn't be here." << endl;
-   return vec3_t();
+   return vec3d_t();
 }
 
 int plane_hit(plane_t *p_t, ray_t & ray, float *t, hit_t *data)
 {
+   /*
    float denominator = ray.dir.dot(p_t->normal);
    if (denominator == 0.0)
    {
       return 0;
    }
-   vec3_t p = p_t->normal * p_t->offset;
-   vec3_t pMinusL = p - ray.point;
+   vec3d_t p = p_t->normal * p_t->offset;
+   vec3d_t pMinusL = p - ray.point;
    float numerator = pMinusL.dot(p_t->normal);
    *t = numerator / denominator;
    if (*t >= MIN_T && *t <= MAX_DIST)
@@ -132,11 +133,13 @@ int plane_hit(plane_t *p_t, ray_t & ray, float *t, hit_t *data)
       data->point += ray.point;
       data->t = (*t);
       data->hitType = PLANE_HIT;
+      */
+
       /*
       if (p_t->f.reflection > 0.0)
       {
-         data->reflect = new vec3_t();
-         vec3_t n = plane_normal(p_t);
+         data->reflect = new vec3d_t();
+         vec3d_t n = plane_normal(p_t);
          *data->reflect = mReflect(ray.dir, n);
       }
       else
@@ -144,21 +147,25 @@ int plane_hit(plane_t *p_t, ray_t & ray, float *t, hit_t *data)
          data->reflect = NULL;
       }
       */
-      return 1;
-   }
+      
+      //return 1;
+   //}
    return 0;
 }
 
-vec3_t plane_normal(plane_t *p_t)
+vec3d_t plane_normal(plane_t *p_t)
 {
-   return p_t->normal;
+   return vec3d_t(p_t->normal);
 }
 
-__device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hit_t *data)
+__device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data)
 {
    // Optimized algorithm courtesy of "Real-Time Rendering, Third Edition".
-   vec3_t l = s_t.location - ray.point;
-   float s = l.dot(ray.dir);
+   vec3d_t location = s_t.location;
+   vec3d_t rayPoint = ray.point;
+   vec3d_t l = location - rayPoint;
+   vec3d_t rayDir = vec3d_t(ray.dir);
+   float s = l.dot(rayDir);
    float l2 = l.dot(l);
    float r2 = s_t.radius * s_t.radius;
    if (s < MIN_T && l2 > r2)
@@ -181,50 +188,36 @@ __device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hit_t *data)
       data->t = s + q;
       *t = s + q;
    }
-   data->point = ray.dir * (*t);
-   data->point += ray.point;
+   vec3d_t dataPoint = rayDir * (*t);
+   dataPoint += rayPoint;
+   data->point.v[0] = dataPoint.v[0];
+   data->point.v[1] = dataPoint.v[1];
+   data->point.v[2] = dataPoint.v[2];
    data->hitType = SPHERE_HIT;
    if (l2 < r2)
    {
       data->hit = -1;
-      /*
-      if (s_t.f.reflection > 0.0)
-      {
-         data->reflect = new vec3_t();
-         vec3_t n = sphere_normal(s_t, data);
-         *data->reflect = mReflect(ray.dir, n);
-      }
-      else
-      {
-         data->reflect = NULL;
-      }
-      */
       return -1;
    }
    else
    {
       data->hit = 1;
-      /*
-      if (s_t.f.reflection > 0.0)
-      {
-         data->reflect = new vec3_t();
-         vec3_t n = sphere_normal(s_t, data);
-         *data->reflect = mReflect(ray.dir, n);
-      }
-      else
-      {
-         data->reflect = NULL;
-      }
-      */
       return 1;
    }
 }
 
-vec3_t sphere_normal(sphere_t & s_t, hit_t *data)
+vec3d_t sphere_normal(sphere_t & s_t, hit_t *data)
 {
-   vec3_t n = data->point - s_t.location;
+   /*
+   vec3d_t dataPoint(data.point);
+   vec3d_t location(s_t.location);
+   vec3d_t n = kdataPoint - location);
    n.normalize();
    return n;
+   */
+   vec3_t n = data->point - s_t.location;
+   n.normalize();
+   return vec3d_t(n);
 }
 
 int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hit_t *data)
@@ -347,42 +340,43 @@ int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hit_t *data)
    return 0;
 }
 
-vec3_t triangle_normal(triangle_t *t_t)
+vec3d_t triangle_normal(triangle_t *t_t)
 {
-   vec3_t s1 = t_t->c2 - t_t->c1;
-   vec3_t s2 = t_t->c3 - t_t->c1;
+   /*
+   vec3d_t s1 = t_t->c2 - t_t->c1;
+   vec3d_t s2 = t_t->c3 - t_t->c1;
    s1.cross(s1, s2);
    return s1;
+   */
+   return vec3d_t(0, 0, 0);
 }
 
-__global__ void hit_spheres(ray_t **rays, int width, int height,
-      sphere_t *spheres, int spheres_size, hit_t *results)
+__global__ void hit_spheres(ray_t *rays, int width, int height,
+      sphere_t *spheres, int spheres_size, hitd_t *results)
 {
    int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
    int x = (idx % width);
    int y = idx / width;
    if (idx >= width * height) return;
-   if (x == 0)
-   {
-      cuPrintf("id %d: (%d, %d)\n", idx, x, y);
-   }
-   results[idx].hit = x;
+   //if (x == 0)
+   //{
+      //printf("id %d: (%d, %d)\n", idx, x, y);
+   //}
 
    // INITIALIZE closestT to MAX_DIST + 0.1
    float closestT = MAX_DIST + 0.1f;
    // INITIALIZE closestData to empty hit_t
-   hit_t *closestData = &results[idx];
+   hitd_t *closestData = &results[idx];
 
-   ray_t *ray = &rays[x][y];
+   ray_t *ray = &rays[x * height + y];
 
    // FOR each item in spheres
    for (int sphereNdx = 0; sphereNdx < (int)spheres_size; sphereNdx++)
    {
       float sphereT = -1;
-      //hit_t *sphereData = new hit_t();
-      hit_t *sphereData = {0};
-      // IF current item is hit by ray
+      hitd_t *sphereData = new hitd_t();
+      //// IF current item is hit by ray
       if (sphere_hit(spheres[sphereNdx], *ray, &sphereT, sphereData) != 0)
       {
          // IF intersection is closer than closestT
@@ -399,15 +393,8 @@ __global__ void hit_spheres(ray_t **rays, int width, int height,
       // ENDIF
       delete sphereData;
    }
-}
-
-void initPrintf()
-{
-   cudaPrintfInit();
-}
-
-void endPrintf()
-{
-   cudaPrintfDisplay(stdout, true);
-   cudaPrintfEnd();
+   for (int i = 0; i < width * height; i++)
+   {
+      //cout << "results_d[" << i << "]: " << results[i].hit << endl;
+   }
 }

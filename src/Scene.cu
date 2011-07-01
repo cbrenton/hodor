@@ -9,6 +9,8 @@
 #include "parse/nyuparser.h"
 #include "Globals.h"
 #include "hit_kernel.h"
+#include "structs/hitd_t.h"
+#include <cutil.h>
 
 using namespace std;
 
@@ -60,111 +62,111 @@ bool Scene::gpuHit(ray_t & ray, hit_t *data)
    // FOR each item in boxes
    for (int boxNdx = 0; boxNdx < (int)boxes.size(); boxNdx++)
    {
-      float boxT = -1;
-      hit_t *boxData = new hit_t();
-      // IF current item is hit by ray
-      if (box_hit(boxes[boxNdx], ray, &boxT, boxData) != 0)
-      {
-         // IF intersection is closer than closestT
-         if (boxT < closestT)
-         {
-            // SET closestT to intersection
-            closestT = boxT;
-            // SET closestData to intersection data
-            *closestData = *boxData;
-            closestData->objIndex = boxNdx;
-         }
-         // ENDIF
-      }
-      // ENDIF
-      delete boxData;
+   float boxT = -1;
+   hit_t *boxData = new hit_t();
+   // IF current item is hit by ray
+   if (box_hit(boxes[boxNdx], ray, &boxT, boxData) != 0)
+   {
+   // IF intersection is closer than closestT
+   if (boxT < closestT)
+   {
+   // SET closestT to intersection
+   closestT = boxT;
+   // SET closestData to intersection data
+    *closestData = *boxData;
+    closestData->objIndex = boxNdx;
+    }
+   // ENDIF
+   }
+   // ENDIF
+   delete boxData;
    }
 
    // Find hit for planes.
    // FOR each item in geometry
    for (int planeNdx = 0; planeNdx < (int)planes.size(); planeNdx++)
    {
-      float planeT = -1;
-      hit_t *planeData = new hit_t();
-      // IF current item is hit by ray
-      if (plane_hit(planes[planeNdx], ray, &planeT, planeData) != 0)
-      {
-         // IF intersection is closer than closestT
-         if (planeT < closestT)
-         {
-            // SET closestT to intersection
-            closestT = planeT;
-            // SET closestData to intersection data
-            *closestData = *planeData;
-            closestData->objIndex = planeNdx;
-         }
-         // ENDIF
-      }
-      // ENDIF
-      delete planeData;
+   float planeT = -1;
+   hit_t *planeData = new hit_t();
+   // IF current item is hit by ray
+   if (plane_hit(planes[planeNdx], ray, &planeT, planeData) != 0)
+   {
+   // IF intersection is closer than closestT
+   if (planeT < closestT)
+   {
+   // SET closestT to intersection
+   closestT = planeT;
+   // SET closestData to intersection data
+    *closestData = *planeData;
+    closestData->objIndex = planeNdx;
+    }
+   // ENDIF
+   }
+   // ENDIF
+   delete planeData;
    }
 
    // Find hit for spheres.
    // FOR each item in spheres
    for (int sphereNdx = 0; sphereNdx < (int)spheres.size(); sphereNdx++)
    {
-      float sphereT = -1;
-      hit_t *sphereData = new hit_t();
-      // IF current item is hit by ray
-      if (sphere_hit(spheres[sphereNdx], ray, &sphereT, sphereData) != 0)
+   float sphereT = -1;
+   hit_t *sphereData = new hit_t();
+   // IF current item is hit by ray
+   if (sphere_hit(spheres[sphereNdx], ray, &sphereT, sphereData) != 0)
+   {
+   // IF intersection is closer than closestT
+   if (sphereT < closestT)
+   {
+   // SET closestT to intersection
+   closestT = sphereT;
+   // SET closestData to intersection data
+    *closestData = *sphereData;
+    closestData->objIndex = sphereNdx;
+}
+// ENDIF
+}
+// ENDIF
+delete sphereData;
+}
+
+// Find hit for triangles.
+// FOR each item in triangles
+for (int triNdx = 0; triNdx < (int)triangles.size(); triNdx++)
+{
+   float triT = -1;
+   hit_t *triData = new hit_t();
+   // IF current item is hit by ray
+   if (triangle_hit(triangles[triNdx], ray, &triT, triData) != 0)
+   {
+      // IF intersection is closer than closestT
+      if (triT < closestT)
       {
-         // IF intersection is closer than closestT
-         if (sphereT < closestT)
-         {
-            // SET closestT to intersection
-            closestT = sphereT;
-            // SET closestData to intersection data
-            *closestData = *sphereData;
-            closestData->objIndex = sphereNdx;
-         }
-         // ENDIF
+         // SET closestT to intersection
+         closestT = triT;
+         // SET closestData to intersection data
+         *closestData = *triData;
+         closestData->objIndex = triNdx;
       }
       // ENDIF
-      delete sphereData;
-   }
-
-   // Find hit for triangles.
-   // FOR each item in triangles
-   for (int triNdx = 0; triNdx < (int)triangles.size(); triNdx++)
-   {
-      float triT = -1;
-      hit_t *triData = new hit_t();
-      // IF current item is hit by ray
-      if (triangle_hit(triangles[triNdx], ray, &triT, triData) != 0)
-      {
-         // IF intersection is closer than closestT
-         if (triT < closestT)
-         {
-            // SET closestT to intersection
-            closestT = triT;
-            // SET closestData to intersection data
-            *closestData = *triData;
-            closestData->objIndex = triNdx;
-         }
-         // ENDIF
-      }
-      // ENDIF
-      delete triData;
-   }
-
-   // ENDFOR
-   // IF data is not null
-   if (data != NULL)
-   {
-      // SET data to closestData
-      *data = *closestData;
    }
    // ENDIF
-   delete closestData;
-   // RETURN true if closestT is less than or equal to MAX_DIST
-   return (closestT <= MAX_DIST);
-   */
-      return false;
+   delete triData;
+}
+
+// ENDFOR
+// IF data is not null
+if (data != NULL)
+{
+   // SET data to closestData
+   *data = *closestData;
+}
+// ENDIF
+delete closestData;
+// RETURN true if closestT is less than or equal to MAX_DIST
+return (closestT <= MAX_DIST);
+*/
+return false;
 }
 
 /**
@@ -211,7 +213,7 @@ bool Scene::hit(ray_t & ray, hit_t *data)
    return (closestT <= MAX_DIST);
 }
 
-Pixel** Scene::castRays(ray_t **rays, int width, int height, int depth)
+Pixel* Scene::castRays(ray_t *rays, int width, int height, int depth)
 {
    cout << "cuda_test: (" << width << ", " << height << ")" << endl;
 
@@ -220,21 +222,28 @@ Pixel** Scene::castRays(ray_t **rays, int width, int height, int depth)
    // Create sphere array on device.
    sphere_t *spheres_d;
    size_t spheres_size = sizeof(sphere_t) * spheres.size();
-   cudaMalloc((void**) &spheres_d, spheres_size);
+   CUDA_SAFE_CALL(cudaMalloc((void**) &spheres_d, spheres_size));
+   // Copy rays to device.
+   CUDA_SAFE_CALL(cudaMemcpy(spheres_d, spheresArray, spheres_size, cudaMemcpyHostToDevice));
 
    // Create hit data array on host.
-   hit_t *results = new hit_t[num];
+   hitd_t *results = new hitd_t[num];
    // Create hit data array on device.
-   hit_t *results_d;
-   size_t results_size = num * sizeof(hit_t);
-   cudaMalloc((void **) &results_d, results_size);
+   hitd_t *results_d;
+   size_t results_size = num * sizeof(hitd_t);
+   CUDA_SAFE_CALL(cudaMalloc((void **) &results_d, results_size));
+   for (int i = 0; i < num; i++)
+   {
+      results[i].hit = 0;
+   }
+   CUDA_SAFE_CALL(cudaMemcpy(results_d, results, results_size, cudaMemcpyHostToDevice));
 
    // Create ray array on device.
-   ray_t **rays_d;
+   ray_t *rays_d;
    size_t rays_size = num * sizeof(ray_t);
-   cudaMalloc((void **) &rays_d, rays_size);
+   CUDA_SAFE_CALL(cudaMalloc((void **) &rays_d, rays_size));
    // Copy rays to device.
-   cudaMemcpy(rays_d, rays, rays_size, cudaMemcpyHostToDevice);
+   CUDA_SAFE_CALL(cudaMemcpy(rays_d, rays, rays_size, cudaMemcpyHostToDevice));
    // Calculate block size and number of blocks.
    int block_size = 4;
    int n_blocks = num / block_size + (num % block_size > 0 ? 1 : 0);
@@ -242,21 +251,29 @@ Pixel** Scene::castRays(ray_t **rays, int width, int height, int depth)
 
    cout << "n_blocks: " << n_blocks << endl;
 
-   initPrintf();
-
    // Test for intersection.
    hit_spheres <<< block_size, n_blocks >>>
       (rays_d, width, height, spheres_d, spheres.size(), results_d);
+   // Check for error.
+   cudaError_t err = cudaGetLastError();
+   if( cudaSuccess != err)
+   {
+      fprintf(stderr, "Cuda error: %s: %s.\n", "kernel",
+            cudaGetErrorString( err) );
+      exit(EXIT_FAILURE);
+   }
 
    // Copy hit data to host.
-   cudaMemcpy(results, results_d, results_size, cudaMemcpyDeviceToHost);
-
-   endPrintf();
+   CUDA_SAFE_CALL(cudaMemcpy(results, results_d, results_size, cudaMemcpyDeviceToHost));
 
    // Print results.
-   for (int i = 0; i < num; i++)
+   for (int y = 0; y < height; y++)
    {
-      cout << "results[" << i << "]: " << results[i].hit << endl;
+      for (int x = 0; x < width; x++)
+      {
+         cout << results[y * width + x].hit;
+      }
+      cout << endl;
    }
 
    cudaFree(rays_d);
@@ -271,67 +288,67 @@ Pixel Scene::castRay(ray_t & ray, int depth)
 {
    Pixel result(0.0, 0.0, 0.0);
    /*
-   Pixel reflectPix(0.0, 0.0, 0.0);
-   Pixel refractPix(0.0, 0.0, 0.0);
-   hit_t rayData;
+      Pixel reflectPix(0.0, 0.0, 0.0);
+      Pixel refractPix(0.0, 0.0, 0.0);
+      hit_t rayData;
    //if (hit(ray, &rayData))
    if (gpuHit(ray, &rayData))
    {
-      result = shade(&rayData, ray.dir);
-      if (useGPU)
-      {
-         if (rayData.reflect != NULL && depth > 0)
-         {
-            //pigment_t hitP = {};
-            finish_t hitF = {};
-            vec3_t hitNormal(0.0, 0.0, 0.0);
-            box_t *b_t;
-            plane_t *p_t;
-            sphere_t s_t;
-            triangle_t *t_t;
-            switch (rayData.hitType) {
-            case BOX_HIT:
-               b_t = boxes[rayData.objIndex];
-               //hitP = b_t->p;
-               hitF = b_t->f;
-               hitNormal = box_normal(b_t, &rayData);
-               break;
-            case PLANE_HIT:
-               p_t = planes[rayData.objIndex];
-               //hitP = p_t->p;
-               hitF = p_t->f;
-               hitNormal = plane_normal(p_t);
-               break;
-            case SPHERE_HIT:
-               s_t = spheresArray[rayData.objIndex];
-               //hitP = s_t->p;
-               hitF = s_t.f;
-               hitNormal = sphere_normal(s_t, &rayData);
-               break;
-            case TRIANGLE_HIT:
-               t_t = triangles[rayData.objIndex];
-               //hitP = t_t->p;
-               hitF = t_t->f;
-               hitNormal = triangle_normal(t_t);
-               break;
-            }
+   result = shade(&rayData, ray.dir);
+   if (useGPU)
+   {
+   if (rayData.reflect != NULL && depth > 0)
+   {
+   //pigment_t hitP = {};
+   finish_t hitF = {};
+   vec3_t hitNormal(0.0, 0.0, 0.0);
+   box_t *b_t;
+   plane_t *p_t;
+   sphere_t s_t;
+   triangle_t *t_t;
+   switch (rayData.hitType) {
+   case BOX_HIT:
+   b_t = boxes[rayData.objIndex];
+   //hitP = b_t->p;
+   hitF = b_t->f;
+   hitNormal = box_normal(b_t, &rayData);
+   break;
+   case PLANE_HIT:
+   p_t = planes[rayData.objIndex];
+   //hitP = p_t->p;
+   hitF = p_t->f;
+   hitNormal = plane_normal(p_t);
+   break;
+   case SPHERE_HIT:
+   s_t = spheresArray[rayData.objIndex];
+   //hitP = s_t->p;
+   hitF = s_t.f;
+   hitNormal = sphere_normal(s_t, &rayData);
+   break;
+   case TRIANGLE_HIT:
+   t_t = triangles[rayData.objIndex];
+   //hitP = t_t->p;
+   hitF = t_t->f;
+   hitNormal = triangle_normal(t_t);
+   break;
+   }
 
-            vec3_t reflectVec = *rayData.reflect;
-            reflectVec.normalize();
-            vec3_t reflectOrig = reflectVec * EPSILON;
-            reflectOrig += rayData.point;
-            ray_t reflectray_t = {reflectOrig, reflectVec};
+   vec3_t reflectVec = *rayData.reflect;
+   reflectVec.normalize();
+   vec3_t reflectOrig = reflectVec * EPSILON;
+   reflectOrig += rayData.point;
+   ray_t reflectray_t = {reflectOrig, reflectVec};
 
-            reflectPix = castRay(reflectray_t, depth - 1);
+   reflectPix = castRay(reflectray_t, depth - 1);
 
-            reflectPix.multiply(hitF.reflection);
-            result.multiply(1 - hitF.reflection);
-            result.add(reflectPix);
-         }
-      }
+   reflectPix.multiply(hitF.reflection);
+   result.multiply(1 - hitF.reflection);
+   result.add(reflectPix);
+   }
+   }
 
    }
-   */
+    */
    return result;
 }
 

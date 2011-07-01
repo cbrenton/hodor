@@ -160,11 +160,14 @@ int main(int argc, char **argv)
       }
       }
       */
+   /*
    ray_t **aRayArray = new ray_t *[width];
    for (int i = 0; i < width; i++)
    {
       aRayArray[i] = new ray_t[height];
    }
+   */
+   ray_t *aRayArray = new ray_t[width * height];
 
    float l = -scene->camera.right.length() / 2;
    float r = scene->camera.right.length() / 2;
@@ -209,7 +212,7 @@ int main(int argc, char **argv)
          //ray_t *curRay = new ray_t(curPoint, rayDir);
          ray_t curRay = {curPoint, rayDir};
          //aRayArray[i][j][k] = *curRay;
-         aRayArray[x][y] = curRay;
+         aRayArray[x * image->height + y] = curRay;
       }
    }
    cout << "done." << endl;
@@ -257,10 +260,12 @@ int main(int argc, char **argv)
    image->close();
    cout << "done." << endl;
    
+   /*
    for (int i = 0; i < width; i++)
    {
       delete[] aRayArray[i];
    }
+   */
    delete[] aRayArray;
    
    delete image;
