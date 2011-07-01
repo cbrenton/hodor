@@ -8,8 +8,6 @@
 #define _SCENE_H
 
 #include <vector>
-#include <thrust/host_vector.h>
-#include <thrust/device_vector.h>
 #include "geom/Geometry.h"
 #include "Camera.h"
 #include "Light.h"
@@ -25,7 +23,6 @@
 #include "structs/ray_t.h"
 #include "structs/hit_t.h"
 #include "Pixel.h"
-#include "hit_kernel.h"
 
 class NYUParser;
 
@@ -60,16 +57,18 @@ class Scene
       std::vector<Geometry*> geometry;
 
       // The vector of boxes in the scene (GPU only).
-      thrust::host_vector<box_t*> boxes;
+      std::vector<box_t*> boxes;
 
       // The vector of planes in the scene (GPU only).
-      thrust::host_vector<plane_t*> planes;
+      std::vector<plane_t*> planes;
 
       // The vector of spheres in the scene (GPU only).
-      thrust::host_vector<sphere_t> spheres;
+      std::vector<sphere_t*> spheres;
+
+      sphere_t *spheresArray;
 
       // The vector of triangles in the scene (GPU only).
-      thrust::host_vector<triangle_t*> triangles;
+      std::vector<triangle_t*> triangles;
 
       // The vector of lights in the scene.
       std::vector<Light*> lights;

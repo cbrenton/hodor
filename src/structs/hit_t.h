@@ -29,9 +29,9 @@ struct hit_t
 
    int faceIndex;
 
-   vec3_t *reflect;
+   //vec3_t *reflect;
 
-   vec3_t *refract;
+   //vec3_t *refract;
 
 };
 #endif

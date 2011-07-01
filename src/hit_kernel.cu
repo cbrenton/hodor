@@ -69,6 +69,7 @@ int box_hit(box_t *b_t, ray_t & ray, float *t, hit_t *data)
    data->point += ray.point;
    data->t = (*t);
    data->hitType = BOX_HIT;
+   /*
    if (b_t->f.reflection > 0.0)
    {
       data->reflect = new vec3_t();
@@ -79,6 +80,7 @@ int box_hit(box_t *b_t, ray_t & ray, float *t, hit_t *data)
    {
       data->reflect = NULL;
    }
+   */
    return 1;
 }
 
@@ -130,6 +132,7 @@ int plane_hit(plane_t *p_t, ray_t & ray, float *t, hit_t *data)
       data->point += ray.point;
       data->t = (*t);
       data->hitType = PLANE_HIT;
+      /*
       if (p_t->f.reflection > 0.0)
       {
          data->reflect = new vec3_t();
@@ -140,6 +143,7 @@ int plane_hit(plane_t *p_t, ray_t & ray, float *t, hit_t *data)
       {
          data->reflect = NULL;
       }
+      */
       return 1;
    }
    return 0;
@@ -150,7 +154,7 @@ vec3_t plane_normal(plane_t *p_t)
    return p_t->normal;
 }
 
-int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hit_t *data)
+__device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hit_t *data)
 {
    // Optimized algorithm courtesy of "Real-Time Rendering, Third Edition".
    vec3_t l = s_t.location - ray.point;
@@ -183,6 +187,7 @@ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hit_t *data)
    if (l2 < r2)
    {
       data->hit = -1;
+      /*
       if (s_t.f.reflection > 0.0)
       {
          data->reflect = new vec3_t();
@@ -193,11 +198,13 @@ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hit_t *data)
       {
          data->reflect = NULL;
       }
+      */
       return -1;
    }
    else
    {
       data->hit = 1;
+      /*
       if (s_t.f.reflection > 0.0)
       {
          data->reflect = new vec3_t();
@@ -208,6 +215,7 @@ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hit_t *data)
       {
          data->reflect = NULL;
       }
+      */
       return 1;
    }
 }
@@ -347,48 +355,8 @@ vec3_t triangle_normal(triangle_t *t_t)
    return s1;
 }
 
-__global__ void hitSpheres(sphere_t *spheres, int sphere_size, ray_t **rays, hit_t *results)
-{
-   /*
-      int thread_id = (blockIdx.y * BLOCKS_PER_ROW * THREADS_PER_BLOCK) +
-      blockIdx.x * THREADS_PER_BLOCK + threadIdx.x;
-
-      cuPrintf("%d\n", thread_id);
-    */
-
-   /*
-   // INITIALIZE closestT to MAX_DIST + 0.1
-   float closestT = MAX_DIST + 0.1f;
-   // INITIALIZE closestData to empty hit_t
-   hit_t *closestData = results[thread_id];
-
-   // FOR each item in spheres
-   for (int sphereNdx = 0; sphereNdx < (int)spheres.size(); sphereNdx++)
-   {
-   float sphereT = -1;
-   hit_t *sphereData = new hit_t();
-   // IF current item is hit by ray
-   if (sphere_hit(spheres[sphereNdx], ray, &sphereT, sphereData) != 0)
-   {
-   // IF intersection is closer than closestT
-   if (sphereT < closestT)
-   {
-   // SET closestT to intersection
-   closestT = sphereT;
-   // SET closestData to intersection data
-    *closestData = *sphereData;
-    closestData->objIndex = sphereNdx;
-    }
-   // ENDIF
-   }
-   // ENDIF
-   delete sphereData;
-   }
-    */
-}
-
-//__global__ void cuda_test(ray_t **rays, int width, int height, sphere_t *spheres, int sphere_size, hit_t* results)
-__global__ void cuda_test(ray_t **rays, int width, int height, sphere_t *spheres, int sphere_size)
+__global__ void hit_spheres(ray_t **rays, int width, int height,
+      sphere_t *spheres, int spheres_size, hit_t *results)
 {
    int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -399,14 +367,45 @@ __global__ void cuda_test(ray_t **rays, int width, int height, sphere_t *spheres
    {
       cuPrintf("id %d: (%d, %d)\n", idx, x, y);
    }
-   //results[idx].hit = x;
+   results[idx].hit = x;
+
+   // INITIALIZE closestT to MAX_DIST + 0.1
+   float closestT = MAX_DIST + 0.1f;
+   // INITIALIZE closestData to empty hit_t
+   hit_t *closestData = &results[idx];
+
+   ray_t *ray = &rays[x][y];
+
+   // FOR each item in spheres
+   for (int sphereNdx = 0; sphereNdx < (int)spheres_size; sphereNdx++)
+   {
+      float sphereT = -1;
+      //hit_t *sphereData = new hit_t();
+      hit_t *sphereData = {0};
+      // IF current item is hit by ray
+      if (sphere_hit(spheres[sphereNdx], *ray, &sphereT, sphereData) != 0)
+      {
+         // IF intersection is closer than closestT
+         if (sphereT < closestT)
+         {
+            // SET closestT to intersection
+            closestT = sphereT;
+            // SET closestData to intersection data
+            *closestData = *sphereData;
+            closestData->objIndex = sphereNdx;
+         }
+         // ENDIF
+      }
+      // ENDIF
+      delete sphereData;
+   }
 }
 
 void initPrintf()
 {
    cudaPrintfInit();
 }
-   
+
 void endPrintf()
 {
    cudaPrintfDisplay(stdout, true);

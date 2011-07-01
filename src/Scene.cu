@@ -8,6 +8,7 @@
 #include "Scene.h"
 #include "parse/nyuparser.h"
 #include "Globals.h"
+#include "hit_kernel.h"
 
 using namespace std;
 
@@ -35,6 +36,11 @@ Scene* Scene::read(std::fstream & input)
       }
     */
    delete parser;
+   curScene->spheresArray = new sphere_t[curScene->spheres.size()];
+   for (int i = 0; i < (int)curScene->spheres.size(); i++)
+   {
+      curScene->spheresArray[i] = *curScene->spheres[i];
+   }
    return curScene;
 }
 
@@ -44,6 +50,7 @@ Scene* Scene::read(std::fstream & input)
  */
 bool Scene::gpuHit(ray_t & ray, hit_t *data)
 {
+   /*
    // INITIALIZE closestT to MAX_DIST + 0.1
    float closestT = MAX_DIST + 0.1f;
    // INITIALIZE closestData to empty hit_t
@@ -156,6 +163,8 @@ bool Scene::gpuHit(ray_t & ray, hit_t *data)
    delete closestData;
    // RETURN true if closestT is less than or equal to MAX_DIST
    return (closestT <= MAX_DIST);
+   */
+      return false;
 }
 
 /**
@@ -205,10 +214,13 @@ bool Scene::hit(ray_t & ray, hit_t *data)
 Pixel** Scene::castRays(ray_t **rays, int width, int height, int depth)
 {
    cout << "cuda_test: (" << width << ", " << height << ")" << endl;
-   thrust::device_vector<sphere_t*> spheres_d = spheres;
-   sphere_t **sphereArray = thrust::raw_pointer_cast(&spheres_d[0]);
 
    int num = width * height;
+
+   // Create sphere array on device.
+   sphere_t *spheres_d;
+   size_t spheres_size = sizeof(sphere_t) * spheres.size();
+   cudaMalloc((void**) &spheres_d, spheres_size);
 
    // Create hit data array on host.
    hit_t *results = new hit_t[num];
@@ -225,33 +237,27 @@ Pixel** Scene::castRays(ray_t **rays, int width, int height, int depth)
    cudaMemcpy(rays_d, rays, rays_size, cudaMemcpyHostToDevice);
    // Calculate block size and number of blocks.
    int block_size = 4;
-   //int n_blocks = num / block_size + (num % block_size > 0 ? 1 : 0);
-   int n_blocks = 100;
+   int n_blocks = num / block_size + (num % block_size > 0 ? 1 : 0);
+   //int n_blocks = 100;
 
    cout << "n_blocks: " << n_blocks << endl;
 
    initPrintf();
 
-   /*
    // Test for intersection.
-   cuda_test <<< block_size, n_blocks >>>
-      (rays_d, width, height, *sphereArray, spheres_d.size(), results_d);
+   hit_spheres <<< block_size, n_blocks >>>
+      (rays_d, width, height, spheres_d, spheres.size(), results_d);
 
    // Copy hit data to host.
    cudaMemcpy(results, results_d, results_size, cudaMemcpyDeviceToHost);
-   */
-   cuda_test <<< block_size, n_blocks >>>
-      (rays_d, width, height, *sphereArray, spheres_d.size());
 
    endPrintf();
 
    // Print results.
-   /*
-   for (int i = 0; i < results_size; i++)
+   for (int i = 0; i < num; i++)
    {
       cout << "results[" << i << "]: " << results[i].hit << endl;
    }
-   */
 
    cudaFree(rays_d);
    delete[] results;
@@ -264,6 +270,7 @@ Pixel** Scene::castRays(ray_t **rays, int width, int height, int depth)
 Pixel Scene::castRay(ray_t & ray, int depth)
 {
    Pixel result(0.0, 0.0, 0.0);
+   /*
    Pixel reflectPix(0.0, 0.0, 0.0);
    Pixel refractPix(0.0, 0.0, 0.0);
    hit_t rayData;
@@ -296,7 +303,7 @@ Pixel Scene::castRay(ray_t & ray, int depth)
                hitNormal = plane_normal(p_t);
                break;
             case SPHERE_HIT:
-               s_t = spheres[rayData.objIndex];
+               s_t = spheresArray[rayData.objIndex];
                //hitP = s_t->p;
                hitF = s_t.f;
                hitNormal = sphere_normal(s_t, &rayData);
@@ -324,6 +331,7 @@ Pixel Scene::castRay(ray_t & ray, int depth)
       }
 
    }
+   */
    return result;
 }
 
@@ -352,7 +360,7 @@ Pixel Scene::shade(hit_t *data, vec3_t view)
       hitNormal = plane_normal(p_t);
       break;
    case SPHERE_HIT:
-      s_t = spheres[data->objIndex];
+      s_t = spheresArray[data->objIndex];
       hitP = s_t.p;
       hitF = s_t.f;
       hitNormal = sphere_normal(s_t, data);

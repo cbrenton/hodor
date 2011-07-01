@@ -12,7 +12,7 @@ struct sphere_t;
 struct triangle_t;
 struct hit_t;
 struct color_t;
-class ray_t;
+struct ray_t;
 
 int box_hit(box_t *b_t, ray_t & ray, float *t, hit_t *data);
 
@@ -22,7 +22,7 @@ int plane_hit(plane_t *p_t, ray_t & ray, float *t, hit_t *data);
 
 vec3_t plane_normal(plane_t *p_t);
 
-int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hit_t *data);
+__device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hit_t *data);
 
 vec3_t sphere_normal(sphere_t & s_t, hit_t *data);
 
@@ -30,13 +30,8 @@ int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hit_t *data);
 
 vec3_t triangle_normal(triangle_t *t_t);
 
-__global__ void hitSpheres(sphere_t *spheres, int sphere_size,
-      ray_t **rays, hit_t *results);
-
-//__global__ void cuda_test(ray_t **rays, int width, int height);
-__global__ void cuda_test(ray_t **rays, int width, int height,
-      sphere_t *spheres, int sphere_size);
-      //sphere_t *spheres, int sphere_size, hit_t* results);
+__global__ void hit_spheres(ray_t **rays, int width, int height,
+      sphere_t *spheres, int spheres_size, hit_t *results);
 
 void initPrintf();
 
