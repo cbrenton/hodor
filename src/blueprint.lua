@@ -1,7 +1,7 @@
 -- location of the gpu computing sdk (for common includes, libraries, and such)
 -- this is the BASE PATH to the sdk, in other words the directory where
 -- the C, doc, OpenCL, and shared directories live
-gpu_sdk_path "/opt/NVIDIA_GPU_Computing_SDK"
+gpu_sdk_path "~/NVIDIA_GPU_Computing_SDK"
 
 -- set our default config, the one that's run if we don't specify one on the
 -- command line
@@ -16,7 +16,7 @@ config "debug"
     libdirs {"../lib/pngwriter/lib", "../lib"}
     includes {"./", "../lib", "../lib/pngwriter/include"}
     cflags {"-Wall -DNO_FREETYPE"}
-    libs {"m", "png", "z", "pngwriter"}
+    libs {"m", "png", "z", "pngwriter", "cudart"}
     compute_capability "2.0"
 
 -- same as above, but define a "profile" config
