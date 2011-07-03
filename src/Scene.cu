@@ -215,6 +215,7 @@ bool Scene::hit(ray_t & ray, hit_t *data)
 
 Pixel* Scene::castRays(ray_t *rays, int width, int height, int depth)
 {
+   Pixel *pixels = new Pixel[width * height];
    cout << "cuda_test: (" << width << ", " << height << ")" << endl;
 
    int num = width * height;
@@ -245,7 +246,7 @@ Pixel* Scene::castRays(ray_t *rays, int width, int height, int depth)
    // Copy rays to device.
    CUDA_SAFE_CALL(cudaMemcpy(rays_d, rays, rays_size, cudaMemcpyHostToDevice));
    // Calculate block size and number of blocks.
-   int block_size = 4;
+   int block_size = 512;
    int n_blocks = num / block_size + (num % block_size > 0 ? 1 : 0);
    //int n_blocks = 100;
 
@@ -271,16 +272,24 @@ Pixel* Scene::castRays(ray_t *rays, int width, int height, int depth)
    {
       for (int x = 0; x < width; x++)
       {
-         cout << results[y * width + x].hit;
+         //cout << results[y * width + x].hit;
+         if (results[y * width + x].hit != 0)
+         {
+            pixels[y * width + x] = Pixel(1.0, 1.0, 1.0);
+         }
+         else
+         {
+            pixels[y * width + x] = Pixel(0.0, 0.0, 0.0);
+         }
       }
-      cout << endl;
+      //cout << endl;
    }
 
    cudaFree(rays_d);
    delete[] results;
 
 
-   return NULL;
+   return pixels;
 }
 
 // Casts a ray into the scene and returns a correctly color_ted pixel.
