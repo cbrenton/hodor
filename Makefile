@@ -31,8 +31,8 @@ INPUTDIR=input
 INPUTFILE=test
 OUTPUTDIR=images
 OUTPUTEXT=png
-WIDTH=20
-HEIGHT=10
+WIDTH=320
+HEIGHT=240
 ARGS = -w $(WIDTH) -h $(HEIGHT) -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
 
 # Additional linker libraries

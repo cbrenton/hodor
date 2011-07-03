@@ -358,7 +358,10 @@ __global__ void hit_spheres(ray_t *rays, int width, int height,
 
    int x = (idx % width);
    int y = idx / width;
-   if (idx >= width * height) return;
+   if (idx >= width * height)
+   {
+      return;
+   }
    //if (x == 0)
    //{
       //printf("id %d: (%d, %d)\n", idx, x, y);

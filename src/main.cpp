@@ -161,12 +161,12 @@ int main(int argc, char **argv)
       }
       */
    /*
-   ray_t **aRayArray = new ray_t *[width];
-   for (int i = 0; i < width; i++)
-   {
+      ray_t **aRayArray = new ray_t *[width];
+      for (int i = 0; i < width; i++)
+      {
       aRayArray[i] = new ray_t[height];
-   }
-   */
+      }
+      */
    ray_t *aRayArray = new ray_t[width * height];
 
    float l = -scene->camera.right.length() / 2;
@@ -216,7 +216,7 @@ int main(int argc, char **argv)
       }
    }
    cout << "done." << endl;
-   
+
    if (numAA > 1)
    {
       cout << "Using " << numAA << "x AA." << endl;
@@ -242,32 +242,41 @@ int main(int argc, char **argv)
    // Test for intersection.
    cout << "Testing intersections." << endl;
 
-   scene->castRays(aRayArray, image->width, image->height, RECURSION_DEPTH);
    /*
+      for (int rayNdx = 0; rayNdx <= image->width * image->height / 256; rayNdx++)
+      {
+      cout << "starting at " << rayNdx * 256 << ", size: " << image->width * image->height << endl;
+      scene->castRays(aRayArray + (rayNdx * 256), image->width, image->height,
+      RECURSION_DEPTH);
+      }
+      */
+   Pixel *pixResults = scene->castRays(aRayArray, image->width, image->height,
+         RECURSION_DEPTH);
+
    for (int x = 0; x < image->width; x++)
    {
       for (int y = 0; y < image->height; y++)
       {
-         Pixel curPix = scene->castRay(aRayArray[x][y], RECURSION_DEPTH);
+         //Pixel curPix = scene->castRay(aRayArray[x][y], RECURSION_DEPTH);
          // Write pixel out to file.
-         image->writePixel(x, y, curPix);
+         //image->writePixel(x, y, curPix);
+         image->writePixel(x, y, pixResults[y * image->width + x]);
       }
    }
-   */
 
    cout << "Writing to file...";
    // finish_t writing image out to file.
    image->close();
    cout << "done." << endl;
-   
+
    /*
-   for (int i = 0; i < width; i++)
-   {
+      for (int i = 0; i < width; i++)
+      {
       delete[] aRayArray[i];
-   }
-   */
+      }
+      */
    delete[] aRayArray;
-   
+
    delete image;
 
    delete scene;
