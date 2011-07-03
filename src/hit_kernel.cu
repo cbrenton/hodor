@@ -9,7 +9,7 @@
 #include "structs/vector.h"
 #include "structs/hitd_t.h"
 
-int box_hit(box_t *b_t, ray_t & ray, float *t, hit_t *data)
+int box_hit(box_t *b_t, ray_t & ray, float *t, hitd_t *data)
 {
    float tNear = MIN_T - 1;
    float tFar = MAX_DIST + 1;
@@ -65,8 +65,9 @@ int box_hit(box_t *b_t, ray_t & ray, float *t, hit_t *data)
    *t = tNear;
 
    data->hit = 1;
-   data->point = ray.dir * (*t);
-   data->point += ray.point;
+   vec3_t dataPoint = ray.dir * (*t);
+   dataPoint += ray.point;
+   data->point = vec3d_t(dataPoint);
    data->t = (*t);
    data->hitType = BOX_HIT;
    /*
@@ -84,37 +85,39 @@ int box_hit(box_t *b_t, ray_t & ray, float *t, hit_t *data)
    return 1;
 }
 
-vec3d_t box_normal(box_t *b_t, hit_t *data)
+vec3d_t box_normal(box_t *b_t, hitd_t & data)
 {
-   if (closeEnough(data->point.x(), b_t->left.offset))
+   /*
+   if (closeEnough(data.point.x(), b_t->left.offset))
    {
       return vec3d_t(b_t->left.normal);
    }
-   if (closeEnough(data->point.x(), b_t->right.offset))
+   if (closeEnough(data.point.x(), b_t->right.offset))
    {
       return vec3d_t(b_t->right.normal);
    }
-   if (closeEnough(data->point.y(), b_t->bottom.offset))
+   if (closeEnough(data.point.y(), b_t->bottom.offset))
    {
       return vec3d_t(b_t->bottom.normal);
    }
-   if (closeEnough(data->point.y(), b_t->top.offset))
+   if (closeEnough(data.point.y(), b_t->top.offset))
    {
       return vec3d_t(b_t->top.normal);
    }
-   if (closeEnough(data->point.z(), b_t->back.offset))
+   if (closeEnough(data.point.z(), b_t->back.offset))
    {
       return vec3d_t(b_t->back.normal);
    }
-   if (closeEnough(data->point.z(), b_t->front.offset))
+   if (closeEnough(data.point.z(), b_t->front.offset))
    {
       return vec3d_t(b_t->front.normal);
    }
    cout << "shouldn't be here." << endl;
+   */
    return vec3d_t();
 }
 
-int plane_hit(plane_t *p_t, ray_t & ray, float *t, hit_t *data)
+int plane_hit(plane_t *p_t, ray_t & ray, float *t, hitd_t *data)
 {
    /*
    float denominator = ray.dir.dot(p_t->normal);
@@ -206,7 +209,7 @@ __device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data)
    }
 }
 
-vec3d_t sphere_normal(sphere_t & s_t, hit_t *data)
+vec3d_t sphere_normal(sphere_t & s_t, hitd_t & data)
 {
    /*
    vec3d_t dataPoint(data.point);
@@ -215,12 +218,20 @@ vec3d_t sphere_normal(sphere_t & s_t, hit_t *data)
    n.normalize();
    return n;
    */
-   vec3_t n = data->point - s_t.location;
+   /*
+   vec3_t dataPoint;
+   for (int i = 0; i < 3; i++)
+   {
+      dataPoint.v[i] = data.point.v[i];
+   }
+   */
+   vec3_t dataPoint = data.point.toHost();
+   vec3_t n = dataPoint - s_t.location;
    n.normalize();
    return vec3d_t(n);
 }
 
-int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hit_t *data)
+int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hitd_t *data)
 {
    float result = -1;
    float bBeta, bGamma, bT;
@@ -331,8 +342,9 @@ int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hit_t *data)
    if (result > EPSILON)
    {
       data->hit = 1;
-      data->point = ray.dir * (*t);
-      data->point += ray.point;
+      vec3_t dataPoint = ray.dir * (*t);
+      dataPoint += ray.point;
+      data->point = vec3d_t(dataPoint);
       data->t = (*t);
       data->hitType = TRIANGLE_HIT;
       return 1;
@@ -369,7 +381,7 @@ __global__ void hit_spheres(ray_t *rays, int width, int height,
 
    // INITIALIZE closestT to MAX_DIST + 0.1
    float closestT = MAX_DIST + 0.1f;
-   // INITIALIZE closestData to empty hit_t
+   // INITIALIZE closestData to empty hitd_t
    hitd_t *closestData = &results[idx];
 
    ray_t *ray = &rays[x * height + y];

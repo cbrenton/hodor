@@ -272,10 +272,16 @@ Pixel* Scene::castRays(ray_t *rays, int width, int height, int depth)
    {
       for (int x = 0; x < width; x++)
       {
+         hitd_t curResult = results[y * width + x];
+         ray_t curRay = rays[y * width + x];
          //cout << results[y * width + x].hit;
-         if (results[y * width + x].hit != 0)
+         if (curResult.hit != 0)
          {
-            pixels[y * width + x] = Pixel(1.0, 1.0, 1.0);
+            sphere_t hitSphere = spheresArray[curResult.objIndex];
+            //pixels[y * width + x] = shade(curResult, curRay.dir);
+            pixels[y * width + x].c.r = hitSphere.p.c.r;
+            pixels[y * width + x].c.g = hitSphere.p.c.g;
+            pixels[y * width + x].c.b = hitSphere.p.c.b;
          }
          else
          {
@@ -362,7 +368,7 @@ Pixel Scene::castRay(ray_t & ray, int depth)
 }
 
 // Calculates proper shading at the current point.
-Pixel Scene::shade(hit_t *data, vec3_t view)
+Pixel Scene::shade(hitd_t & data, vec3_t & view)
 {
    Pixel result(0.0, 0.0, 0.0);
    pigment_t hitP = {};
@@ -372,27 +378,27 @@ Pixel Scene::shade(hit_t *data, vec3_t view)
    plane_t *p_t;
    sphere_t s_t;
    triangle_t *t_t;
-   switch (data->hitType) {
+   switch (data.hitType) {
    case BOX_HIT:
-      b_t = boxes[data->objIndex];
+      b_t = boxes[data.objIndex];
       hitP = b_t->p;
       hitF = b_t->f;
       hitNormal = box_normal(b_t, data);
       break;
    case PLANE_HIT:
-      p_t = planes[data->objIndex];
+      p_t = planes[data.objIndex];
       hitP = p_t->p;
       hitF = p_t->f;
       hitNormal = plane_normal(p_t);
       break;
    case SPHERE_HIT:
-      s_t = spheresArray[data->objIndex];
+      s_t = spheresArray[data.objIndex];
       hitP = s_t.p;
       hitF = s_t.f;
       hitNormal = sphere_normal(s_t, data);
       break;
    case TRIANGLE_HIT:
-      t_t = triangles[data->objIndex];
+      t_t = triangles[data.objIndex];
       hitP = t_t->p;
       hitF = t_t->f;
       hitNormal = triangle_normal(t_t);
@@ -409,10 +415,11 @@ Pixel Scene::shade(hit_t *data, vec3_t view)
 
       // Cast light feeler ray.
       ray_t feeler;
-      feeler.dir = curLight->location - data->point;
+      vec3_t dataPoint = data.point.toHost();
+      feeler.dir = curLight->location - dataPoint;
       feeler.dir.normalize();
       feeler.point = feeler.dir * EPSILON;
-      feeler.point += data->point;
+      feeler.point += dataPoint;
 
       hit_t tmpHit;
 
@@ -424,7 +431,7 @@ Pixel Scene::shade(hit_t *data, vec3_t view)
          // Diffuse.
          vec3_t n = hitNormal;
          n.normalize();
-         vec3_t l = curLight->location - data->point;
+         vec3_t l = curLight->location - dataPoint;
          l.normalize();
          float nDotL = n.dot(l);
          nDotL = min(nDotL, 1.0f);

@@ -25,6 +25,7 @@
 #include "Pixel.h"
 
 class NYUParser;
+struct hitd_t;
 
 class Scene
 {
@@ -47,7 +48,7 @@ class Scene
       Pixel castRay(ray_t & ray, int depth);
 
       // Calculates proper shading at the current point.
-      Pixel shade(hit_t *data, vec3_t view);
+      Pixel shade(hitd_t & data, vec3_t & view);
 
       //vec3_t reflect(vec3_t incident, vec3_t normal);
 

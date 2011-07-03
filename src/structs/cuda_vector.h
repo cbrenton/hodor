@@ -75,6 +75,11 @@ struct vec3d_t
    __device__ void rotateY(float amnt);
    __device__ void rotateZ(float amnt);
 
+   __host__ inline vec3_t toHost()
+   {
+      return vec3_t(v);
+   }
+
    __device__ void print();
 
    //protected:
