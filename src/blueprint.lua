@@ -10,22 +10,26 @@ default "debug"
 -- define a debug config, where debugging options are turned on, profiling
 -- options are turned off, and optimizing is turned off
 config "debug"
-    output "build-debug"
+    -- output "build-debug"
+    output "../terlR"
     debugging "on"
     defines {"DEBUG"}
-    libdirs {"../lib/pngwriter/lib", "../lib"}
-    includes {"./", "../lib", "../lib/pngwriter/include"}
+    libdirs {"../lib/pngwriter/lib", "../lib", "/tmp2/jfostero/NVIDIA_GPU_Computing_SDK/C/lib"}
+    includes {"./", "../lib", "../lib/pngwriter/include", "/tmp2/jfostero/NVIDIA_GPU_Computing_SDK/CUDALibraries/common/inc/"}
     cflags {"-Wall -DNO_FREETYPE"}
     libs {"m", "png", "z", "pngwriter", "cudart"}
     compute_capability "2.0"
 
 -- same as above, but define a "profile" config
 config "profile"
-    output "build-profile"
+    -- output "build-profile"
+    output "../terlR"
     debugging "on"
     profiling "on"
-    cflags {"-Wall"}
-    libs {"m"}
+    libdirs {"../lib/pngwriter/lib", "../lib", "/tmp2/jfostero/NVIDIA_GPU_Computing_SDK/C/lib"}
+    includes {"./", "../lib", "../lib/pngwriter/include", "/tmp2/jfostero/NVIDIA_GPU_Computing_SDK/CUDALibraries/common/inc/"}
+    cflags {"-Wall -DNO_FREETYPE"}
+    libs {"m", "png", "z", "pngwriter", "cudart"}
     compute_capability "2.0"
 
 -- same as above, but define a "release" config

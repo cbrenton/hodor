@@ -213,12 +213,10 @@ bool Scene::hit(ray_t & ray, hit_t *data)
    return (closestT <= MAX_DIST);
 }
 
-Pixel* Scene::castRays(ray_t *rays, int width, int height, int depth)
+Pixel* Scene::castRays(ray_t *rays, int num, int depth)
 {
-   Pixel *pixels = new Pixel[width * height];
-   cout << "cuda_test: (" << width << ", " << height << ")" << endl;
-
-   int num = width * height;
+   Pixel *pixels = new Pixel[num];
+   //cout << "cuda_test: (" << width << ", " << height << ")" << endl;
 
    // Create sphere array on device.
    sphere_t *spheres_d;
@@ -246,15 +244,14 @@ Pixel* Scene::castRays(ray_t *rays, int width, int height, int depth)
    // Copy rays to device.
    CUDA_SAFE_CALL(cudaMemcpy(rays_d, rays, rays_size, cudaMemcpyHostToDevice));
    // Calculate block size and number of blocks.
-   int block_size = 512;
+   int block_size = 8;
    int n_blocks = num / block_size + (num % block_size > 0 ? 1 : 0);
-   //int n_blocks = 100;
 
    cout << "n_blocks: " << n_blocks << endl;
 
    // Test for intersection.
    hit_spheres <<< block_size, n_blocks >>>
-      (rays_d, width, height, spheres_d, spheres.size(), results_d);
+      (rays_d, num, spheres_d, spheres.size(), results_d);
    // Check for error.
    cudaError_t err = cudaGetLastError();
    if( cudaSuccess != err)
@@ -268,32 +265,28 @@ Pixel* Scene::castRays(ray_t *rays, int width, int height, int depth)
    CUDA_SAFE_CALL(cudaMemcpy(results, results_d, results_size, cudaMemcpyDeviceToHost));
 
    // Print results.
-   for (int y = 0; y < height; y++)
+   for (int resultNdx = 0; resultNdx < num; resultNdx++)
    {
-      for (int x = 0; x < width; x++)
+      hitd_t curResult = results[resultNdx];
+      ray_t curRay = rays[resultNdx];
+      if (curResult.hit != 0)
       {
-         hitd_t curResult = results[y * width + x];
-         ray_t curRay = rays[y * width + x];
-         //cout << results[y * width + x].hit;
-         if (curResult.hit != 0)
-         {
-            sphere_t hitSphere = spheresArray[curResult.objIndex];
-            //pixels[y * width + x] = shade(curResult, curRay.dir);
-            pixels[y * width + x].c.r = hitSphere.p.c.r;
-            pixels[y * width + x].c.g = hitSphere.p.c.g;
-            pixels[y * width + x].c.b = hitSphere.p.c.b;
-         }
-         else
-         {
-            pixels[y * width + x] = Pixel(0.0, 0.0, 0.0);
-         }
+         sphere_t hitSphere = spheresArray[curResult.objIndex];
+         //pixels[resultNdx] = shade(curResult, curRay.dir);
+         pixels[resultNdx].c.r = hitSphere.p.c.r;
+         pixels[resultNdx].c.g = hitSphere.p.c.g;
+         pixels[resultNdx].c.b = hitSphere.p.c.b;
       }
-      //cout << endl;
+      else
+      {
+         pixels[resultNdx] = Pixel(0.0, 0.0, 0.0);
+      }
    }
 
    cudaFree(rays_d);
+   cudaFree(spheres_d);
+   cudaFree(results_d);
    delete[] results;
-
 
    return pixels;
 }

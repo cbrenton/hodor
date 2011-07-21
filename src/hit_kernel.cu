@@ -4,6 +4,7 @@
  * @date 6/24/2011
  */
 
+#include <cutil_math.h>
 #include "hit_kernel.h"
 #include "Globals.h"
 #include "structs/vector.h"
@@ -161,13 +162,18 @@ vec3d_t plane_normal(plane_t *p_t)
    return vec3d_t(p_t->normal);
 }
 
+__device__ float3 vec_to_float3(vec3d_t v)
+{
+   return make_float3(v.x(), v.y(), v.z());
+}
+
 __device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data)
 {
    // Optimized algorithm courtesy of "Real-Time Rendering, Third Edition".
    vec3d_t location = s_t.location;
    vec3d_t rayPoint = ray.point;
    vec3d_t l = location - rayPoint;
-   vec3d_t rayDir = vec3d_t(ray.dir);
+   vec3d_t rayDir = ray.dir;
    float s = l.dot(rayDir);
    float l2 = l.dot(l);
    float r2 = s_t.radius * s_t.radius;
@@ -193,9 +199,9 @@ __device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data)
    }
    vec3d_t dataPoint = rayDir * (*t);
    dataPoint += rayPoint;
-   data->point.v[0] = dataPoint.v[0];
-   data->point.v[1] = dataPoint.v[1];
-   data->point.v[2] = dataPoint.v[2];
+   data->point.v[0] = dataPoint.x();
+   data->point.v[1] = dataPoint.y();
+   data->point.v[2] = dataPoint.z();
    data->hitType = SPHERE_HIT;
    if (l2 < r2)
    {
@@ -363,14 +369,12 @@ vec3d_t triangle_normal(triangle_t *t_t)
    return vec3d_t(0, 0, 0);
 }
 
-__global__ void hit_spheres(ray_t *rays, int width, int height,
-      sphere_t *spheres, int spheres_size, hitd_t *results)
+__global__ void hit_spheres(ray_t *rays, int num, sphere_t *spheres,
+      int spheres_size, hitd_t *results)
 {
    int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-   int x = (idx % width);
-   int y = idx / width;
-   if (idx >= width * height)
+   if (idx >= num)
    {
       return;
    }
@@ -384,7 +388,8 @@ __global__ void hit_spheres(ray_t *rays, int width, int height,
    // INITIALIZE closestData to empty hitd_t
    hitd_t *closestData = &results[idx];
 
-   ray_t *ray = &rays[x * height + y];
+   //ray_t *ray = &rays[num];
+   ray_t *ray = &rays[idx];
 
    // FOR each item in spheres
    for (int sphereNdx = 0; sphereNdx < (int)spheres_size; sphereNdx++)
@@ -408,7 +413,7 @@ __global__ void hit_spheres(ray_t *rays, int width, int height,
       // ENDIF
       delete sphereData;
    }
-   for (int i = 0; i < width * height; i++)
+   for (int i = 0; i < num; i++)
    {
       //cout << "results_d[" << i << "]: " << results[i].hit << endl;
    }

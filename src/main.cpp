@@ -19,6 +19,7 @@
 #define DEFAULT_H 256
 #define AA_RAYS 4
 #define RECURSION_DEPTH 6
+#define CHUNK_SIZE 4096
 
 using namespace std;
 
@@ -250,8 +251,24 @@ int main(int argc, char **argv)
       RECURSION_DEPTH);
       }
       */
-   Pixel *pixResults = scene->castRays(aRayArray, image->width, image->height,
-         RECURSION_DEPTH);
+
+   Pixel *pixResults = new Pixel[width * height];
+   for (int chunkNdx = 0; chunkNdx < width * height; chunkNdx += CHUNK_SIZE)
+   {
+      Pixel *chunkPix = scene->castRays(aRayArray + chunkNdx, min(CHUNK_SIZE,
+               width * height - chunkNdx), RECURSION_DEPTH);
+
+      for (int pixNdx = 0; pixNdx < CHUNK_SIZE; pixNdx++)
+      {
+         if (pixNdx + chunkNdx < width * height)
+         {
+            pixResults[chunkNdx + pixNdx] = chunkPix[pixNdx];
+         }
+      }
+   }
+
+   //Pixel *pixResults = scene->castRays(aRayArray, image->width, image->height,
+   //RECURSION_DEPTH);
 
    for (int x = 0; x < image->width; x++)
    {
@@ -260,7 +277,7 @@ int main(int argc, char **argv)
          //Pixel curPix = scene->castRay(aRayArray[x][y], RECURSION_DEPTH);
          // Write pixel out to file.
          //image->writePixel(x, y, curPix);
-         image->writePixel(x, y, pixResults[y * image->width + x]);
+         image->writePixel(x, y, pixResults[x * image->height + y]);
       }
    }
 

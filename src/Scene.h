@@ -42,7 +42,7 @@ class Scene
       // Checks if a ray intersects any geometry in the scene, using Geometry.
       bool hit(ray_t & ray, hit_t *data);
       
-      Pixel* castRays(ray_t *ray, int height, int width, int depth);
+      Pixel* castRays(ray_t *ray, int num, int depth);
 
       // Casts a ray into the scene and returns a correctly color_ted pixel.
       Pixel castRay(ray_t & ray, int depth);

@@ -31,8 +31,8 @@ INPUTDIR=input
 INPUTFILE=test
 OUTPUTDIR=images
 OUTPUTEXT=png
-WIDTH=320
-HEIGHT=240
+WIDTH=1024
+HEIGHT=768
 ARGS = -w $(WIDTH) -h $(HEIGHT) -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
 
 # Additional linker libraries
@@ -61,10 +61,10 @@ lib:
 cuda:	gpu
 
 gpu:
-	cd ./src && ./cubuild
+	cd ./src && ./cubuild profile
 
 run:
-	./src/build-debug $(ARGS)
+	time ./$(TARGET) $(ARGS)
 
 eog:
 	eog ./$(OUTPUTDIR)/$(INPUTFILE).$(OUTPUTEXT)
@@ -83,7 +83,7 @@ valgrind:
 	valgrind --tool=memcheck --leak-check=full ./$(TARGET) $(ARGS)
 
 clean:
-	$(RM) $(TARGET) $(OBJS) src/*.o src/build-debug src/build-profile src/build-release
+	$(RM) $(TARGET) $(OBJS) src/*.o
 
 killall:
 	$(KILL) $(TARGET)

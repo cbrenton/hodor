@@ -11,7 +11,6 @@ struct plane_t;
 struct sphere_t;
 struct triangle_t;
 struct hitd_t;
-struct hitd_t;
 struct color_t;
 struct ray_t;
 
@@ -31,5 +30,5 @@ int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hitd_t *data);
 
 vec3d_t triangle_normal(triangle_t *t_t);
 
-__global__ void hit_spheres(ray_t *rays, int width, int height,
-      sphere_t *spheres, int spheres_size, hitd_t *results);
+__global__ void hit_spheres(ray_t *rays, int num, sphere_t *spheres,
+      int spheres_size, hitd_t *results);
