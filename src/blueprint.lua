@@ -14,8 +14,8 @@ config "debug"
     output "../terlR"
     debugging "on"
     defines {"DEBUG"}
-    libdirs {"../lib/pngwriter/lib", "../lib", "/tmp2/jfostero/NVIDIA_GPU_Computing_SDK/C/lib"}
-    includes {"./", "../lib", "../lib/pngwriter/include", "/tmp2/jfostero/NVIDIA_GPU_Computing_SDK/CUDALibraries/common/inc/"}
+    libdirs {"../lib/pngwriter/lib", "../lib", "/home/cbrenton/NVIDIA_GPU_Computing_SDK/C/lib"}
+    includes {"./", "../lib", "../lib/pngwriter/include", "/home/cbrenton/NVIDIA_GPU_Computing_SDK/C/common/inc/"}
     cflags {"-Wall -DNO_FREETYPE"}
     libs {"m", "png", "z", "pngwriter", "cudart"}
     compute_capability "2.0"
@@ -26,18 +26,20 @@ config "profile"
     output "../terlR"
     debugging "on"
     profiling "on"
-    libdirs {"../lib/pngwriter/lib", "../lib", "/tmp2/jfostero/NVIDIA_GPU_Computing_SDK/C/lib"}
-    includes {"./", "../lib", "../lib/pngwriter/include", "/tmp2/jfostero/NVIDIA_GPU_Computing_SDK/CUDALibraries/common/inc/"}
+    libdirs {"../lib/pngwriter/lib", "../lib", "/home/cbrenton/NVIDIA_GPU_Computing_SDK/C/lib"}
+    includes {"./", "../lib", "../lib/pngwriter/include", "/home/cbrenton/NVIDIA_GPU_Computing_SDK/C/common/inc/"}
     cflags {"-Wall -DNO_FREETYPE"}
     libs {"m", "png", "z", "pngwriter", "cudart"}
     compute_capability "2.0"
 
 -- same as above, but define a "release" config
 config "release"
-    output "build-release"
+    -- output "build-release"
+    output "../terlR"
     optimizing "on"
     defines {"RELEASE"}
-    cflags {"-Wall"}
-    cflags {"-Wall -Wconversion -Werror"}
-    libs {"m"}
+    libdirs {"../lib/pngwriter/lib", "../lib", "/home/cbrenton/NVIDIA_GPU_Computing_SDK/C/lib"}
+    includes {"./", "../lib", "../lib/pngwriter/include", "/home/cbrenton/NVIDIA_GPU_Computing_SDK/C/common/inc/"}
+    cflags {"-Wall -DNO_FREETYPE"}
+    libs {"m", "png", "z", "pngwriter", "cudart"}
     compute_capability "2.0"

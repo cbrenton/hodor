@@ -213,44 +213,56 @@ bool Scene::hit(ray_t & ray, hit_t *data)
    return (closestT <= MAX_DIST);
 }
 
+void Scene::cudaSetup(int chunkSize)
+{
+   cout << "Allocating device arrays...";
+   // Create sphere array on device.
+   spheres_size = sizeof(sphere_t) * spheres.size();
+   CUDA_SAFE_CALL(cudaMalloc((void**) &spheres_d, spheres_size));
+   // Copy rays to device.
+   CUDA_SAFE_CALL(cudaMemcpy(spheres_d, spheresArray, spheres_size,
+            cudaMemcpyHostToDevice));
+
+   // Create ray array on device.
+   rays_size = chunkSize * sizeof(ray_t);
+   CUDA_SAFE_CALL(cudaMalloc((void **) &rays_d, rays_size));
+   
+   // Create hit data array on device.
+   results_size = chunkSize * sizeof(hitd_t);
+   CUDA_SAFE_CALL(cudaMalloc((void **) &results_d, results_size));
+   cout << "done." << endl;
+}
+
+void Scene::cudaCleanup()
+{
+   cout << "Cleaning up device arrays...";
+   cudaFree(spheres_d);
+   cudaFree(rays_d);
+   cudaFree(results_d);
+   cout << "done." << endl;
+}
+
 Pixel* Scene::castRays(ray_t *rays, int num, int depth)
 {
    Pixel *pixels = new Pixel[num];
-   //cout << "cuda_test: (" << width << ", " << height << ")" << endl;
-
-   // Create sphere array on device.
-   sphere_t *spheres_d;
-   size_t spheres_size = sizeof(sphere_t) * spheres.size();
-   CUDA_SAFE_CALL(cudaMalloc((void**) &spheres_d, spheres_size));
-   // Copy rays to device.
-   CUDA_SAFE_CALL(cudaMemcpy(spheres_d, spheresArray, spheres_size, cudaMemcpyHostToDevice));
 
    // Create hit data array on host.
    hitd_t *results = new hitd_t[num];
-   // Create hit data array on device.
-   hitd_t *results_d;
-   size_t results_size = num * sizeof(hitd_t);
-   CUDA_SAFE_CALL(cudaMalloc((void **) &results_d, results_size));
    for (int i = 0; i < num; i++)
    {
       results[i].hit = 0;
    }
-   CUDA_SAFE_CALL(cudaMemcpy(results_d, results, results_size, cudaMemcpyHostToDevice));
+   CUDA_SAFE_CALL(cudaMemcpy(results_d, results, results_size,
+            cudaMemcpyHostToDevice));
 
-   // Create ray array on device.
-   ray_t *rays_d;
-   size_t rays_size = num * sizeof(ray_t);
-   CUDA_SAFE_CALL(cudaMalloc((void **) &rays_d, rays_size));
    // Copy rays to device.
    CUDA_SAFE_CALL(cudaMemcpy(rays_d, rays, rays_size, cudaMemcpyHostToDevice));
    // Calculate block size and number of blocks.
-   int block_size = 8;
-   int n_blocks = num / block_size + (num % block_size > 0 ? 1 : 0);
-
-   cout << "n_blocks: " << n_blocks << endl;
+   dim3 dimGrid(ceil((float)num / (float)THREADS_PER_BLOCK), 1);
+   dim3 dimBlock(THREADS_PER_BLOCK, 1);
 
    // Test for intersection.
-   hit_spheres <<< block_size, n_blocks >>>
+   hit_spheres <<< dimGrid, dimBlock >>>
       (rays_d, num, spheres_d, spheres.size(), results_d);
    // Check for error.
    cudaError_t err = cudaGetLastError();
@@ -262,7 +274,8 @@ Pixel* Scene::castRays(ray_t *rays, int num, int depth)
    }
 
    // Copy hit data to host.
-   CUDA_SAFE_CALL(cudaMemcpy(results, results_d, results_size, cudaMemcpyDeviceToHost));
+   CUDA_SAFE_CALL(cudaMemcpy(results, results_d, results_size,
+            cudaMemcpyDeviceToHost));
 
    // Print results.
    for (int resultNdx = 0; resultNdx < num; resultNdx++)
@@ -283,9 +296,6 @@ Pixel* Scene::castRays(ray_t *rays, int num, int depth)
       }
    }
 
-   cudaFree(rays_d);
-   cudaFree(spheres_d);
-   cudaFree(results_d);
    delete[] results;
 
    return pixels;

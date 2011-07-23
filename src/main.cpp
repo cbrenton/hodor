@@ -252,20 +252,33 @@ int main(int argc, char **argv)
       }
       */
 
+   int numChunks = ceil((float)(width * height) / (float)CHUNK_SIZE);
+
+   scene->cudaSetup(CHUNK_SIZE);
+
    Pixel *pixResults = new Pixel[width * height];
-   for (int chunkNdx = 0; chunkNdx < width * height; chunkNdx += CHUNK_SIZE)
+   for (int chunkNdx = 0; chunkNdx < numChunks; chunkNdx++)
    {
-      Pixel *chunkPix = scene->castRays(aRayArray + chunkNdx, min(CHUNK_SIZE,
-               width * height - chunkNdx), RECURSION_DEPTH);
+      Pixel *chunkPix = scene->castRays(aRayArray + chunkNdx * CHUNK_SIZE,
+            min(CHUNK_SIZE, width * height - chunkNdx * CHUNK_SIZE), RECURSION_DEPTH);
 
       for (int pixNdx = 0; pixNdx < CHUNK_SIZE; pixNdx++)
       {
-         if (pixNdx + chunkNdx < width * height)
+         if (pixNdx + chunkNdx * CHUNK_SIZE < width * height)
          {
-            pixResults[chunkNdx + pixNdx] = chunkPix[pixNdx];
+            pixResults[chunkNdx * CHUNK_SIZE + pixNdx] = chunkPix[pixNdx];
          }
       }
+
+      // Calculate and print chunk progress.
+      float chunkProgress = (float)(chunkNdx + 1) / (float)numChunks * 100.0f;
+      printf("\r%6.2f%%: %d/%d", chunkProgress, chunkNdx + 1, numChunks);
+      fflush(stdout);
    }
+
+   cout << endl;
+
+   scene->cudaCleanup();
 
    //Pixel *pixResults = scene->castRays(aRayArray, image->width, image->height,
    //RECURSION_DEPTH);

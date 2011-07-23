@@ -24,6 +24,8 @@
 #include "structs/hit_t.h"
 #include "Pixel.h"
 
+#define THREADS_PER_BLOCK 256
+
 class NYUParser;
 struct hitd_t;
 
@@ -41,6 +43,10 @@ class Scene
 
       // Checks if a ray intersects any geometry in the scene, using Geometry.
       bool hit(ray_t & ray, hit_t *data);
+
+      void cudaSetup(int chunkSize);
+
+      void cudaCleanup();
       
       Pixel* castRays(ray_t *ray, int num, int depth);
 
@@ -67,6 +73,15 @@ class Scene
       std::vector<sphere_t*> spheres;
 
       sphere_t *spheresArray;
+      
+      sphere_t *spheres_d;
+      size_t spheres_size;
+
+      ray_t *rays_d;
+      size_t rays_size;
+
+      hitd_t *results_d;
+      size_t results_size;
 
       // The vector of triangles in the scene (GPU only).
       std::vector<triangle_t*> triangles;
