@@ -24,7 +24,7 @@ vec3d_t plane_normal(plane_t *p_t);
 
 __device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data);
 
-vec3d_t sphere_normal(sphere_t & s_t, hitd_t & data);
+vec3d_t *sphere_normal(sphere_t & s_t, hitd_t & data);
 
 int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hitd_t *data);
 

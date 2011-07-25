@@ -72,87 +72,87 @@ int box_hit(box_t *b_t, ray_t & ray, float *t, hitd_t *data)
    data->t = (*t);
    data->hitType = BOX_HIT;
    /*
-   if (b_t->f.reflection > 0.0)
-   {
+      if (b_t->f.reflection > 0.0)
+      {
       data->reflect = new vec3d_t();
       vec3d_t n = box_normal(b_t, data);
-      *data->reflect = mReflect(ray.dir, n);
-   }
-   else
-   {
-      data->reflect = NULL;
-   }
-   */
+    *data->reflect = mReflect(ray.dir, n);
+    }
+    else
+    {
+    data->reflect = NULL;
+    }
+    */
    return 1;
 }
 
 vec3d_t box_normal(box_t *b_t, hitd_t & data)
 {
    /*
-   if (closeEnough(data.point.x(), b_t->left.offset))
-   {
+      if (closeEnough(data.point.x(), b_t->left.offset))
+      {
       return vec3d_t(b_t->left.normal);
-   }
-   if (closeEnough(data.point.x(), b_t->right.offset))
-   {
+      }
+      if (closeEnough(data.point.x(), b_t->right.offset))
+      {
       return vec3d_t(b_t->right.normal);
-   }
-   if (closeEnough(data.point.y(), b_t->bottom.offset))
-   {
+      }
+      if (closeEnough(data.point.y(), b_t->bottom.offset))
+      {
       return vec3d_t(b_t->bottom.normal);
-   }
-   if (closeEnough(data.point.y(), b_t->top.offset))
-   {
+      }
+      if (closeEnough(data.point.y(), b_t->top.offset))
+      {
       return vec3d_t(b_t->top.normal);
-   }
-   if (closeEnough(data.point.z(), b_t->back.offset))
-   {
+      }
+      if (closeEnough(data.point.z(), b_t->back.offset))
+      {
       return vec3d_t(b_t->back.normal);
-   }
-   if (closeEnough(data.point.z(), b_t->front.offset))
-   {
+      }
+      if (closeEnough(data.point.z(), b_t->front.offset))
+      {
       return vec3d_t(b_t->front.normal);
-   }
-   cout << "shouldn't be here." << endl;
-   */
+      }
+      cout << "shouldn't be here." << endl;
+    */
    return vec3d_t();
 }
 
 int plane_hit(plane_t *p_t, ray_t & ray, float *t, hitd_t *data)
 {
    /*
-   float denominator = ray.dir.dot(p_t->normal);
-   if (denominator == 0.0)
-   {
+      float denominator = ray.dir.dot(p_t->normal);
+      if (denominator == 0.0)
+      {
       return 0;
-   }
-   vec3d_t p = p_t->normal * p_t->offset;
-   vec3d_t pMinusL = p - ray.point;
-   float numerator = pMinusL.dot(p_t->normal);
-   *t = numerator / denominator;
-   if (*t >= MIN_T && *t <= MAX_DIST)
-   {
-      data->hit = 1;
-      data->point = ray.dir * (*t);
-      data->point += ray.point;
-      data->t = (*t);
-      data->hitType = PLANE_HIT;
-      */
+      }
+      vec3d_t p = p_t->normal * p_t->offset;
+      vec3d_t pMinusL = p - ray.point;
+      float numerator = pMinusL.dot(p_t->normal);
+    *t = numerator / denominator;
+    if (*t >= MIN_T && *t <= MAX_DIST)
+    {
+    data->hit = 1;
+    data->point = ray.dir * (*t);
+    data->point += ray.point;
+    data->t = (*t);
+    data->hitType = PLANE_HIT;
+    */
 
-      /*
+   /*
       if (p_t->f.reflection > 0.0)
       {
-         data->reflect = new vec3d_t();
-         vec3d_t n = plane_normal(p_t);
-         *data->reflect = mReflect(ray.dir, n);
-      }
-      else
-      {
-         data->reflect = NULL;
-      }
-      */
-      
-      //return 1;
+      data->reflect = new vec3d_t();
+      vec3d_t n = plane_normal(p_t);
+    *data->reflect = mReflect(ray.dir, n);
+    }
+    else
+    {
+    data->reflect = NULL;
+    }
+    */
+
+   //return 1;
    //}
    return 0;
 }
@@ -215,26 +215,16 @@ __device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data)
    }
 }
 
-vec3d_t sphere_normal(sphere_t & s_t, hitd_t & data)
+vec3d_t *sphere_normal(sphere_t & s_t, hitd_t & data)
 {
-   /*
-   vec3d_t dataPoint(data.point);
-   vec3d_t location(s_t.location);
-   vec3d_t n = kdataPoint - location);
-   n.normalize();
-   return n;
-   */
-   /*
-   vec3_t dataPoint;
-   for (int i = 0; i < 3; i++)
-   {
-      dataPoint.v[i] = data.point.v[i];
-   }
-   */
    vec3_t dataPoint = data.point.toHost();
    vec3_t n = dataPoint - s_t.location;
    n.normalize();
-   return vec3d_t(n);
+   vec3d_t *ret = new vec3d_t();
+   ret->v[0] = n.v[0];
+   ret->v[1] = n.v[1];
+   ret->v[2] = n.v[2];
+   return ret;
 }
 
 int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hitd_t *data)
@@ -361,11 +351,11 @@ int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hitd_t *data)
 vec3d_t triangle_normal(triangle_t *t_t)
 {
    /*
-   vec3d_t s1 = t_t->c2 - t_t->c1;
-   vec3d_t s2 = t_t->c3 - t_t->c1;
-   s1.cross(s1, s2);
-   return s1;
-   */
+      vec3d_t s1 = t_t->c2 - t_t->c1;
+      vec3d_t s2 = t_t->c3 - t_t->c1;
+      s1.cross(s1, s2);
+      return s1;
+    */
    return vec3d_t(0, 0, 0);
 }
 
@@ -378,10 +368,6 @@ __global__ void hit_spheres(ray_t *rays, int num, sphere_t *spheres,
    {
       return;
    }
-   //if (x == 0)
-   //{
-      //printf("id %d: (%d, %d)\n", idx, x, y);
-   //}
 
    // INITIALIZE closestT to MAX_DIST + 0.1
    float closestT = MAX_DIST + 0.1f;
@@ -391,11 +377,11 @@ __global__ void hit_spheres(ray_t *rays, int num, sphere_t *spheres,
    //ray_t *ray = &rays[num];
    ray_t *ray = &rays[idx];
 
+   hitd_t *sphereData = new hitd_t();
    // FOR each item in spheres
    for (int sphereNdx = 0; sphereNdx < (int)spheres_size; sphereNdx++)
    {
       float sphereT = -1;
-      hitd_t *sphereData = new hitd_t();
       //// IF current item is hit by ray
       if (sphere_hit(spheres[sphereNdx], *ray, &sphereT, sphereData) != 0)
       {
@@ -411,10 +397,6 @@ __global__ void hit_spheres(ray_t *rays, int num, sphere_t *spheres,
          // ENDIF
       }
       // ENDIF
-      delete sphereData;
    }
-   for (int i = 0; i < num; i++)
-   {
-      //cout << "results_d[" << i << "]: " << results[i].hit << endl;
-   }
+   delete sphereData;
 }

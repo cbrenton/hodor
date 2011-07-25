@@ -226,10 +226,13 @@ void Scene::cudaSetup(int chunkSize)
    // Create ray array on device.
    rays_size = chunkSize * sizeof(ray_t);
    CUDA_SAFE_CALL(cudaMalloc((void **) &rays_d, rays_size));
-   
+
    // Create hit data array on device.
    results_size = chunkSize * sizeof(hitd_t);
    CUDA_SAFE_CALL(cudaMalloc((void **) &results_d, results_size));
+
+   // Create hit data array on host.
+   results = new hitd_t[chunkSize];
    cout << "done." << endl;
 }
 
@@ -239,6 +242,8 @@ void Scene::cudaCleanup()
    cudaFree(spheres_d);
    cudaFree(rays_d);
    cudaFree(results_d);
+
+   delete[] results;
    cout << "done." << endl;
 }
 
@@ -246,8 +251,6 @@ Pixel* Scene::castRays(ray_t *rays, int num, int depth)
 {
    Pixel *pixels = new Pixel[num];
 
-   // Create hit data array on host.
-   hitd_t *results = new hitd_t[num];
    for (int i = 0; i < num; i++)
    {
       results[i].hit = 0;
@@ -258,7 +261,7 @@ Pixel* Scene::castRays(ray_t *rays, int num, int depth)
    // Copy rays to device.
    CUDA_SAFE_CALL(cudaMemcpy(rays_d, rays, rays_size, cudaMemcpyHostToDevice));
    // Calculate block size and number of blocks.
-   dim3 dimGrid(ceil((float)num / (float)THREADS_PER_BLOCK), 1);
+   dim3 dimGrid((int)ceil((float)num / (float)THREADS_PER_BLOCK), 1);
    dim3 dimBlock(THREADS_PER_BLOCK, 1);
 
    // Test for intersection.
@@ -277,7 +280,7 @@ Pixel* Scene::castRays(ray_t *rays, int num, int depth)
    CUDA_SAFE_CALL(cudaMemcpy(results, results_d, results_size,
             cudaMemcpyDeviceToHost));
 
-   // Print results.
+   // Color result pixels.
    for (int resultNdx = 0; resultNdx < num; resultNdx++)
    {
       hitd_t curResult = results[resultNdx];
@@ -285,18 +288,13 @@ Pixel* Scene::castRays(ray_t *rays, int num, int depth)
       if (curResult.hit != 0)
       {
          sphere_t hitSphere = spheresArray[curResult.objIndex];
-         //pixels[resultNdx] = shade(curResult, curRay.dir);
-         pixels[resultNdx].c.r = hitSphere.p.c.r;
-         pixels[resultNdx].c.g = hitSphere.p.c.g;
-         pixels[resultNdx].c.b = hitSphere.p.c.b;
+         pixels[resultNdx] = shade(curResult, curRay.dir);
       }
       else
       {
          pixels[resultNdx] = Pixel(0.0, 0.0, 0.0);
       }
    }
-
-   delete[] results;
 
    return pixels;
 }
@@ -381,6 +379,7 @@ Pixel Scene::shade(hitd_t & data, vec3_t & view)
    plane_t *p_t;
    sphere_t s_t;
    triangle_t *t_t;
+   vec3d_t *newHitNormal = new vec3d_t();
    switch (data.hitType) {
    case BOX_HIT:
       b_t = boxes[data.objIndex];
@@ -398,7 +397,10 @@ Pixel Scene::shade(hitd_t & data, vec3_t & view)
       s_t = spheresArray[data.objIndex];
       hitP = s_t.p;
       hitF = s_t.f;
-      hitNormal = sphere_normal(s_t, data);
+      newHitNormal = sphere_normal(s_t, data);
+      hitNormal.v[0] = newHitNormal->v[0];
+      hitNormal.v[1] = newHitNormal->v[1];
+      hitNormal.v[2] = newHitNormal->v[2];
       break;
    case TRIANGLE_HIT:
       t_t = triangles[data.objIndex];
@@ -406,6 +408,8 @@ Pixel Scene::shade(hitd_t & data, vec3_t & view)
       hitF = t_t->f;
       hitNormal = triangle_normal(t_t);
       break;
+   default:
+      cerr << "Invalid intersection type." << endl;
    }
 
    for (int lightNdx = 0; lightNdx < (int)lights.size(); lightNdx++)
@@ -416,52 +420,71 @@ Pixel Scene::shade(hitd_t & data, vec3_t & view)
       result.c.g += (hitF.ambient*hitP.c.g) * curLight->g;
       result.c.b += (hitF.ambient*hitP.c.b) * curLight->b;
 
-      // Cast light feeler ray.
-      ray_t feeler;
+      // Diffuse.
+      vec3_t n = hitNormal;
+      n.normalize();
       vec3_t dataPoint = data.point.toHost();
-      feeler.dir = curLight->location - dataPoint;
-      feeler.dir.normalize();
-      feeler.point = feeler.dir * EPSILON;
-      feeler.point += dataPoint;
+      vec3_t l = curLight->location - dataPoint;
+      l.normalize();
+      float nDotL = n.dot(l);
+      nDotL = min(nDotL, 1.0f);
 
-      hit_t tmpHit;
+      if (nDotL > 0)
+      {
+         result.c.r += hitF.diffuse*hitP.c.r * nDotL * curLight->r;
+         result.c.g += hitF.diffuse*hitP.c.g * nDotL * curLight->g;
+         result.c.b += hitF.diffuse*hitP.c.b * nDotL * curLight->b;
+      }
+
+
+      // Cast light feeler ray.
+      /*
+         ray_t feeler;
+         vec3_t dataPoint = data.point.toHost();
+         feeler.dir = curLight->location - dataPoint;
+         feeler.dir.normalize();
+         feeler.point = feeler.dir * EPSILON;
+         feeler.point += dataPoint;
+
+         hit_t tmpHit;
 
       // If feeler hits any object, current point is in shadow.
       bool isShadow = gpuHit(feeler, &tmpHit);
 
       if (!isShadow)
       {
-         // Diffuse.
-         vec3_t n = hitNormal;
-         n.normalize();
-         vec3_t l = curLight->location - dataPoint;
-         l.normalize();
-         float nDotL = n.dot(l);
-         nDotL = min(nDotL, 1.0f);
+      // Diffuse.
+      vec3_t n = hitNormal;
+      n.normalize();
+      vec3_t l = curLight->location - dataPoint;
+      l.normalize();
+      float nDotL = n.dot(l);
+      nDotL = min(nDotL, 1.0f);
 
-         if (nDotL > 0)
-         {
-            result.c.r += hitF.diffuse*hitP.c.r * nDotL * curLight->r;
-            result.c.g += hitF.diffuse*hitP.c.g * nDotL * curLight->g;
-            result.c.b += hitF.diffuse*hitP.c.b * nDotL * curLight->b;
-         }
-
-         // Specular (Phong).
-         vec3_t r = mReflect(l, n);
-         r.normalize();
-         vec3_t v = view;
-         v.normalize();
-         float rDotV = r.dot(v);
-         rDotV = (float)pow(rDotV, 1.0f / hitF.roughness);
-         rDotV = min(rDotV, 1.0f);
-
-         if (rDotV > 0)
-         {
-            result.c.r += hitF.specular*hitP.c.r * rDotV * curLight->r;
-            result.c.g += hitF.specular*hitP.c.g * rDotV * curLight->g;
-            result.c.b += hitF.specular*hitP.c.b * rDotV * curLight->b;
-         }
+      if (nDotL > 0)
+      {
+      result.c.r += hitF.diffuse*hitP.c.r * nDotL * curLight->r;
+      result.c.g += hitF.diffuse*hitP.c.g * nDotL * curLight->g;
+      result.c.b += hitF.diffuse*hitP.c.b * nDotL * curLight->b;
       }
+
+      // Specular (Phong).
+      vec3_t r = mReflect(l, n);
+      r.normalize();
+      vec3_t v = view;
+      v.normalize();
+      float rDotV = r.dot(v);
+      rDotV = (float)pow(rDotV, 1.0f / hitF.roughness);
+      rDotV = min(rDotV, 1.0f);
+
+      if (rDotV > 0)
+      {
+      result.c.r += hitF.specular*hitP.c.r * rDotV * curLight->r;
+      result.c.g += hitF.specular*hitP.c.g * rDotV * curLight->g;
+      result.c.b += hitF.specular*hitP.c.b * rDotV * curLight->b;
+      }
+      }
+       */
    }
    return result;
 }

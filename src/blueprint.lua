@@ -16,7 +16,7 @@ config "debug"
     defines {"DEBUG"}
     libdirs {"../lib/pngwriter/lib", "../lib", "/home/cbrenton/NVIDIA_GPU_Computing_SDK/C/lib"}
     includes {"./", "../lib", "../lib/pngwriter/include", "/home/cbrenton/NVIDIA_GPU_Computing_SDK/C/common/inc/"}
-    cflags {"-Wall -DNO_FREETYPE"}
+    cflags {"-Wall", "-DNO_FREETYPE"}
     libs {"m", "png", "z", "pngwriter", "cudart"}
     compute_capability "2.0"
 
@@ -28,7 +28,7 @@ config "profile"
     profiling "on"
     libdirs {"../lib/pngwriter/lib", "../lib", "/home/cbrenton/NVIDIA_GPU_Computing_SDK/C/lib"}
     includes {"./", "../lib", "../lib/pngwriter/include", "/home/cbrenton/NVIDIA_GPU_Computing_SDK/C/common/inc/"}
-    cflags {"-Wall -DNO_FREETYPE"}
+    cflags {"-Wall", "-DNO_FREETYPE", "-Werror", "-Wconversion"}
     libs {"m", "png", "z", "pngwriter", "cudart"}
     compute_capability "2.0"
 
@@ -40,6 +40,6 @@ config "release"
     defines {"RELEASE"}
     libdirs {"../lib/pngwriter/lib", "../lib", "/home/cbrenton/NVIDIA_GPU_Computing_SDK/C/lib"}
     includes {"./", "../lib", "../lib/pngwriter/include", "/home/cbrenton/NVIDIA_GPU_Computing_SDK/C/common/inc/"}
-    cflags {"-Wall -DNO_FREETYPE"}
+    cflags {"-Wall", "-DNO_FREETYPE"}
     libs {"m", "png", "z", "pngwriter", "cudart"}
     compute_capability "2.0"

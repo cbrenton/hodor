@@ -19,7 +19,7 @@
 #define DEFAULT_H 256
 #define AA_RAYS 4
 #define RECURSION_DEPTH 6
-#define CHUNK_SIZE 4096
+#define CHUNK_SIZE (512*512)
 
 using namespace std;
 
@@ -150,24 +150,6 @@ int main(int argc, char **argv)
    inputFileStream.close();
 
    // Make array of rays.
-   /*
-      ray_t ***aRayArray = new ray_t **[width];
-      for (int i = 0; i < width; i++)
-      {
-      aRayArray[i] = new ray_t *[height];
-      for (int j = 0; j < height; j++)
-      {
-      aRayArray[i][j] = new ray_t[numAA];
-      }
-      }
-      */
-   /*
-      ray_t **aRayArray = new ray_t *[width];
-      for (int i = 0; i < width; i++)
-      {
-      aRayArray[i] = new ray_t[height];
-      }
-      */
    ray_t *aRayArray = new ray_t[width * height];
 
    float l = -scene->camera.right.length() / 2;
@@ -210,9 +192,7 @@ int main(int argc, char **argv)
          vec3_t rayDir = uVector + vVector + wVector;
          rayDir.normalize();
          vec3_t curPoint = vec3_t(scene->camera.location);
-         //ray_t *curRay = new ray_t(curPoint, rayDir);
          ray_t curRay = {curPoint, rayDir};
-         //aRayArray[i][j][k] = *curRay;
          aRayArray[x * image->height + y] = curRay;
       }
    }
@@ -243,20 +223,14 @@ int main(int argc, char **argv)
    // Test for intersection.
    cout << "Testing intersections." << endl;
 
-   /*
-      for (int rayNdx = 0; rayNdx <= image->width * image->height / 256; rayNdx++)
-      {
-      cout << "starting at " << rayNdx * 256 << ", size: " << image->width * image->height << endl;
-      scene->castRays(aRayArray + (rayNdx * 256), image->width, image->height,
-      RECURSION_DEPTH);
-      }
-      */
+   int numChunks = (int)ceil((float)(width * height) / (float)CHUNK_SIZE);
 
-   int numChunks = ceil((float)(width * height) / (float)CHUNK_SIZE);
-
+   // Do initial memory allocation for CUDA.
    scene->cudaSetup(CHUNK_SIZE);
 
    Pixel *pixResults = new Pixel[width * height];
+
+   // Cast rays for each chunk.
    for (int chunkNdx = 0; chunkNdx < numChunks; chunkNdx++)
    {
       Pixel *chunkPix = scene->castRays(aRayArray + chunkNdx * CHUNK_SIZE,
@@ -278,33 +252,23 @@ int main(int argc, char **argv)
 
    cout << endl;
 
+   // Free memory allocated for CUDA.
    scene->cudaCleanup();
-
-   //Pixel *pixResults = scene->castRays(aRayArray, image->width, image->height,
-   //RECURSION_DEPTH);
 
    for (int x = 0; x < image->width; x++)
    {
       for (int y = 0; y < image->height; y++)
       {
-         //Pixel curPix = scene->castRay(aRayArray[x][y], RECURSION_DEPTH);
          // Write pixel out to file.
-         //image->writePixel(x, y, curPix);
          image->writePixel(x, y, pixResults[x * image->height + y]);
       }
    }
 
    cout << "Writing to file...";
-   // finish_t writing image out to file.
+   // Finish writing image out to file.
    image->close();
    cout << "done." << endl;
 
-   /*
-      for (int i = 0; i < width; i++)
-      {
-      delete[] aRayArray[i];
-      }
-      */
    delete[] aRayArray;
 
    delete image;

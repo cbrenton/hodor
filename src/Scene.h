@@ -74,6 +74,8 @@ class Scene
 
       sphere_t *spheresArray;
       
+      hitd_t *results;
+
       sphere_t *spheres_d;
       size_t spheres_size;
 

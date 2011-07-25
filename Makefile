@@ -15,6 +15,7 @@ RM     = rm -rf
 KILL   = killall -9
 SHELL  = /bin/sh
 MAKE   = make
+TIME   = time
 
 IFLAGS = -I./src -I./lib -I./lib/pngwriter/include -DNO_FREETYPE
 LFLAGS = -lpng -lz -lpngwriter -L./lib/pngwriter/lib
@@ -27,12 +28,12 @@ LDFLAGS = $(OPTIMIZE) $(DEBUG) $(ERROR) $(LFLAGS)
 TARGET = terlR
 INPUTEXT=pov
 INPUTDIR=input
-INPUTFILE=bunny_small
+INPUTFILE=bunny_large
 #INPUTFILE=test
 OUTPUTDIR=images
 OUTPUTEXT=png
-WIDTH=320
-HEIGHT=240
+WIDTH=640
+HEIGHT=480
 ARGS = -w $(WIDTH) -h $(HEIGHT) -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
 
 # Additional linker libraries
@@ -64,7 +65,7 @@ gpu:
 	cd ./src && ./cubuild profile
 
 run:
-	time ./$(TARGET) $(ARGS)
+	$(TIME) ./$(TARGET) $(ARGS)
 
 eog:
 	eog ./$(OUTPUTDIR)/$(INPUTFILE).$(OUTPUTEXT)
