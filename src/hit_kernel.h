@@ -24,11 +24,11 @@ vec3d_t plane_normal(plane_t *p_t);
 
 __device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data);
 
-vec3d_t *sphere_normal(sphere_t & s_t, hitd_t & data);
+vec3_t sphere_normal(sphere_t & s_t, vec3_t & data);
 
 int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hitd_t *data);
 
 vec3d_t triangle_normal(triangle_t *t_t);
 
-__global__ void hit_spheres(ray_t *rays, int num, sphere_t *spheres,
+__global__ void cuda_hit(ray_t *rays, int num, sphere_t *spheres,
       int spheres_size, hitd_t *results);

@@ -18,17 +18,17 @@ struct vec3d_t
    __device__ vec3d_t(float *pVec) {v[0] = pVec[0]; v[1] = pVec[1]; v[2] = pVec[2];}
 
    __device__ vec3d_t operator=(vec3d_t &pVec)
-   __device__ {return vec3d_t(v[0] = pVec.v[0], v[1] = pVec.v[1], v[2] = pVec.v[2]);}
+   {return vec3d_t(v[0] = pVec.v[0], v[1] = pVec.v[1], v[2] = pVec.v[2]);}
    __device__ vec3d_t operator=(float *ptr)
-   __device__ {return vec3d_t(v[0] = ptr[0], v[1] = ptr[1], v[2] = ptr[2]);}
+   {return vec3d_t(v[0] = ptr[0], v[1] = ptr[1], v[2] = ptr[2]);}
    __device__ int operator==(vec3d_t &pVec)
-   __device__ {return (v[0] == pVec.v[0] && v[1] == pVec.v[1] && v[2] == pVec.v[2]);}
+   {return (v[0] == pVec.v[0] && v[1] == pVec.v[1] && v[2] == pVec.v[2]);}
    __device__ int operator==(float *pVec)
-   __device__ {return (v[0] == pVec[0] && v[1] == pVec[1] && v[2] == pVec[2]);}
+   {return (v[0] == pVec[0] && v[1] == pVec[1] && v[2] == pVec[2]);}
    __device__ inline int operator!=(vec3d_t &pVec)
-   __device__ {return !(pVec == (*this));}
+   {return !(pVec == (*this));}
    __device__ inline int operator!=(float *pVec)
-   __device__ {return !(pVec == (*this));}
+   {return !(pVec == (*this));}
 
    __device__ vec3d_t operator+=(vec3d_t &pVec);
    __device__ vec3d_t operator-=(vec3d_t &pVec);
@@ -38,17 +38,17 @@ struct vec3d_t
    __device__ vec3d_t operator/=(float val);
 
    __device__ vec3d_t operator+(vec3d_t &pVec)
-   __device__ {return vec3d_t(v[0] + pVec.v[0], v[1] + pVec.v[1], v[2] + pVec.v[2]);}
+   {return vec3d_t(v[0] + pVec.v[0], v[1] + pVec.v[1], v[2] + pVec.v[2]);}
    __device__ vec3d_t operator-(vec3d_t &pVec)
-   __device__ {return vec3d_t(v[0] - pVec.v[0], v[1] - pVec.v[1], v[2] - pVec.v[2]);}
+   {return vec3d_t(v[0] - pVec.v[0], v[1] - pVec.v[1], v[2] - pVec.v[2]);}
    __device__ vec3d_t operator*(vec3d_t &pVec)
-   __device__ {return vec3d_t(v[0] * pVec.v[0], v[1] * pVec.v[1], v[2] * pVec.v[2]);}
+   {return vec3d_t(v[0] * pVec.v[0], v[1] * pVec.v[1], v[2] * pVec.v[2]);}
    __device__ vec3d_t operator*(float val)
-   __device__ {return vec3d_t(v[0] * val, v[1] * val, v[2] * val);}
+   {return vec3d_t(v[0] * val, v[1] * val, v[2] * val);}
    __device__ vec3d_t operator/(vec3d_t &pVec)
-   __device__ {return vec3d_t(v[0] / pVec.v[0], v[1] / pVec.v[1], v[2] / pVec.v[2]);}
+   {return vec3d_t(v[0] / pVec.v[0], v[1] / pVec.v[1], v[2] / pVec.v[2]);}
    __device__ vec3d_t operator/(float val)
-   __device__ {return vec3d_t(v[0] / val, v[1] / val, v[2] / val);}
+   {return vec3d_t(v[0] / val, v[1] / val, v[2] / val);}
 
    __device__ void clear(void) {v[0] = v[1] = v[2] = 0;}
    __device__ void normalize(void);

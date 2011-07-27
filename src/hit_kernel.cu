@@ -162,11 +162,6 @@ vec3d_t plane_normal(plane_t *p_t)
    return vec3d_t(p_t->normal);
 }
 
-__device__ float3 vec_to_float3(vec3d_t v)
-{
-   return make_float3(v.x(), v.y(), v.z());
-}
-
 __device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data)
 {
    // Optimized algorithm courtesy of "Real-Time Rendering, Third Edition".
@@ -197,11 +192,6 @@ __device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data)
       data->t = s + q;
       *t = s + q;
    }
-   vec3d_t dataPoint = rayDir * (*t);
-   dataPoint += rayPoint;
-   data->point.v[0] = dataPoint.x();
-   data->point.v[1] = dataPoint.y();
-   data->point.v[2] = dataPoint.z();
    data->hitType = SPHERE_HIT;
    if (l2 < r2)
    {
@@ -215,16 +205,11 @@ __device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data)
    }
 }
 
-vec3d_t *sphere_normal(sphere_t & s_t, hitd_t & data)
+vec3_t sphere_normal(sphere_t & s_t, vec3_t & data)
 {
-   vec3_t dataPoint = data.point.toHost();
-   vec3_t n = dataPoint - s_t.location;
+   vec3_t n = data - s_t.location;
    n.normalize();
-   vec3d_t *ret = new vec3d_t();
-   ret->v[0] = n.v[0];
-   ret->v[1] = n.v[1];
-   ret->v[2] = n.v[2];
-   return ret;
+   return n;
 }
 
 int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hitd_t *data)
@@ -359,7 +344,7 @@ vec3d_t triangle_normal(triangle_t *t_t)
    return vec3d_t(0, 0, 0);
 }
 
-__global__ void hit_spheres(ray_t *rays, int num, sphere_t *spheres,
+__global__ void cuda_hit(ray_t *rays, int num, sphere_t *spheres,
       int spheres_size, hitd_t *results)
 {
    int idx = blockIdx.x * blockDim.x + threadIdx.x;

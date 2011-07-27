@@ -48,13 +48,13 @@ class Scene
 
       void cudaCleanup();
       
+      // Casts rays into the scene and returns correctly colored pixels.
       Pixel* castRays(ray_t *ray, int num, int depth);
 
-      // Casts a ray into the scene and returns a correctly color_ted pixel.
       Pixel castRay(ray_t & ray, int depth);
 
       // Calculates proper shading at the current point.
-      Pixel shade(hitd_t & data, vec3_t & view);
+      Pixel shade(hitd_t & data, ray_t & view);
 
       //vec3_t reflect(vec3_t incident, vec3_t normal);
 

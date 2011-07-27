@@ -247,6 +247,9 @@ void Scene::cudaCleanup()
    cout << "done." << endl;
 }
 
+/**
+ * Casts rays into the scene and returns correctly colored pixels.
+ */
 Pixel* Scene::castRays(ray_t *rays, int num, int depth)
 {
    Pixel *pixels = new Pixel[num];
@@ -265,7 +268,7 @@ Pixel* Scene::castRays(ray_t *rays, int num, int depth)
    dim3 dimBlock(THREADS_PER_BLOCK, 1);
 
    // Test for intersection.
-   hit_spheres <<< dimGrid, dimBlock >>>
+   cuda_hit <<< dimGrid, dimBlock >>>
       (rays_d, num, spheres_d, spheres.size(), results_d);
    // Check for error.
    cudaError_t err = cudaGetLastError();
@@ -288,7 +291,7 @@ Pixel* Scene::castRays(ray_t *rays, int num, int depth)
       if (curResult.hit != 0)
       {
          sphere_t hitSphere = spheresArray[curResult.objIndex];
-         pixels[resultNdx] = shade(curResult, curRay.dir);
+         pixels[resultNdx] = shade(curResult, curRay);
       }
       else
       {
@@ -299,114 +302,43 @@ Pixel* Scene::castRays(ray_t *rays, int num, int depth)
    return pixels;
 }
 
-// Casts a ray into the scene and returns a correctly color_ted pixel.
-Pixel Scene::castRay(ray_t & ray, int depth)
-{
-   Pixel result(0.0, 0.0, 0.0);
-   /*
-      Pixel reflectPix(0.0, 0.0, 0.0);
-      Pixel refractPix(0.0, 0.0, 0.0);
-      hit_t rayData;
-   //if (hit(ray, &rayData))
-   if (gpuHit(ray, &rayData))
-   {
-   result = shade(&rayData, ray.dir);
-   if (useGPU)
-   {
-   if (rayData.reflect != NULL && depth > 0)
-   {
-   //pigment_t hitP = {};
-   finish_t hitF = {};
-   vec3_t hitNormal(0.0, 0.0, 0.0);
-   box_t *b_t;
-   plane_t *p_t;
-   sphere_t s_t;
-   triangle_t *t_t;
-   switch (rayData.hitType) {
-   case BOX_HIT:
-   b_t = boxes[rayData.objIndex];
-   //hitP = b_t->p;
-   hitF = b_t->f;
-   hitNormal = box_normal(b_t, &rayData);
-   break;
-   case PLANE_HIT:
-   p_t = planes[rayData.objIndex];
-   //hitP = p_t->p;
-   hitF = p_t->f;
-   hitNormal = plane_normal(p_t);
-   break;
-   case SPHERE_HIT:
-   s_t = spheresArray[rayData.objIndex];
-   //hitP = s_t->p;
-   hitF = s_t.f;
-   hitNormal = sphere_normal(s_t, &rayData);
-   break;
-   case TRIANGLE_HIT:
-   t_t = triangles[rayData.objIndex];
-   //hitP = t_t->p;
-   hitF = t_t->f;
-   hitNormal = triangle_normal(t_t);
-   break;
-   }
-
-   vec3_t reflectVec = *rayData.reflect;
-   reflectVec.normalize();
-   vec3_t reflectOrig = reflectVec * EPSILON;
-   reflectOrig += rayData.point;
-   ray_t reflectray_t = {reflectOrig, reflectVec};
-
-   reflectPix = castRay(reflectray_t, depth - 1);
-
-   reflectPix.multiply(hitF.reflection);
-   result.multiply(1 - hitF.reflection);
-   result.add(reflectPix);
-   }
-   }
-
-   }
-    */
-   return result;
-}
-
 // Calculates proper shading at the current point.
-Pixel Scene::shade(hitd_t & data, vec3_t & view)
+Pixel Scene::shade(hitd_t & data, ray_t & view)
 {
    Pixel result(0.0, 0.0, 0.0);
    pigment_t hitP = {};
    finish_t hitF = {0};
    vec3_t hitNormal(0.0, 0.0, 0.0);
+   vec3_t dataPoint = view.dir * data.t;
+   dataPoint += view.point;
    box_t *b_t;
    plane_t *p_t;
    sphere_t s_t;
    triangle_t *t_t;
-   vec3d_t *newHitNormal = new vec3d_t();
    switch (data.hitType) {
    case BOX_HIT:
       b_t = boxes[data.objIndex];
       hitP = b_t->p;
       hitF = b_t->f;
-      hitNormal = box_normal(b_t, data);
+      //hitNormal = box_normal(b_t, data);
       break;
    case PLANE_HIT:
       p_t = planes[data.objIndex];
       hitP = p_t->p;
       hitF = p_t->f;
-      hitNormal = plane_normal(p_t);
+      //hitNormal = plane_normal(p_t);
       break;
    case SPHERE_HIT:
       s_t = spheresArray[data.objIndex];
       hitP = s_t.p;
       hitF = s_t.f;
-      newHitNormal = sphere_normal(s_t, data);
-      hitNormal.v[0] = newHitNormal->v[0];
-      hitNormal.v[1] = newHitNormal->v[1];
-      hitNormal.v[2] = newHitNormal->v[2];
+      hitNormal = sphere_normal(s_t, dataPoint);
       break;
    case TRIANGLE_HIT:
       t_t = triangles[data.objIndex];
       hitP = t_t->p;
       hitF = t_t->f;
-      hitNormal = triangle_normal(t_t);
+      //hitNormal = triangle_normal(t_t);
       break;
    default:
       cerr << "Invalid intersection type." << endl;
