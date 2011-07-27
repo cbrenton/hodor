@@ -215,21 +215,24 @@ bool Scene::hit(ray_t & ray, hit_t *data)
 
 void Scene::cudaSetup(int chunkSize)
 {
-   cout << "Allocating device arrays...";
+   cout << "Allocating device arrays";
    // Create sphere array on device.
    spheres_size = sizeof(sphere_t) * spheres.size();
    CUDA_SAFE_CALL(cudaMalloc((void**) &spheres_d, spheres_size));
    // Copy spheres to device.
    CUDA_SAFE_CALL(cudaMemcpy(spheres_d, spheresArray, spheres_size,
             cudaMemcpyHostToDevice));
+   cout << ".";
 
    // Create ray array on device.
    rays_size = chunkSize * sizeof(ray_t);
    CUDA_SAFE_CALL(cudaMalloc((void **) &rays_d, rays_size));
+   cout << ".";
 
    // Create hit data array on device.
    results_size = chunkSize * sizeof(hitd_t);
    CUDA_SAFE_CALL(cudaMalloc((void **) &results_d, results_size));
+   cout << ".";
 
    // Create hit data array on host.
    results = new hitd_t[chunkSize];
@@ -267,10 +270,11 @@ Pixel* Scene::castRays(ray_t *rays, int num, int depth)
    dim3 dimGrid((int)ceil((float)num / (float)THREADS_PER_BLOCK), 1);
    dim3 dimBlock(THREADS_PER_BLOCK, 1);
 
+   // Send scene geometry to device.
    set_spheres <<< dimGrid, dimBlock >>> (spheres_d, spheres.size());
+
    // Test for intersection.
-   cuda_hit <<< dimGrid, dimBlock >>>
-      (rays_d, num, results_d);
+   cuda_hit <<< dimGrid, dimBlock >>> (rays_d, num, results_d);
    //cuda_hit <<< dimGrid, dimBlock >>>
       //(rays_d, num, spheres_d, spheres.size(), results_d);
    // Check for error.

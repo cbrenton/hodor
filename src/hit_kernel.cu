@@ -66,9 +66,6 @@ int box_hit(box_t *b_t, ray_t & ray, float *t, hitd_t *data)
    *t = tNear;
 
    data->hit = 1;
-   vec3_t dataPoint = ray.dir * (*t);
-   dataPoint += ray.point;
-   data->point = vec3d_t(dataPoint);
    data->t = (*t);
    data->hitType = BOX_HIT;
    /*
@@ -86,7 +83,7 @@ int box_hit(box_t *b_t, ray_t & ray, float *t, hitd_t *data)
    return 1;
 }
 
-vec3d_t box_normal(box_t *b_t, hitd_t & data)
+vec3_t box_normal(box_t *b_t, hitd_t & data)
 {
    /*
       if (closeEnough(data.point.x(), b_t->left.offset))
@@ -115,7 +112,7 @@ vec3d_t box_normal(box_t *b_t, hitd_t & data)
       }
       cout << "shouldn't be here." << endl;
     */
-   return vec3d_t();
+   return vec3_t();
 }
 
 int plane_hit(plane_t *p_t, ray_t & ray, float *t, hitd_t *data)
@@ -133,8 +130,6 @@ int plane_hit(plane_t *p_t, ray_t & ray, float *t, hitd_t *data)
     if (*t >= MIN_T && *t <= MAX_DIST)
     {
     data->hit = 1;
-    data->point = ray.dir * (*t);
-    data->point += ray.point;
     data->t = (*t);
     data->hitType = PLANE_HIT;
     */
@@ -157,9 +152,9 @@ int plane_hit(plane_t *p_t, ray_t & ray, float *t, hitd_t *data)
    return 0;
 }
 
-vec3d_t plane_normal(plane_t *p_t)
+vec3_t plane_normal(plane_t *p_t)
 {
-   return vec3d_t(p_t->normal);
+   return p_t->normal;
 }
 
 __device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data)
@@ -323,9 +318,6 @@ int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hitd_t *data)
    if (result > EPSILON)
    {
       data->hit = 1;
-      vec3_t dataPoint = ray.dir * (*t);
-      dataPoint += ray.point;
-      data->point = vec3d_t(dataPoint);
       data->t = (*t);
       data->hitType = TRIANGLE_HIT;
       return 1;
@@ -333,7 +325,7 @@ int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hitd_t *data)
    return 0;
 }
 
-vec3d_t triangle_normal(triangle_t *t_t)
+vec3_t triangle_normal(triangle_t *t_t)
 {
    /*
       vec3d_t s1 = t_t->c2 - t_t->c1;
@@ -341,7 +333,7 @@ vec3d_t triangle_normal(triangle_t *t_t)
       s1.cross(s1, s2);
       return s1;
     */
-   return vec3d_t(0, 0, 0);
+   return vec3_t(0, 0, 0);
 }
 
 __global__ void set_spheres(sphere_t *spheresIn, int numSpheres)

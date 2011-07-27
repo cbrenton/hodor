@@ -17,7 +17,6 @@
 #define POV_EXT ".pov"
 #define DEFAULT_W 256
 #define DEFAULT_H 256
-#define AA_RAYS 4
 #define RECURSION_DEPTH 6
 #define CHUNK_SIZE (128*128)
 
@@ -54,14 +53,7 @@ void setHeight(char* strIn)
 
 void setAA(char* strIn)
 {
-   if (strlen(strIn) == 0)
-   {
-      numAA = AA_RAYS;
-   }
-   else
-   {
-      numAA = atoi(strIn);
-   }
+   numAA = atoi(strIn);
    if (numAA < 1)
    {
       cerr << "Invalid antialiasing sample rate: " << numAA << endl;
@@ -98,19 +90,12 @@ int main(int argc, char **argv)
    srand((int)time(NULL));
 
    int c;
-   while ((c = getopt(argc, argv, "a::A::bBi:I:h:H:w:W:")) != -1)
+   while ((c = getopt(argc, argv, "a:A:bBi:I:h:H:w:W:")) != -1)
    {
       switch (c)
       {
       case 'a': case 'A':
-         if (optarg != NULL)
-         {
-            setAA(optarg);
-         }
-         else
-         {
-            setAA((char *)"");
-         }
+         setAA(optarg);
          break;
       case 'b': case 'B':
          useBVH = true;
@@ -132,6 +117,9 @@ int main(int argc, char **argv)
    }
 
    image = new PngImage(width, height, filename);
+
+   width *= numAA;
+   height *= numAA;
 
    // Open input file.
    fstream inputFileStream(inputFileName.c_str(), fstream::in);
@@ -159,48 +147,50 @@ int main(int argc, char **argv)
 
    // Generate rays.
    cout << "Generating rays...";
-   for (int x = 0; x < image->width; x++)
+   for (int x = 0; x < width; x += numAA)
    {
-      for (int y = 0; y < image->height; y++)
+      for (int y = 0; y < height; y += numAA)
       {
-         float jitter = 0.5f;
-         if (numAA > 1)
+         for (int aa = 0; aa < numAA * numAA; aa++)
          {
-            //jitter = randFloat();
-         }
+            int aaX = aa / numAA;
+            int aaY = aa % numAA;
 
-         float uScale = (float)(l + (r - l) * ((float)x + jitter)
-               / (float)image->width);
-         float vScale = (float)(b + (t - b) * ((float)y + jitter)
-               / (float)image->height);
-         float wScale = -1;
-         vec3_t sVector = scene->camera.location;
-         vec3_t uVector = scene->camera.right;
-         vec3_t vVector = scene->camera.up;
-         vec3_t wVector = scene->camera.look_at - scene->camera.location;
-         uVector.normalize();
-         vVector.normalize();
-         wVector.normalize();
-         // Left-handed.
-         wVector *= -1;
-         uVector *= uScale;
-         vVector *= vScale;
-         wVector *= wScale;
-         sVector += uVector;
-         sVector += vVector;
-         sVector += wVector;
-         vec3_t rayDir = uVector + vVector + wVector;
-         rayDir.normalize();
-         vec3_t curPoint = vec3_t(scene->camera.location);
-         ray_t curRay = {curPoint, rayDir};
-         aRayArray[x * image->height + y] = curRay;
+            float jitter = 0.5f;
+
+            float uScale = (float)(l + (r - l) * ((float)(x + aaX) + jitter)
+                  / (float)(width));
+            float vScale = (float)(b + (t - b) * ((float)(y + aaY) + jitter)
+                  / (float)(height));
+            float wScale = -1;
+            vec3_t sVector = scene->camera.location;
+            vec3_t uVector = scene->camera.right;
+            vec3_t vVector = scene->camera.up;
+            vec3_t wVector = scene->camera.look_at - scene->camera.location;
+            uVector.normalize();
+            vVector.normalize();
+            wVector.normalize();
+            // Left-handed.
+            wVector *= -1;
+            uVector *= uScale;
+            vVector *= vScale;
+            wVector *= wScale;
+            sVector += uVector;
+            sVector += vVector;
+            sVector += wVector;
+            vec3_t rayDir = uVector + vVector + wVector;
+            rayDir.normalize();
+            vec3_t curPoint = vec3_t(scene->camera.location);
+            ray_t curRay = {curPoint, rayDir};
+            aRayArray[x * height + y + aa] = curRay;
+         }
       }
    }
    cout << "done." << endl;
 
    if (numAA > 1)
    {
-      cout << "Using " << numAA << "x AA." << endl;
+      cout << "Using " << numAA << "x" << numAA << " AA." << endl;
    }
    else
    {
@@ -220,15 +210,15 @@ int main(int argc, char **argv)
    struct timeval startTime;
    gettimeofday(&startTime, NULL);
 
-   // Test for intersection.
-   cout << "Testing intersections." << endl;
-
    int numChunks = (int)ceil((float)(width * height) / (float)CHUNK_SIZE);
 
    // Do initial memory allocation for CUDA.
    scene->cudaSetup(CHUNK_SIZE);
 
    Pixel *pixResults = new Pixel[width * height];
+
+   // Test for intersection.
+   cout << "Testing intersections." << endl;
 
    // Cast rays for each chunk.
    for (int chunkNdx = 0; chunkNdx < numChunks; chunkNdx++)
@@ -255,12 +245,22 @@ int main(int argc, char **argv)
    // Free memory allocated for CUDA.
    scene->cudaCleanup();
 
-   for (int x = 0; x < image->width; x++)
+   Pixel curPix(0.0, 0.0, 0.0);
+   for (int x = 0; x < width; x++)
    {
-      for (int y = 0; y < image->height; y++)
+      for (int y = 0; y < height; y++)
       {
-         // Write pixel out to file.
-         image->writePixel(x, y, pixResults[x * image->height + y]);
+         if (x % numAA == 0 && y % numAA == 0)
+         {
+            curPix.add(pixResults[x * height + y]);
+            curPix.multiply(1.0f / (float)(numAA));
+            image->writePixel(x / numAA, y / numAA, curPix);
+            curPix = Pixel(0.0, 0.0, 0.0);
+         }
+         else
+         {
+            curPix.add(pixResults[x * height + y]);
+         }
       }
    }
 
