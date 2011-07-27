@@ -219,7 +219,7 @@ void Scene::cudaSetup(int chunkSize)
    // Create sphere array on device.
    spheres_size = sizeof(sphere_t) * spheres.size();
    CUDA_SAFE_CALL(cudaMalloc((void**) &spheres_d, spheres_size));
-   // Copy rays to device.
+   // Copy spheres to device.
    CUDA_SAFE_CALL(cudaMemcpy(spheres_d, spheresArray, spheres_size,
             cudaMemcpyHostToDevice));
 
@@ -267,9 +267,12 @@ Pixel* Scene::castRays(ray_t *rays, int num, int depth)
    dim3 dimGrid((int)ceil((float)num / (float)THREADS_PER_BLOCK), 1);
    dim3 dimBlock(THREADS_PER_BLOCK, 1);
 
+   set_spheres <<< dimGrid, dimBlock >>> (spheres_d, spheres.size());
    // Test for intersection.
    cuda_hit <<< dimGrid, dimBlock >>>
-      (rays_d, num, spheres_d, spheres.size(), results_d);
+      (rays_d, num, results_d);
+   //cuda_hit <<< dimGrid, dimBlock >>>
+      //(rays_d, num, spheres_d, spheres.size(), results_d);
    // Check for error.
    cudaError_t err = cudaGetLastError();
    if( cudaSuccess != err)

@@ -344,8 +344,15 @@ vec3d_t triangle_normal(triangle_t *t_t)
    return vec3d_t(0, 0, 0);
 }
 
-__global__ void cuda_hit(ray_t *rays, int num, sphere_t *spheres,
-      int spheres_size, hitd_t *results)
+__global__ void set_spheres(sphere_t *spheresIn, int numSpheres)
+{
+   spheres = spheresIn;
+   spheres_size = numSpheres;
+}
+
+//__global__ void cuda_hit(ray_t *rays, int num, sphere_t *spheres,
+      //int spheres_size, hitd_t *results)
+__global__ void cuda_hit(ray_t *rays, int num, hitd_t *results)
 {
    int idx = blockIdx.x * blockDim.x + threadIdx.x;
 

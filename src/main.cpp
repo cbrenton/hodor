@@ -19,7 +19,7 @@
 #define DEFAULT_H 256
 #define AA_RAYS 4
 #define RECURSION_DEPTH 6
-#define CHUNK_SIZE (512*512)
+#define CHUNK_SIZE (128*128)
 
 using namespace std;
 
