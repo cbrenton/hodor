@@ -18,6 +18,8 @@
 #define DEFAULT_W 256
 #define DEFAULT_H 256
 #define RECURSION_DEPTH 6
+#define MIN_AA 1
+#define MAX_AA 8
 #define CHUNK_SIZE (128*128)
 
 using namespace std;
@@ -54,9 +56,10 @@ void setHeight(char* strIn)
 void setAA(char* strIn)
 {
    numAA = atoi(strIn);
-   if (numAA < 1)
+   if (numAA < MIN_AA || numAA > MAX_AA)
    {
-      cerr << "Invalid antialiasing sample rate: " << numAA << endl;
+      cerr << "Invalid antialiasing sample rate (must be between " <<
+         MIN_AA << " and " << MAX_AA << "): " << numAA << endl;
       exit(EXIT_FAILURE);
    }
 }

@@ -28,13 +28,13 @@ LDFLAGS = $(OPTIMIZE) $(DEBUG) $(ERROR) $(LFLAGS)
 TARGET = terlR
 INPUTEXT=pov
 INPUTDIR=input
-#INPUTFILE=bunny_jumbo
-INPUTFILE=simple_spec
+INPUTFILE=bunny_jumbo
+#INPUTFILE=simple_spec
 OUTPUTDIR=images
 OUTPUTEXT=png
-WIDTH=320
-HEIGHT=240
-AA = 4
+WIDTH=640
+HEIGHT=480
+AA = 1
 ARGS = -a $(AA) -w $(WIDTH) -h $(HEIGHT) -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
 
 # Additional linker libraries
