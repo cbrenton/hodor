@@ -173,7 +173,7 @@ return false;
  * Checks if a ray intersects any geometry in the scene, using Geometry.
  * @returns true if an intersection is found.
  */
-bool Scene::hit(ray_t & ray, hit_t *data)
+bool Scene::cpuHit(ray_t & ray, hit_t *data)
 {
    // INITIALIZE closestT to MAX_DIST + 0.1
    float closestT = MAX_DIST + 0.1f;
@@ -235,7 +235,7 @@ void Scene::cudaSetup(int chunkSize)
    cout << ".";
 
    // Create hit data array on host.
-   results = new hitd_t[chunkSize];
+   //results = new hitd_t[chunkSize];
    cout << "done." << endl;
 }
 
@@ -246,16 +246,49 @@ void Scene::cudaCleanup()
    cudaFree(rays_d);
    cudaFree(results_d);
 
-   delete[] results;
+   //delete[] results;
    cout << "done." << endl;
 }
 
 /**
  * Casts rays into the scene and returns correctly colored pixels.
  */
-Pixel* Scene::castRays(ray_t *rays, int num, int depth)
+Pixel *Scene::castRays(ray_t *rays, int num, int depth)
+//void Scene::castRays(Pixel **pixels, ray_t *rays, int num, int depth)
 {
-   Pixel *pixels = new Pixel[num];
+   Pixel *pixels;
+   // = new Pixel[num];
+
+   hitd_t *results = hit(rays, num, depth);
+
+   pixels = shadeArray(results, rays, num);
+
+   /*
+   // Color result pixels.
+   for (int resultNdx = 0; resultNdx < num; resultNdx++)
+   {
+   hitd_t curResult = results[resultNdx];
+   ray_t curRay = rays[resultNdx];
+   if (curResult.hit != 0)
+   {
+   sphere_t hitSphere = spheresArray[curResult.objIndex];
+   pixels[resultNdx] = shade(curResult, curRay);
+   }
+   else
+   {
+   pixels[resultNdx] = Pixel(0.0, 0.0, 0.0);
+   }
+   }
+    */
+
+   delete[] results;
+
+   return pixels;
+}
+
+hitd_t *Scene::hit(ray_t *rays, int num, int depth)
+{
+   hitd_t *results = new hitd_t[num];
 
    for (int i = 0; i < num; i++)
    {
@@ -276,7 +309,7 @@ Pixel* Scene::castRays(ray_t *rays, int num, int depth)
    // Test for intersection.
    cuda_hit <<< dimGrid, dimBlock >>> (rays_d, num, results_d);
    //cuda_hit <<< dimGrid, dimBlock >>>
-      //(rays_d, num, spheres_d, spheres.size(), results_d);
+   //(rays_d, num, spheres_d, spheres.size(), results_d);
    // Check for error.
    cudaError_t err = cudaGetLastError();
    if( cudaSuccess != err)
@@ -290,28 +323,39 @@ Pixel* Scene::castRays(ray_t *rays, int num, int depth)
    CUDA_SAFE_CALL(cudaMemcpy(results, results_d, results_size,
             cudaMemcpyDeviceToHost));
 
-   // Color result pixels.
-   for (int resultNdx = 0; resultNdx < num; resultNdx++)
-   {
-      hitd_t curResult = results[resultNdx];
-      ray_t curRay = rays[resultNdx];
-      if (curResult.hit != 0)
-      {
-         sphere_t hitSphere = spheresArray[curResult.objIndex];
-         pixels[resultNdx] = shade(curResult, curRay);
-      }
-      else
-      {
-         pixels[resultNdx] = Pixel(0.0, 0.0, 0.0);
-      }
-   }
+   return results;
+}
 
-   return pixels;
+Pixel *Scene::shadeArray(hitd_t *data, ray_t *view, int num)
+{
+   Pixel *results = new Pixel[num];
+   hitd_t *feelers = new hitd_t[num];
+   for (int i = 0; i < num; i++)
+   {
+      bool feelerHit = false;
+      if (data[i].hit != 0)
+      {
+         vec3_t lightVecPos = data[i].point.toHost();
+         vec3_t lightVec = lights[0]->location - lightVecPos;
+         ray_t feelerRay;
+         feelerRay.point = lightVecPos;
+         feelerRay.dir = lightVec;
+         //feelerHit = cpuHit(feelerRay, NULL);
+      }
+      //results[i] = shade(data[i], view[i], feelers[i].hit);
+      results[i] = shade(data[i], view[i], feelerHit);
+   }
+   delete[] feelers;
+   return results;
 }
 
 // Calculates proper shading at the current point.
-Pixel Scene::shade(hitd_t & data, ray_t & view)
+Pixel Scene::shade(hitd_t & data, ray_t & view, bool hit)
 {
+   if (data.hit == 0)
+   {
+      return Pixel(0.0, 0.0, 0.0);
+   }
    Pixel result(0.0, 0.0, 0.0);
    pigment_t hitP = {};
    finish_t hitF = {0};
@@ -324,6 +368,7 @@ Pixel Scene::shade(hitd_t & data, ray_t & view)
    triangle_t *t_t;
    switch (data.hitType) {
    case BOX_HIT:
+      cout << "BOX WTF" << endl;
       b_t = boxes[data.objIndex];
       hitP = b_t->p;
       hitF = b_t->f;
@@ -375,6 +420,13 @@ Pixel Scene::shade(hitd_t & data, ray_t & view)
          result.c.b += hitF.diffuse*hitP.c.b * nDotL * curLight->b;
       }
 
+      if (hit)
+      {
+         result.c.r = 0.0;
+         result.c.g = 1.0;
+         result.c.b = 0.0;
+         cout << "hit" << endl;
+      }
 
       // Cast light feeler ray.
       /*

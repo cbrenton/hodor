@@ -36,25 +36,31 @@ class Scene
       void constructBVH();
 
       // Reads in scene data from a file and returns a new Scene containing the newly stored data.
-      static Scene* read(std::fstream & input);
+      static Scene *read(std::fstream & input);
 
       // Checks if a ray intersects any geometry in the scene, using structs.
       bool gpuHit(ray_t & ray, hit_t *data);
 
       // Checks if a ray intersects any geometry in the scene, using Geometry.
-      bool hit(ray_t & ray, hit_t *data);
+      bool cpuHit(ray_t & ray, hit_t *data);
 
       void cudaSetup(int chunkSize);
 
       void cudaCleanup();
       
       // Casts rays into the scene and returns correctly colored pixels.
-      Pixel* castRays(ray_t *ray, int num, int depth);
+      //void castRays(Pixel **pixels, ray_t *ray, int num, int depth);
+      Pixel *castRays(ray_t *ray, int num, int depth);
+
+      hitd_t *hit(ray_t *rays, int num, int depth);
 
       Pixel castRay(ray_t & ray, int depth);
 
+      // Calculates proper shading for a chunk of pixels.
+      Pixel *shadeArray(hitd_t *data, ray_t *view, int num);
+      
       // Calculates proper shading at the current point.
-      Pixel shade(hitd_t & data, ray_t & view);
+      Pixel shade(hitd_t & data, ray_t & view, bool hit);
 
       //vec3_t reflect(vec3_t incident, vec3_t normal);
 
@@ -74,7 +80,7 @@ class Scene
 
       sphere_t *spheresArray;
       
-      hitd_t *results;
+      //hitd_t *results;
 
       sphere_t *spheres_d;
       size_t spheres_size;

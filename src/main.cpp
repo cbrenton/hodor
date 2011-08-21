@@ -237,6 +237,8 @@ int main(int argc, char **argv)
          }
       }
 
+      delete[] chunkPix;
+
       // Calculate and print chunk progress.
       float chunkProgress = (float)(chunkNdx + 1) / (float)numChunks * 100.0f;
       printf("\r%6.2f%%: %d/%d", chunkProgress, chunkNdx + 1, numChunks);
@@ -273,6 +275,8 @@ int main(int argc, char **argv)
    cout << "done." << endl;
 
    delete[] aRayArray;
+
+   delete[] pixResults;
 
    delete image;
 
