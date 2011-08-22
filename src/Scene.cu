@@ -43,6 +43,11 @@ Scene* Scene::read(std::fstream & input)
    {
       curScene->spheresArray[i] = *curScene->spheres[i];
    }
+   curScene->planesArray = new plane_t[curScene->planes.size()];
+   for (int i = 0; i < (int)curScene->planes.size(); i++)
+   {
+      curScene->planesArray[i] = *curScene->planes[i];
+   }
    return curScene;
 }
 
@@ -175,18 +180,25 @@ return false;
  */
 bool Scene::cpuHit(ray_t & ray, hit_t *data)
 {
+   //cout << "< " << ray.point << " >, < " << ray.dir << " >" << endl;
    // INITIALIZE closestT to MAX_DIST + 0.1
    float closestT = MAX_DIST + 0.1f;
    // INITIALIZE closestData to empty hit_t
    hit_t *closestData = new hit_t();
+
+   bool hitFound = false;
    // FOR each item in geometry
-   for (int geomNdx = 0; geomNdx < (int)geometry.size(); geomNdx++)
+   //for (int geomNdx = 0; geomNdx < (int)geometry.size(); geomNdx++)
+   for (int geomNdx = 0; geomNdx < (int)spheres.size(); geomNdx++)
    {
       float geomT = -1;
       hit_t *geomData = new hit_t();
       // IF current item is hit by ray
-      if (geometry[geomNdx]->hit(ray, &geomT, geomData) != 0)
+      //if (geometry[geomNdx]->hit(ray, &geomT, geomData) != 0)
+      if (cpu_sphere_hit(spheresArray[geomNdx], ray, &geomT, geomData) != 0)
       {
+         hitFound = true;
+         //cout << "hit at " << geomNdx << endl;
          // IF intersection is closer than closestT
          if (geomT < closestT)
          {
@@ -199,6 +211,10 @@ bool Scene::cpuHit(ray_t & ray, hit_t *data)
       }
       // ENDIF
       delete geomData;
+   }
+   if (!hitFound)
+   {
+      //cout << "no hit: " << closestT << endl;
    }
    // ENDFOR
    // IF data is not null
@@ -224,6 +240,14 @@ void Scene::cudaSetup(int chunkSize)
             cudaMemcpyHostToDevice));
    cout << ".";
 
+   // Create plane array on device.
+   planes_size = sizeof(plane_t) * planes.size();
+   CUDA_SAFE_CALL(cudaMalloc((void**) &planes_d, planes_size));
+   // Copy planes to device.
+   CUDA_SAFE_CALL(cudaMemcpy(planes_d, planesArray, planes_size,
+            cudaMemcpyHostToDevice));
+   cout << ".";
+
    // Create ray array on device.
    rays_size = chunkSize * sizeof(ray_t);
    CUDA_SAFE_CALL(cudaMalloc((void **) &rays_d, rays_size));
@@ -233,6 +257,14 @@ void Scene::cudaSetup(int chunkSize)
    results_size = chunkSize * sizeof(hitd_t);
    CUDA_SAFE_CALL(cudaMalloc((void **) &results_d, results_size));
    cout << ".";
+
+   // Calculate block size and number of blocks.
+   dim3 dimGrid((int)ceil((float)chunkSize / (float)THREADS_PER_BLOCK), 1);
+   dim3 dimBlock(THREADS_PER_BLOCK, 1);
+
+   // Send scene geometry to device.
+   set_spheres <<< dimGrid, dimBlock >>> (spheres_d, spheres.size());
+   //set_planes <<< dimGrid, dimBlock >>> (planes_d, planes.size());
 
    // Create hit data array on host.
    //results = new hitd_t[chunkSize];
@@ -303,9 +335,6 @@ hitd_t *Scene::hit(ray_t *rays, int num, int depth)
    dim3 dimGrid((int)ceil((float)num / (float)THREADS_PER_BLOCK), 1);
    dim3 dimBlock(THREADS_PER_BLOCK, 1);
 
-   // Send scene geometry to device.
-   set_spheres <<< dimGrid, dimBlock >>> (spheres_d, spheres.size());
-
    // Test for intersection.
    cuda_hit <<< dimGrid, dimBlock >>> (rays_d, num, results_d);
    //cuda_hit <<< dimGrid, dimBlock >>>
@@ -328,25 +357,37 @@ hitd_t *Scene::hit(ray_t *rays, int num, int depth)
 
 Pixel *Scene::shadeArray(hitd_t *data, ray_t *view, int num)
 {
-   Pixel *results = new Pixel[num];
-   hitd_t *feelers = new hitd_t[num];
-   for (int i = 0; i < num; i++)
+   Pixel *pixelResults = new Pixel[num];
+   hitd_t *feelerResults = new hitd_t[num];
+   ray_t *rays = new ray_t[num];
+
+   for (int dataNdx = 0; dataNdx < num; dataNdx++)
    {
-      bool feelerHit = false;
-      if (data[i].hit != 0)
+      if (data[dataNdx].hit != 0)
       {
-         vec3_t lightVecPos = data[i].point.toHost();
+         vec3_t lightVecPos = view[dataNdx].dir;
+         lightVecPos *= data[dataNdx].t;
+         lightVecPos += view[dataNdx].point;
+
          vec3_t lightVec = lights[0]->location - lightVecPos;
-         ray_t feelerRay;
-         feelerRay.point = lightVecPos;
-         feelerRay.dir = lightVec;
-         //feelerHit = cpuHit(feelerRay, NULL);
+         lightVec.normalize();
+         vec3_t offset = lightVec * EPSILON;
+
+         rays[dataNdx].point = lightVecPos + offset;
+         rays[dataNdx].dir = lightVec;
       }
-      //results[i] = shade(data[i], view[i], feelers[i].hit);
-      results[i] = shade(data[i], view[i], feelerHit);
    }
-   delete[] feelers;
-   return results;
+   // Cast light feelers on GPU.
+   feelerResults = hit(rays, num, 1);
+
+   // Shade each pixel on the CPU.
+   for (int shadeNdx = 0; shadeNdx < num; shadeNdx++)
+   {
+      pixelResults[shadeNdx] = shade(data[shadeNdx], view[shadeNdx], feelerResults[shadeNdx].hit);
+   }
+
+   delete[] feelerResults;
+   return pixelResults;
 }
 
 // Calculates proper shading at the current point.
@@ -363,7 +404,7 @@ Pixel Scene::shade(hitd_t & data, ray_t & view, bool hit)
    vec3_t dataPoint = view.dir * data.t;
    dataPoint += view.point;
    box_t *b_t;
-   plane_t *p_t;
+   plane_t p_t;
    sphere_t s_t;
    triangle_t *t_t;
    switch (data.hitType) {
@@ -375,10 +416,11 @@ Pixel Scene::shade(hitd_t & data, ray_t & view, bool hit)
       //hitNormal = box_normal(b_t, data);
       break;
    case PLANE_HIT:
-      p_t = planes[data.objIndex];
-      hitP = p_t->p;
-      hitF = p_t->f;
+      p_t = planesArray[data.objIndex];
+      hitP = p_t.p;
+      hitF = p_t.f;
       //hitNormal = plane_normal(p_t);
+      hitNormal = p_t.normal;
       break;
    case SPHERE_HIT:
       s_t = spheresArray[data.objIndex];
@@ -404,79 +446,41 @@ Pixel Scene::shade(hitd_t & data, ray_t & view, bool hit)
       result.c.g += (hitF.ambient*hitP.c.g) * curLight->g;
       result.c.b += (hitF.ambient*hitP.c.b) * curLight->b;
 
-      // Diffuse.
-      vec3_t n = hitNormal;
-      n.normalize();
-      vec3_t dataPoint = data.point.toHost();
-      vec3_t l = curLight->location - dataPoint;
-      l.normalize();
-      float nDotL = n.dot(l);
-      nDotL = min(nDotL, 1.0f);
-
-      if (nDotL > 0)
+      if (!hit)
       {
-         result.c.r += hitF.diffuse*hitP.c.r * nDotL * curLight->r;
-         result.c.g += hitF.diffuse*hitP.c.g * nDotL * curLight->g;
-         result.c.b += hitF.diffuse*hitP.c.b * nDotL * curLight->b;
+         // Diffuse.
+         vec3_t n = hitNormal;
+         n.normalize();
+         vec3_t l = curLight->location - dataPoint;
+         l.normalize();
+         float nDotL = n.dot(l);
+         nDotL = min(nDotL, 1.0f);
+
+         if (nDotL > 0)
+         {
+            result.c.r += hitF.diffuse*hitP.c.r * nDotL * curLight->r;
+            result.c.g += hitF.diffuse*hitP.c.g * nDotL * curLight->g;
+            result.c.b += hitF.diffuse*hitP.c.b * nDotL * curLight->b;
+         }
+
+         // Specular (Phong).
+         vec3_t r = mReflect(l, n);
+         r.normalize();
+         vec3_t v = view.dir;
+         v.normalize();
+         float rDotV = r.dot(v);
+         rDotV = (float)pow(rDotV, 1.0f / hitF.roughness);
+         rDotV = min(rDotV, 1.0f);
+
+         if (rDotV > 0)
+         {
+            result.c.r += hitF.specular*hitP.c.r * rDotV * curLight->r;
+            result.c.g += hitF.specular*hitP.c.g * rDotV * curLight->g;
+            result.c.b += hitF.specular*hitP.c.b * rDotV * curLight->b;
+         }
       }
-
-      if (hit)
-      {
-         result.c.r = 0.0;
-         result.c.g = 1.0;
-         result.c.b = 0.0;
-         cout << "hit" << endl;
-      }
-
-      // Cast light feeler ray.
-      /*
-         ray_t feeler;
-         vec3_t dataPoint = data.point.toHost();
-         feeler.dir = curLight->location - dataPoint;
-         feeler.dir.normalize();
-         feeler.point = feeler.dir * EPSILON;
-         feeler.point += dataPoint;
-
-         hit_t tmpHit;
-
-      // If feeler hits any object, current point is in shadow.
-      bool isShadow = gpuHit(feeler, &tmpHit);
-
-      if (!isShadow)
-      {
-      // Diffuse.
-      vec3_t n = hitNormal;
-      n.normalize();
-      vec3_t l = curLight->location - dataPoint;
-      l.normalize();
-      float nDotL = n.dot(l);
-      nDotL = min(nDotL, 1.0f);
-
-      if (nDotL > 0)
-      {
-      result.c.r += hitF.diffuse*hitP.c.r * nDotL * curLight->r;
-      result.c.g += hitF.diffuse*hitP.c.g * nDotL * curLight->g;
-      result.c.b += hitF.diffuse*hitP.c.b * nDotL * curLight->b;
-      }
-
-      // Specular (Phong).
-      vec3_t r = mReflect(l, n);
-      r.normalize();
-      vec3_t v = view;
-      v.normalize();
-      float rDotV = r.dot(v);
-      rDotV = (float)pow(rDotV, 1.0f / hitF.roughness);
-      rDotV = min(rDotV, 1.0f);
-
-      if (rDotV > 0)
-      {
-      result.c.r += hitF.specular*hitP.c.r * rDotV * curLight->r;
-      result.c.g += hitF.specular*hitP.c.g * rDotV * curLight->g;
-      result.c.b += hitF.specular*hitP.c.b * rDotV * curLight->b;
-      }
-      }
-       */
    }
+
    return result;
 }
 

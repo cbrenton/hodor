@@ -9,6 +9,7 @@
 #include "Globals.h"
 #include "structs/vector.h"
 #include "structs/hitd_t.h"
+#include "structs/hit_t.h"
 
 int box_hit(box_t *b_t, ray_t & ray, float *t, hitd_t *data)
 {
@@ -155,6 +156,48 @@ int plane_hit(plane_t *p_t, ray_t & ray, float *t, hitd_t *data)
 vec3_t plane_normal(plane_t *p_t)
 {
    return p_t->normal;
+}
+
+int cpu_sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hit_t *data)
+{
+   vec3_t location = s_t.location;
+   vec3_t rayPoint = ray.point;
+   vec3_t l = location - rayPoint;
+   vec3_t rayDir = ray.dir;
+   float s = l.dot(rayDir);
+   float l2 = l.dot(l);
+   float r2 = s_t.radius * s_t.radius;
+   if (s < MIN_T && l2 > r2)
+   {
+      return 0;
+   }
+   float m2 = l2 - (s*s);
+   if (m2 > r2)
+   {
+      return 0;
+   }
+   float q = sqrt(r2 - m2);
+   if (l2 > r2)
+   {
+      data->t = s - q;
+      *t = s - q;
+   }
+   else
+   {
+      data->t = s + q;
+      *t = s + q;
+   }
+   data->hitType = SPHERE_HIT;
+   if (l2 < r2)
+   {
+      data->hit = -1;
+      return -1;
+   }
+   else
+   {
+      data->hit = 1;
+      return 1;
+   }
 }
 
 __device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data)

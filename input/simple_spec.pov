@@ -16,6 +16,12 @@ sphere { <0, 0, 0>, 2
   translate <0, 0, 0>
 }
 
+sphere { <0, 2.5, 2.5>, 0.5
+  pigment { color rgb <0.0, 0.0, 1.0>}
+  finish {ambient 0.2 diffuse 0.4 specular 0.3}
+  translate <0, 0, 0>
+}
+
 plane {<0, 1, 0>, -4
       pigment {color rgb <0.2, 0.2, 0.8>}
       finish {ambient 0.4 diffuse 0.8 specular 0.2 reflection 0.8}

@@ -79,8 +79,12 @@ class Scene
       std::vector<sphere_t*> spheres;
 
       sphere_t *spheresArray;
+      plane_t *planesArray;
       
       //hitd_t *results;
+
+      plane_t *planes_d;
+      size_t planes_size;
 
       sphere_t *spheres_d;
       size_t spheres_size;

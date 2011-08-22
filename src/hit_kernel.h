@@ -13,6 +13,7 @@ struct triangle_t;
 struct hitd_t;
 struct color_t;
 struct ray_t;
+struct hit_t;
 
 __device__ sphere_t *spheres;
 __device__ int spheres_size = 0;
@@ -26,6 +27,8 @@ int plane_hit(plane_t *p_t, ray_t & ray, float *t, hitd_t *data);
 vec3_t plane_normal(plane_t *p_t);
 
 __device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data);
+
+int cpu_sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hit_t *data);
 
 vec3_t sphere_normal(sphere_t & s_t, vec3_t & data);
 
