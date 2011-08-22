@@ -264,7 +264,7 @@ void Scene::cudaSetup(int chunkSize)
 
    // Send scene geometry to device.
    set_spheres <<< dimGrid, dimBlock >>> (spheres_d, spheres.size());
-   //set_planes <<< dimGrid, dimBlock >>> (planes_d, planes.size());
+   set_planes <<< dimGrid, dimBlock >>> (planes_d, planes.size());
 
    // Create hit data array on host.
    //results = new hitd_t[chunkSize];

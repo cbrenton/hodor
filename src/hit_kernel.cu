@@ -84,38 +84,6 @@ int cpu_hit(box_t *b_t, ray_t & ray, float *t, hitd_t *data)
    return 1;
 }
 
-vec3_t normal(box_t *b_t, hitd_t & data)
-{
-   /*
-      if (closeEnough(data.point.x(), b_t->left.offset))
-      {
-      return vec3d_t(b_t->left.normal);
-      }
-      if (closeEnough(data.point.x(), b_t->right.offset))
-      {
-      return vec3d_t(b_t->right.normal);
-      }
-      if (closeEnough(data.point.y(), b_t->bottom.offset))
-      {
-      return vec3d_t(b_t->bottom.normal);
-      }
-      if (closeEnough(data.point.y(), b_t->top.offset))
-      {
-      return vec3d_t(b_t->top.normal);
-      }
-      if (closeEnough(data.point.z(), b_t->back.offset))
-      {
-      return vec3d_t(b_t->back.normal);
-      }
-      if (closeEnough(data.point.z(), b_t->front.offset))
-      {
-      return vec3d_t(b_t->front.normal);
-      }
-      cout << "shouldn't be here." << endl;
-    */
-   return vec3_t();
-}
-
 int cpu_hit(plane_t *p_t, ray_t & ray, float *t, hitd_t *data)
 {
    /*
@@ -151,11 +119,6 @@ int cpu_hit(plane_t *p_t, ray_t & ray, float *t, hitd_t *data)
    //return 1;
    //}
    return 0;
-}
-
-vec3_t normal(plane_t & p_t)
-{
-   return p_t.normal;
 }
 
 int cpu_hit(sphere_t & s_t, ray_t & ray, float *t, hit_t *data)
@@ -198,56 +161,6 @@ int cpu_hit(sphere_t & s_t, ray_t & ray, float *t, hit_t *data)
       data->hit = 1;
       return 1;
    }
-}
-
-__device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data)
-{
-   // Optimized algorithm courtesy of "Real-Time Rendering, Third Edition".
-   vec3d_t location = s_t.location;
-   vec3d_t rayPoint = ray.point;
-   vec3d_t l = location - rayPoint;
-   vec3d_t rayDir = ray.dir;
-   float s = l.dot(rayDir);
-   float l2 = l.dot(l);
-   float r2 = s_t.radius * s_t.radius;
-   if (s < MIN_T && l2 > r2)
-   {
-      return 0;
-   }
-   float m2 = l2 - (s*s);
-   if (m2 > r2)
-   {
-      return 0;
-   }
-   float q = sqrt(r2 - m2);
-   if (l2 > r2)
-   {
-      data->t = s - q;
-      *t = s - q;
-   }
-   else
-   {
-      data->t = s + q;
-      *t = s + q;
-   }
-   data->hitType = SPHERE_HIT;
-   if (l2 < r2)
-   {
-      data->hit = -1;
-      return -1;
-   }
-   else
-   {
-      data->hit = 1;
-      return 1;
-   }
-}
-
-vec3_t normal(sphere_t & s_t, vec3_t & data)
-{
-   vec3_t n = data - s_t.location;
-   n.normalize();
-   return n;
 }
 
 int cpu_hit(triangle_t *t_t, ray_t & ray, float *t, hitd_t *data)
@@ -368,6 +281,119 @@ int cpu_hit(triangle_t *t_t, ray_t & ray, float *t, hitd_t *data)
    return 0;
 }
 
+__device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data)
+{
+   // Optimized algorithm courtesy of "Real-Time Rendering, Third Edition".
+   vec3d_t location = s_t.location;
+   vec3d_t rayPoint = ray.point;
+   vec3d_t l = location - rayPoint;
+   vec3d_t rayDir = ray.dir;
+   float s = l.dot(rayDir);
+   float l2 = l.dot(l);
+   float r2 = s_t.radius * s_t.radius;
+   if (s < MIN_T && l2 > r2)
+   {
+      return 0;
+   }
+   float m2 = l2 - (s*s);
+   if (m2 > r2)
+   {
+      return 0;
+   }
+   float q = sqrt(r2 - m2);
+   if (l2 > r2)
+   {
+      data->t = s - q;
+      *t = s - q;
+   }
+   else
+   {
+      data->t = s + q;
+      *t = s + q;
+   }
+   data->hitType = SPHERE_HIT;
+   if (l2 < r2)
+   {
+      data->hit = -1;
+      return -1;
+   }
+   else
+   {
+      data->hit = 1;
+      return 1;
+   }
+}
+
+__device__ int plane_hit(plane_t & p_t, ray_t & ray, float *t, hitd_t *data)
+{
+   vec3d_t rayDir = ray.dir;
+   vec3d_t normal = p_t.normal;
+   float denominator = rayDir.dot(normal);
+   if (denominator == 0.0)
+   {
+      return 0;
+   }
+   vec3d_t p = normal * p_t.offset;
+   //vec3d_t pMinusL = p - ray.point;
+   vec3d_t pMinusL = ray.point;
+   pMinusL *= -1.0f;
+   pMinusL += p;
+   float numerator = pMinusL.dot(normal);
+   *t = numerator / denominator;
+   if (*t >= MIN_T && *t <= MAX_DIST)
+   {
+      data->hit = 1;
+      data->t = (*t);
+      data->hitType = PLANE_HIT;
+      return 1;
+   }
+   return 0;
+}
+
+vec3_t normal(box_t *b_t, hitd_t & data)
+{
+   /*
+      if (closeEnough(data.point.x(), b_t->left.offset))
+      {
+      return vec3d_t(b_t->left.normal);
+      }
+      if (closeEnough(data.point.x(), b_t->right.offset))
+      {
+      return vec3d_t(b_t->right.normal);
+      }
+      if (closeEnough(data.point.y(), b_t->bottom.offset))
+      {
+      return vec3d_t(b_t->bottom.normal);
+      }
+      if (closeEnough(data.point.y(), b_t->top.offset))
+      {
+      return vec3d_t(b_t->top.normal);
+      }
+      if (closeEnough(data.point.z(), b_t->back.offset))
+      {
+      return vec3d_t(b_t->back.normal);
+      }
+      if (closeEnough(data.point.z(), b_t->front.offset))
+      {
+      return vec3d_t(b_t->front.normal);
+      }
+      cout << "shouldn't be here." << endl;
+    */
+   return vec3_t();
+}
+
+vec3_t normal(plane_t & p_t)
+{
+   return p_t.normal;
+}
+
+vec3_t normal(sphere_t & s_t, vec3_t & data)
+{
+   vec3_t n = data - s_t.location;
+   n.normalize();
+   return n;
+}
+
 vec3_t normal(triangle_t *t_t)
 {
    /*
@@ -385,8 +411,14 @@ __global__ void set_spheres(sphere_t *spheresIn, int numSpheres)
    spheres_size = numSpheres;
 }
 
+__global__ void set_planes(plane_t *planesIn, int numplanes)
+{
+   planes = planesIn;
+   planes_size = numplanes;
+}
+
 //__global__ void cuda_hit(ray_t *rays, int num, sphere_t *spheres,
-      //int spheres_size, hitd_t *results)
+//int spheres_size, hitd_t *results)
 __global__ void cuda_hit(ray_t *rays, int num, hitd_t *results)
 {
    int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -426,4 +458,28 @@ __global__ void cuda_hit(ray_t *rays, int num, hitd_t *results)
       // ENDIF
    }
    delete sphereData;
+
+   hitd_t *planeData = new hitd_t();
+   // FOR each item in planes
+   for (int planeNdx = 0; planeNdx < (int)planes_size; planeNdx++)
+   {
+      float planeT = -1;
+      //// IF current item is hit by ray
+      if (plane_hit(planes[planeNdx], *ray, &planeT, planeData) != 0)
+      {
+         // IF intersection is closer than closestT
+         if (planeT < closestT)
+         {
+            // SET closestT to intersection
+            closestT = planeT;
+            // SET closestData to intersection data
+            *closestData = *planeData;
+            closestData->objIndex = planeNdx;
+         }
+         // ENDIF
+      }
+      // ENDIF
+   }
+   delete planeData;
+
 }
