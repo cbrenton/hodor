@@ -11,7 +11,7 @@
 #include "structs/hitd_t.h"
 #include "structs/hit_t.h"
 
-int box_hit(box_t *b_t, ray_t & ray, float *t, hitd_t *data)
+int cpu_hit(box_t *b_t, ray_t & ray, float *t, hitd_t *data)
 {
    float tNear = MIN_T - 1;
    float tFar = MAX_DIST + 1;
@@ -84,7 +84,7 @@ int box_hit(box_t *b_t, ray_t & ray, float *t, hitd_t *data)
    return 1;
 }
 
-vec3_t box_normal(box_t *b_t, hitd_t & data)
+vec3_t normal(box_t *b_t, hitd_t & data)
 {
    /*
       if (closeEnough(data.point.x(), b_t->left.offset))
@@ -116,7 +116,7 @@ vec3_t box_normal(box_t *b_t, hitd_t & data)
    return vec3_t();
 }
 
-int plane_hit(plane_t *p_t, ray_t & ray, float *t, hitd_t *data)
+int cpu_hit(plane_t *p_t, ray_t & ray, float *t, hitd_t *data)
 {
    /*
       float denominator = ray.dir.dot(p_t->normal);
@@ -153,12 +153,12 @@ int plane_hit(plane_t *p_t, ray_t & ray, float *t, hitd_t *data)
    return 0;
 }
 
-vec3_t plane_normal(plane_t *p_t)
+vec3_t normal(plane_t & p_t)
 {
-   return p_t->normal;
+   return p_t.normal;
 }
 
-int cpu_sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hit_t *data)
+int cpu_hit(sphere_t & s_t, ray_t & ray, float *t, hit_t *data)
 {
    vec3_t location = s_t.location;
    vec3_t rayPoint = ray.point;
@@ -243,14 +243,14 @@ __device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data)
    }
 }
 
-vec3_t sphere_normal(sphere_t & s_t, vec3_t & data)
+vec3_t normal(sphere_t & s_t, vec3_t & data)
 {
    vec3_t n = data - s_t.location;
    n.normalize();
    return n;
 }
 
-int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hitd_t *data)
+int cpu_hit(triangle_t *t_t, ray_t & ray, float *t, hitd_t *data)
 {
    float result = -1;
    float bBeta, bGamma, bT;
@@ -368,7 +368,7 @@ int triangle_hit(triangle_t *t_t, ray_t & ray, float *t, hitd_t *data)
    return 0;
 }
 
-vec3_t triangle_normal(triangle_t *t_t)
+vec3_t normal(triangle_t *t_t)
 {
    /*
       vec3d_t s1 = t_t->c2 - t_t->c1;

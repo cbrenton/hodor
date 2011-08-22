@@ -195,7 +195,7 @@ bool Scene::cpuHit(ray_t & ray, hit_t *data)
       hit_t *geomData = new hit_t();
       // IF current item is hit by ray
       //if (geometry[geomNdx]->hit(ray, &geomT, geomData) != 0)
-      if (cpu_sphere_hit(spheresArray[geomNdx], ray, &geomT, geomData) != 0)
+      if (cpu_hit(spheresArray[geomNdx], ray, &geomT, geomData) != 0)
       {
          hitFound = true;
          //cout << "hit at " << geomNdx << endl;
@@ -419,14 +419,13 @@ Pixel Scene::shade(hitd_t & data, ray_t & view, bool hit)
       p_t = planesArray[data.objIndex];
       hitP = p_t.p;
       hitF = p_t.f;
-      //hitNormal = plane_normal(p_t);
-      hitNormal = p_t.normal;
+      hitNormal = normal(p_t);
       break;
    case SPHERE_HIT:
       s_t = spheresArray[data.objIndex];
       hitP = s_t.p;
       hitF = s_t.f;
-      hitNormal = sphere_normal(s_t, dataPoint);
+      hitNormal = normal(s_t, dataPoint);
       break;
    case TRIANGLE_HIT:
       t_t = triangles[data.objIndex];
