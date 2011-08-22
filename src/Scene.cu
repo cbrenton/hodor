@@ -67,129 +67,6 @@ Scene* Scene::read(std::fstream & input)
 }
 
 /**
- * Checks if a ray intersects any geometry in the scene, using structs.
- * @returns true if an intersection is found.
- */
-bool Scene::gpuHit(ray_t & ray, hit_t *data)
-{
-   /*
-   // INITIALIZE closestT to MAX_DIST + 0.1
-   float closestT = MAX_DIST + 0.1f;
-   // INITIALIZE closestData to empty hit_t
-   hit_t *closestData = new hit_t();
-
-   // Find hit for boxes.
-   // FOR each item in boxes
-   for (int boxNdx = 0; boxNdx < (int)boxes.size(); boxNdx++)
-   {
-   float boxT = -1;
-   hit_t *boxData = new hit_t();
-   // IF current item is hit by ray
-   if (box_hit(boxes[boxNdx], ray, &boxT, boxData) != 0)
-   {
-   // IF intersection is closer than closestT
-   if (boxT < closestT)
-   {
-   // SET closestT to intersection
-   closestT = boxT;
-   // SET closestData to intersection data
-    *closestData = *boxData;
-    closestData->objIndex = boxNdx;
-    }
-   // ENDIF
-   }
-   // ENDIF
-   delete boxData;
-   }
-
-   // Find hit for planes.
-   // FOR each item in geometry
-   for (int planeNdx = 0; planeNdx < (int)planes.size(); planeNdx++)
-   {
-   float planeT = -1;
-   hit_t *planeData = new hit_t();
-   // IF current item is hit by ray
-   if (plane_hit(planes[planeNdx], ray, &planeT, planeData) != 0)
-   {
-   // IF intersection is closer than closestT
-   if (planeT < closestT)
-   {
-   // SET closestT to intersection
-   closestT = planeT;
-   // SET closestData to intersection data
-    *closestData = *planeData;
-    closestData->objIndex = planeNdx;
-    }
-   // ENDIF
-   }
-   // ENDIF
-   delete planeData;
-   }
-
-   // Find hit for spheres.
-   // FOR each item in spheres
-   for (int sphereNdx = 0; sphereNdx < (int)spheres.size(); sphereNdx++)
-   {
-   float sphereT = -1;
-   hit_t *sphereData = new hit_t();
-   // IF current item is hit by ray
-   if (sphere_hit(spheres[sphereNdx], ray, &sphereT, sphereData) != 0)
-   {
-   // IF intersection is closer than closestT
-   if (sphereT < closestT)
-   {
-   // SET closestT to intersection
-   closestT = sphereT;
-   // SET closestData to intersection data
-    *closestData = *sphereData;
-    closestData->objIndex = sphereNdx;
-}
-// ENDIF
-}
-// ENDIF
-delete sphereData;
-}
-
-// Find hit for triangles.
-// FOR each item in triangles
-for (int triNdx = 0; triNdx < (int)triangles.size(); triNdx++)
-{
-   float triT = -1;
-   hit_t *triData = new hit_t();
-   // IF current item is hit by ray
-   if (triangle_hit(triangles[triNdx], ray, &triT, triData) != 0)
-   {
-      // IF intersection is closer than closestT
-      if (triT < closestT)
-      {
-         // SET closestT to intersection
-         closestT = triT;
-         // SET closestData to intersection data
-         *closestData = *triData;
-         closestData->objIndex = triNdx;
-      }
-      // ENDIF
-   }
-   // ENDIF
-   delete triData;
-}
-
-// ENDFOR
-// IF data is not null
-if (data != NULL)
-{
-   // SET data to closestData
-   *data = *closestData;
-}
-// ENDIF
-delete closestData;
-// RETURN true if closestT is less than or equal to MAX_DIST
-return (closestT <= MAX_DIST);
-*/
-return false;
-}
-
-/**
  * Checks if a ray intersects any geometry in the scene, using Geometry.
  * @returns true if an intersection is found.
  */
@@ -441,6 +318,7 @@ Pixel Scene::shade(hitd_t & data, ray_t & view, bool hit)
       hitP = t_t.p;
       hitF = t_t.f;
       hitNormal = normal(t_t);
+      //cout << hitNormal << endl;
       break;
    default:
       cerr << "Invalid intersection type." << endl;

@@ -38,9 +38,6 @@ class Scene
       // Reads in scene data from a file and returns a new Scene containing the newly stored data.
       static Scene *read(std::fstream & input);
 
-      // Checks if a ray intersects any geometry in the scene, using structs.
-      bool gpuHit(ray_t & ray, hit_t *data);
-
       // Checks if a ray intersects any geometry in the scene, using Geometry.
       bool cpuHit(ray_t & ray, hit_t *data);
 
@@ -51,8 +48,10 @@ class Scene
       // Casts rays into the scene and returns correctly colored pixels.
       Pixel *castRays(ray_t *ray, int num, int depth);
 
+      // Checks an array of rays for intersectionin the scene.
       hitd_t *hit(ray_t *rays, int num, int depth);
 
+      // Casts a single ray into the scene and returns a single correctly colored pixel.
       Pixel castRay(ray_t & ray, int depth);
 
       // Calculates proper shading for a chunk of pixels.
