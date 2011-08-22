@@ -49,7 +49,6 @@ class Scene
       void cudaCleanup();
       
       // Casts rays into the scene and returns correctly colored pixels.
-      //void castRays(Pixel **pixels, ray_t *ray, int num, int depth);
       Pixel *castRays(ray_t *ray, int num, int depth);
 
       hitd_t *hit(ray_t *rays, int num, int depth);
@@ -78,16 +77,20 @@ class Scene
       // The vector of spheres in the scene (GPU only).
       std::vector<sphere_t*> spheres;
 
+      box_t *boxesArray;
       sphere_t *spheresArray;
       plane_t *planesArray;
+      triangle_t *trianglesArray;
       
-      //hitd_t *results;
-
-      plane_t *planes_d;
-      size_t planes_size;
-
+      box_t *boxes_d;
       sphere_t *spheres_d;
+      plane_t *planes_d;
+      triangle_t *triangles_d;
+
+      size_t boxes_size;
       size_t spheres_size;
+      size_t planes_size;
+      size_t triangles_size;
 
       ray_t *rays_d;
       size_t rays_size;

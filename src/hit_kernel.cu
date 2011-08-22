@@ -281,6 +281,112 @@ int cpu_hit(triangle_t *t_t, ray_t & ray, float *t, hitd_t *data)
    return 0;
 }
 
+__device__ int box_hit(box_t & b_t, ray_t & ray, float *t, hitd_t *data)
+{
+   float tNear = MIN_T - 1;
+   float tFar = MAX_DIST + 1;
+
+   vec3d_t rayDir = ray.dir;
+   vec3d_t rayPoint = ray.point;
+   vec3d_t c1 = b_t.c1;
+   vec3d_t c2 = b_t.c2;
+
+   // For the pair of planes in each dimension.
+   for (int i = 0; i < 3; i++)
+   {
+      // Component of the ray's direction in the current dimension.
+      float xD = rayDir[i];
+      // Component of the ray's origin in the current dimension.
+      float xO = rayPoint[i];
+      // Component of the mininum plane location in the current dimension.
+      float xL = min(c1[i], c2[i]);
+      // Component of the maxinum plane location in the current dimension.
+      float xH = max(c1[i], c2[i]);
+      // If direction in current dimension is 0, ray is parallel to planes.
+      if (xD == 0)
+      {
+         // If ray origin is not between the planes.
+         if (xO < xL || xO > xH)
+         {
+            return 0;
+         }
+      }
+      // Else the ray is not parallel to the planes.
+      else
+      {
+         // Calculate tMin and tMax.
+         float t1 = (xL - xO) / xD;
+         float t2 = (xH - xO) / xD;
+         if (t1 > t2)
+         {
+            float tmp = t1;
+            t1 = t2;
+            t2 = tmp;
+         }
+         if (t1 > tNear)
+         {
+            tNear = t1;
+         }
+         if (t2 < tFar)
+         {
+            tFar = t2;
+         }
+         if (tNear > tFar)
+         {
+            return 0;
+         }
+         if (tFar < 0)
+         {
+            return 0;
+         }
+      }
+   }
+   *t = tNear;
+
+   data->hit = 1;
+   data->t = (*t);
+   data->hitType = BOX_HIT;
+   /*
+      if (b_t->f.reflection > 0.0)
+      {
+      data->reflect = new vec3d_t();
+      vec3d_t n = box_normal(b_t, data);
+    *data->reflect = mReflect(ray.dir, n);
+    }
+    else
+    {
+    data->reflect = NULL;
+    }
+    */
+   return 1;
+}
+
+__device__ int plane_hit(plane_t & p_t, ray_t & ray, float *t, hitd_t *data)
+{
+   vec3d_t rayDir = ray.dir;
+   vec3d_t normal = p_t.normal;
+   float denominator = rayDir.dot(normal);
+   if (denominator == 0.0)
+   {
+      return 0;
+   }
+   vec3d_t p = normal * p_t.offset;
+   //vec3d_t pMinusL = p - ray.point;
+   vec3d_t pMinusL = ray.point;
+   pMinusL *= -1.0f;
+   pMinusL += p;
+   float numerator = pMinusL.dot(normal);
+   *t = numerator / denominator;
+   if (*t >= MIN_T && *t <= MAX_DIST)
+   {
+      data->hit = 1;
+      data->t = (*t);
+      data->hitType = PLANE_HIT;
+      return 1;
+   }
+   return 0;
+}
+
 __device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data)
 {
    // Optimized algorithm courtesy of "Real-Time Rendering, Third Edition".
@@ -324,34 +430,133 @@ __device__ int sphere_hit(sphere_t & s_t, ray_t & ray, float *t, hitd_t *data)
    }
 }
 
-__device__ int plane_hit(plane_t & p_t, ray_t & ray, float *t, hitd_t *data)
+__device__ int triangle_hit(triangle_t & t_t, ray_t & ray, float *t, hitd_t *data)
 {
+   float result = -1;
+   float bBeta, bGamma, bT;
+
    vec3d_t rayDir = ray.dir;
-   vec3d_t normal = p_t.normal;
-   float denominator = rayDir.dot(normal);
-   if (denominator == 0.0)
+   vec3d_t rayPoint = ray.point;
+   vec3d_t c1 = t_t.c1;
+   vec3d_t c2 = t_t.c2;
+   vec3d_t c3 = t_t.c3;
+
+   float A[9];
+   A[0] = c1.x()-c2.x();
+   A[1] = c1.x()-c3.x();
+   A[2] = rayDir.x();
+   A[3] = c1.y()-c2.y();
+   A[4] = c1.y()-c3.y();
+   A[5] = rayDir.y();
+   A[6] = c1.z()-c2.z();
+   A[7] = c1.z()-c3.z();
+   A[8] = rayDir.z();
+   float detA = (A[0]*A[4]*A[8]) + (A[1]*A[5]*A[6]) + (A[2]*A[3]*A[7]) -
+      (A[0]*A[5]*A[7]) - (A[1]*A[3]*A[8]) - (A[2]*A[4]*A[6]);
+
+   float baryT[9];
+   baryT[0] = c1.x()-c2.x();
+   baryT[1] = c1.x()-c3.x();
+   baryT[2] = c1.x()-rayPoint.x();
+
+   baryT[3] = c1.y()-c2.y();
+   baryT[4] = c1.y()-c3.y();
+   baryT[5] = c1.y()-rayPoint.y();
+
+   baryT[6] = c1.z()-c2.z();
+   baryT[7] = c1.z()-c3.z();
+   baryT[8] = c1.z()-rayPoint.z();
+
+   float detBaryT = (baryT[0]*baryT[4]*baryT[8]) +
+      (baryT[1]*baryT[5]*baryT[6]) +
+      (baryT[2]*baryT[3]*baryT[7]) -
+      (baryT[0]*baryT[5]*baryT[7]) -
+      (baryT[1]*baryT[3]*baryT[8]) -
+      (baryT[2]*baryT[4]*baryT[6]);
+
+   bT = detBaryT / detA;
+
+   if (bT < 0)
    {
-      return 0;
+      result = 0;
    }
-   vec3d_t p = normal * p_t.offset;
-   //vec3d_t pMinusL = p - ray.point;
-   vec3d_t pMinusL = ray.point;
-   pMinusL *= -1.0f;
-   pMinusL += p;
-   float numerator = pMinusL.dot(normal);
-   *t = numerator / denominator;
-   if (*t >= MIN_T && *t <= MAX_DIST)
+   else
+   {
+      float baryGamma[9];
+      baryGamma[0] = c1.x()-c2.x();
+      baryGamma[1] = c1.x()-rayPoint.x();
+      baryGamma[2] = rayDir.x();
+
+      baryGamma[3] = c1.y()-c2.y();
+      baryGamma[4] = c1.y()-rayPoint.y();
+      baryGamma[5] = rayDir.y();
+
+      baryGamma[6] = c1.z()-c2.z();
+      baryGamma[7] = c1.z()-rayPoint.z();
+      baryGamma[8] = rayDir.z();
+
+      float detBaryGamma = (baryGamma[0]*baryGamma[4]*baryGamma[8]) +
+         (baryGamma[1]*baryGamma[5]*baryGamma[6]) +
+         (baryGamma[2]*baryGamma[3]*baryGamma[7]) -
+         (baryGamma[0]*baryGamma[5]*baryGamma[7]) -
+         (baryGamma[1]*baryGamma[3]*baryGamma[8]) -
+         (baryGamma[2]*baryGamma[4]*baryGamma[6]);
+
+      bGamma = detBaryGamma / detA;
+
+      if (bGamma < 0 || bGamma > 1)
+      {
+         result = 0;
+      }
+      else
+      {
+         float baryBeta[9];
+         baryBeta[0] = c1.x()-rayPoint.x();
+         baryBeta[1] = c1.x()-c3.x();
+         baryBeta[2] = rayDir.x();
+
+         baryBeta[3] = c1.y()-rayPoint.y();
+         baryBeta[4] = c1.y()-c3.y();
+         baryBeta[5] = rayDir.y();
+
+         baryBeta[6] = c1.z()-rayPoint.z();
+         baryBeta[7] = c1.z()-c3.z();
+         baryBeta[8] = rayDir.z();
+
+         float detBaryBeta = (baryBeta[0]*baryBeta[4]*baryBeta[8]) +
+            (baryBeta[1]*baryBeta[5]*baryBeta[6]) +
+            (baryBeta[2]*baryBeta[3]*baryBeta[7]) -
+            (baryBeta[0]*baryBeta[5]*baryBeta[7]) -
+            (baryBeta[1]*baryBeta[3]*baryBeta[8]) -
+            (baryBeta[2]*baryBeta[4]*baryBeta[6]);
+
+         bBeta = detBaryBeta / detA;
+
+         if (bBeta < 0 || bBeta > 1 - bGamma)
+         {
+            result = 0;
+         }
+      }
+   }
+
+   if (result != 0)
+   {
+      result = bT;
+   }
+   *t = result;
+   if (result > EPSILON)
    {
       data->hit = 1;
       data->t = (*t);
-      data->hitType = PLANE_HIT;
+      data->hitType = TRIANGLE_HIT;
       return 1;
    }
    return 0;
 }
 
-vec3_t normal(box_t *b_t, hitd_t & data)
+vec3_t normal(box_t & b_t, hitd_t & data)
 {
+   // TODO: Correctly calculate box normals.
    /*
       if (closeEnough(data.point.x(), b_t->left.offset))
       {
@@ -394,15 +599,18 @@ vec3_t normal(sphere_t & s_t, vec3_t & data)
    return n;
 }
 
-vec3_t normal(triangle_t *t_t)
+vec3_t normal(triangle_t & t_t)
 {
-   /*
-      vec3d_t s1 = t_t->c2 - t_t->c1;
-      vec3d_t s2 = t_t->c3 - t_t->c1;
-      s1.cross(s1, s2);
-      return s1;
-    */
-   return vec3_t(0, 0, 0);
+   vec3_t s1 = t_t.c2 - t_t.c1;
+   vec3_t s2 = t_t.c3 - t_t.c1;
+   s1.cross(s1, s2);
+   return s1;
+}
+
+__global__ void set_boxes(box_t *boxesIn, int numBoxes)
+{
+   boxes = boxesIn;
+   boxes_size = numBoxes;
 }
 
 __global__ void set_spheres(sphere_t *spheresIn, int numSpheres)
@@ -417,8 +625,12 @@ __global__ void set_planes(plane_t *planesIn, int numplanes)
    planes_size = numplanes;
 }
 
-//__global__ void cuda_hit(ray_t *rays, int num, sphere_t *spheres,
-//int spheres_size, hitd_t *results)
+__global__ void set_triangles(triangle_t *trianglesIn, int numTriangles)
+{
+   triangles = trianglesIn;
+   triangles_size = numTriangles;
+}
+
 __global__ void cuda_hit(ray_t *rays, int num, hitd_t *results)
 {
    int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -433,39 +645,37 @@ __global__ void cuda_hit(ray_t *rays, int num, hitd_t *results)
    // INITIALIZE closestData to empty hitd_t
    hitd_t *closestData = &results[idx];
 
-   //ray_t *ray = &rays[num];
    ray_t *ray = &rays[idx];
 
-   hitd_t *sphereData = new hitd_t();
-   // FOR each item in spheres
-   for (int sphereNdx = 0; sphereNdx < (int)spheres_size; sphereNdx++)
+   hitd_t *tempData = new hitd_t();
+
+   // FOR each item in planes
+   for (int boxNdx = 0; boxNdx < (int)boxes_size; boxNdx++)
    {
-      float sphereT = -1;
+      float boxT = -1;
       //// IF current item is hit by ray
-      if (sphere_hit(spheres[sphereNdx], *ray, &sphereT, sphereData) != 0)
+      if (box_hit(boxes[boxNdx], *ray, &boxT, tempData) != 0)
       {
          // IF intersection is closer than closestT
-         if (sphereT < closestT)
+         if (boxT < closestT)
          {
             // SET closestT to intersection
-            closestT = sphereT;
+            closestT = boxT;
             // SET closestData to intersection data
-            *closestData = *sphereData;
-            closestData->objIndex = sphereNdx;
+            *closestData = *tempData;
+            closestData->objIndex = boxNdx;
          }
          // ENDIF
       }
       // ENDIF
    }
-   delete sphereData;
 
-   hitd_t *planeData = new hitd_t();
    // FOR each item in planes
    for (int planeNdx = 0; planeNdx < (int)planes_size; planeNdx++)
    {
       float planeT = -1;
       //// IF current item is hit by ray
-      if (plane_hit(planes[planeNdx], *ray, &planeT, planeData) != 0)
+      if (plane_hit(planes[planeNdx], *ray, &planeT, tempData) != 0)
       {
          // IF intersection is closer than closestT
          if (planeT < closestT)
@@ -473,13 +683,56 @@ __global__ void cuda_hit(ray_t *rays, int num, hitd_t *results)
             // SET closestT to intersection
             closestT = planeT;
             // SET closestData to intersection data
-            *closestData = *planeData;
+            *closestData = *tempData;
             closestData->objIndex = planeNdx;
          }
          // ENDIF
       }
       // ENDIF
    }
-   delete planeData;
 
+
+   // FOR each item in spheres
+   for (int sphereNdx = 0; sphereNdx < (int)spheres_size; sphereNdx++)
+   {
+      float sphereT = -1;
+      // IF current item is hit by ray
+      if (sphere_hit(spheres[sphereNdx], *ray, &sphereT, tempData) != 0)
+      {
+         // IF intersection is closer than closestT
+         if (sphereT < closestT)
+         {
+            // SET closestT to intersection
+            closestT = sphereT;
+            // SET closestData to intersection data
+            *closestData = *tempData;
+            closestData->objIndex = sphereNdx;
+         }
+         // ENDIF
+      }
+      // ENDIF
+   }
+
+   // FOR each item in triangles
+   for (int triangleNdx = 0; triangleNdx < (int)triangles_size; triangleNdx++)
+   {
+      float triangleT = -1;
+      //// IF current item is hit by ray
+      if (triangle_hit(triangles[triangleNdx], *ray, &triangleT, tempData) != 0)
+      {
+         // IF intersection is closer than closestT
+         if (triangleT < closestT)
+         {
+            // SET closestT to intersection
+            closestT = triangleT;
+            // SET closestData to intersection data
+            *closestData = *tempData;
+            closestData->objIndex = triangleNdx;
+         }
+         // ENDIF
+      }
+      // ENDIF
+   }
+
+   delete tempData;
 }

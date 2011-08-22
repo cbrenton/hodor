@@ -38,16 +38,31 @@ Scene* Scene::read(std::fstream & input)
       }
     */
    delete parser;
-   curScene->spheresArray = new sphere_t[curScene->spheres.size()];
-   for (int i = 0; i < (int)curScene->spheres.size(); i++)
-   {
-      curScene->spheresArray[i] = *curScene->spheres[i];
-   }
+   
+   // Create geometry arrays.
+   curScene->boxesArray = new box_t[curScene->boxes.size()];
    curScene->planesArray = new plane_t[curScene->planes.size()];
+   curScene->spheresArray = new sphere_t[curScene->spheres.size()];
+   curScene->trianglesArray = new triangle_t[curScene->triangles.size()];
+
+   // Copy geometry data from vectors to arrays.
+   for (int i = 0; i < (int)curScene->boxes.size(); i++)
+   {
+      curScene->boxesArray[i] = *curScene->boxes[i];
+   }
    for (int i = 0; i < (int)curScene->planes.size(); i++)
    {
       curScene->planesArray[i] = *curScene->planes[i];
    }
+   for (int i = 0; i < (int)curScene->spheres.size(); i++)
+   {
+      curScene->spheresArray[i] = *curScene->spheres[i];
+   }
+   for (int i = 0; i < (int)curScene->triangles.size(); i++)
+   {
+      curScene->trianglesArray[i] = *curScene->triangles[i];
+   }
+
    return curScene;
 }
 
@@ -232,11 +247,12 @@ bool Scene::cpuHit(ray_t & ray, hit_t *data)
 void Scene::cudaSetup(int chunkSize)
 {
    cout << "Allocating device arrays";
-   // Create sphere array on device.
-   spheres_size = sizeof(sphere_t) * spheres.size();
-   CUDA_SAFE_CALL(cudaMalloc((void**) &spheres_d, spheres_size));
-   // Copy spheres to device.
-   CUDA_SAFE_CALL(cudaMemcpy(spheres_d, spheresArray, spheres_size,
+
+   // Create box array on device.
+   boxes_size = sizeof(box_t) * boxes.size();
+   CUDA_SAFE_CALL(cudaMalloc((void**) &boxes_d, boxes_size));
+   // Copy boxes to device.
+   CUDA_SAFE_CALL(cudaMemcpy(boxes_d, boxesArray, boxes_size,
             cudaMemcpyHostToDevice));
    cout << ".";
 
@@ -245,6 +261,22 @@ void Scene::cudaSetup(int chunkSize)
    CUDA_SAFE_CALL(cudaMalloc((void**) &planes_d, planes_size));
    // Copy planes to device.
    CUDA_SAFE_CALL(cudaMemcpy(planes_d, planesArray, planes_size,
+            cudaMemcpyHostToDevice));
+   cout << ".";
+
+   // Create sphere array on device.
+   spheres_size = sizeof(sphere_t) * spheres.size();
+   CUDA_SAFE_CALL(cudaMalloc((void**) &spheres_d, spheres_size));
+   // Copy spheres to device.
+   CUDA_SAFE_CALL(cudaMemcpy(spheres_d, spheresArray, spheres_size,
+            cudaMemcpyHostToDevice));
+   cout << ".";
+
+   // Create triangle array on device.
+   triangles_size = sizeof(triangle_t) * triangles.size();
+   CUDA_SAFE_CALL(cudaMalloc((void**) &triangles_d, triangles_size));
+   // Copy triangles to device.
+   CUDA_SAFE_CALL(cudaMemcpy(triangles_d, trianglesArray, triangles_size,
             cudaMemcpyHostToDevice));
    cout << ".";
 
@@ -263,11 +295,11 @@ void Scene::cudaSetup(int chunkSize)
    dim3 dimBlock(THREADS_PER_BLOCK, 1);
 
    // Send scene geometry to device.
+   set_boxes <<< dimGrid, dimBlock >>> (boxes_d, boxes.size());
    set_spheres <<< dimGrid, dimBlock >>> (spheres_d, spheres.size());
    set_planes <<< dimGrid, dimBlock >>> (planes_d, planes.size());
+   set_triangles <<< dimGrid, dimBlock >>> (triangles_d, triangles.size());
 
-   // Create hit data array on host.
-   //results = new hitd_t[chunkSize];
    cout << "done." << endl;
 }
 
@@ -278,7 +310,6 @@ void Scene::cudaCleanup()
    cudaFree(rays_d);
    cudaFree(results_d);
 
-   //delete[] results;
    cout << "done." << endl;
 }
 
@@ -286,35 +317,13 @@ void Scene::cudaCleanup()
  * Casts rays into the scene and returns correctly colored pixels.
  */
 Pixel *Scene::castRays(ray_t *rays, int num, int depth)
-//void Scene::castRays(Pixel **pixels, ray_t *rays, int num, int depth)
 {
    Pixel *pixels;
-   // = new Pixel[num];
-
    hitd_t *results = hit(rays, num, depth);
 
    pixels = shadeArray(results, rays, num);
 
-   /*
-   // Color result pixels.
-   for (int resultNdx = 0; resultNdx < num; resultNdx++)
-   {
-   hitd_t curResult = results[resultNdx];
-   ray_t curRay = rays[resultNdx];
-   if (curResult.hit != 0)
-   {
-   sphere_t hitSphere = spheresArray[curResult.objIndex];
-   pixels[resultNdx] = shade(curResult, curRay);
-   }
-   else
-   {
-   pixels[resultNdx] = Pixel(0.0, 0.0, 0.0);
-   }
-   }
-    */
-
    delete[] results;
-
    return pixels;
 }
 
@@ -365,6 +374,7 @@ Pixel *Scene::shadeArray(hitd_t *data, ray_t *view, int num)
    {
       if (data[dataNdx].hit != 0)
       {
+         // TODO: Make this work correctly with multiple lights.
          vec3_t lightVecPos = view[dataNdx].dir;
          lightVecPos *= data[dataNdx].t;
          lightVecPos += view[dataNdx].point;
@@ -403,17 +413,16 @@ Pixel Scene::shade(hitd_t & data, ray_t & view, bool hit)
    vec3_t hitNormal(0.0, 0.0, 0.0);
    vec3_t dataPoint = view.dir * data.t;
    dataPoint += view.point;
-   box_t *b_t;
+   box_t b_t;
    plane_t p_t;
    sphere_t s_t;
-   triangle_t *t_t;
+   triangle_t t_t;
    switch (data.hitType) {
    case BOX_HIT:
-      cout << "BOX WTF" << endl;
-      b_t = boxes[data.objIndex];
-      hitP = b_t->p;
-      hitF = b_t->f;
-      //hitNormal = box_normal(b_t, data);
+      b_t = boxesArray[data.objIndex];
+      hitP = b_t.p;
+      hitF = b_t.f;
+      hitNormal = normal(b_t, data);
       break;
    case PLANE_HIT:
       p_t = planesArray[data.objIndex];
@@ -428,15 +437,16 @@ Pixel Scene::shade(hitd_t & data, ray_t & view, bool hit)
       hitNormal = normal(s_t, dataPoint);
       break;
    case TRIANGLE_HIT:
-      t_t = triangles[data.objIndex];
-      hitP = t_t->p;
-      hitF = t_t->f;
-      //hitNormal = triangle_normal(t_t);
+      t_t = trianglesArray[data.objIndex];
+      hitP = t_t.p;
+      hitF = t_t.f;
+      hitNormal = normal(t_t);
       break;
    default:
       cerr << "Invalid intersection type." << endl;
    }
 
+   // TODO: Make this work correctly with multiple lights.
    for (int lightNdx = 0; lightNdx < (int)lights.size(); lightNdx++)
    {
       Light *curLight = lights[lightNdx];
