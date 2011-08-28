@@ -206,9 +206,12 @@ inline float vec3_t::length(void)
 
 inline void vec3_t::cross(vec3_t &p, vec3_t &q)
 {
-   v[0] = p.v[1] * q.v[2] - p.v[2] * q.v[1];
-   v[1] = p.v[2] * q.v[0] - p.v[0] * q.v[2];
-   v[2] = p.v[0] * q.v[1] - p.v[1] * q.v[0];
+   float v0 = p.v[1] * q.v[2] - p.v[2] * q.v[1];
+   float v1 = p.v[2] * q.v[0] - p.v[0] * q.v[2];
+   float v2 = p.v[0] * q.v[1] - p.v[1] * q.v[0];
+   v[0] = v0;
+   v[1] = v1;
+   v[2] = v2;
 }
 
 inline void vec3_t::clamp(int min, int max)
