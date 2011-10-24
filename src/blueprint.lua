@@ -11,7 +11,7 @@ default "debug"
 -- options are turned off, and optimizing is turned off
 config "debug"
     -- output "build-debug"
-    output "./terlR"
+    output "../terlR"
     debugging "on"
     defines {"DEBUG"}
     libdirs {"../lib/pngwriter/lib", "../lib", "/home/cbrenton/NVIDIA_GPU_Computing_SDK/C/lib"}
@@ -23,7 +23,7 @@ config "debug"
 -- same as above, but define a "profile" config
 config "profile"
     -- output "build-profile"
-    output "./terlR"
+    output "../terlR"
     debugging "on"
     profiling "on"
     libdirs {"../lib/pngwriter/lib", "../lib", "/home/cbrenton/NVIDIA_GPU_Computing_SDK/C/lib"}
@@ -35,7 +35,7 @@ config "profile"
 -- same as above, but define a "release" config
 config "release"
     -- output "build-release"
-    output "./terlR"
+    output "../terlR"
     optimizing "on"
     defines {"RELEASE"}
     libdirs {"../lib/pngwriter/lib", "../lib", "/home/cbrenton/NVIDIA_GPU_Computing_SDK/C/lib"}
