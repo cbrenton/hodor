@@ -28,7 +28,11 @@ LDFLAGS = $(OPTIMIZE) $(DEBUG) $(ERROR) $(LFLAGS)
 TARGET = terlR
 INPUTEXT=pov
 INPUTDIR=input
+<<<<<<< HEAD
 INPUTFILE=simple_box
+=======
+INPUTFILE=bunny_small_tris
+>>>>>>> origin/gpu
 #INPUTFILE=simple_tri
 OUTPUTDIR=images
 OUTPUTEXT=png
