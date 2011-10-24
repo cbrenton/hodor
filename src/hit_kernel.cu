@@ -632,6 +632,8 @@ __global__ void set_triangles(triangle_t *trianglesIn, int numTriangles)
 }
 
 __global__ void cuda_hit(ray_t *rays, int num, hitd_t *results)
+//__global__ void cuda_hit(ray_t *rays, int num, triangle_t *triangles,
+      //int triangles_size, hitd_t *results)
 {
    int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -649,7 +651,7 @@ __global__ void cuda_hit(ray_t *rays, int num, hitd_t *results)
 
    hitd_t *tempData = new hitd_t();
 
-   // FOR each item in planes
+   // FOR each item in boxes
    for (int boxNdx = 0; boxNdx < (int)boxes_size; boxNdx++)
    {
       float boxT = -1;

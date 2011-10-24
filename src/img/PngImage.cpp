@@ -18,9 +18,32 @@ PngImage::PngImage(int w, int h, string name) : Image(w, h)
    png = new pngwriter(width, height, 0, filename.c_str());
 }
 
+PngImage::PngImage(string name) : Image(1, 1)
+{
+   filename = name;
+   /*
+   png = new pngwriter();
+   png->readfromfile(filename.c_str());
+   width = png->getwidth();
+   height = png->getheight();
+   cout << "Read image of dimensions (" << width << ", " << height <<
+      ") from file " << filename << ".\n";
+   png->close();
+   */
+}
+
 PngImage::~PngImage()
 {
    delete png;
+}
+
+color_t PngImage::getPixel(int x, int y)
+{
+   color_t result = {};
+   result.r = png->read(x, y, 0);
+   result.g = png->read(x, y, 0);
+   result.b = png->read(x, y, 0);
+   return result;
 }
 
 void PngImage::write()

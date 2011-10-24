@@ -160,11 +160,15 @@ void Scene::cudaSetup(int chunkSize)
    // Create ray array on device.
    rays_size = chunkSize * sizeof(ray_t);
    CUDA_SAFE_CALL(cudaMalloc((void **) &rays_d, rays_size));
+   //cudaHostAlloc((void **)&rays_h, rays_size, cudaHostAllocMapped);
+   //cudaHostGetDevicePointer((void **)&rays_d, (void *)rays_h, 0);
    cout << ".";
 
    // Create hit data array on device.
    results_size = chunkSize * sizeof(hitd_t);
    CUDA_SAFE_CALL(cudaMalloc((void **) &results_d, results_size));
+   //cudaHostAlloc((void **)&results_h, results_size, cudaHostAllocMapped);
+   //cudaHostGetDevicePointer((void **)&results_d, (void *)results_h, 0);
    cout << ".";
 
    // Calculate block size and number of blocks.
@@ -217,12 +221,16 @@ hitd_t *Scene::hit(ray_t *rays, int num, int depth)
 
    // Copy rays to device.
    CUDA_SAFE_CALL(cudaMemcpy(rays_d, rays, rays_size, cudaMemcpyHostToDevice));
+   
+   //memcpy(rays_h, rays, rays_size);
+   
    // Calculate block size and number of blocks.
    dim3 dimGrid((int)ceil((float)num / (float)THREADS_PER_BLOCK), 1);
    dim3 dimBlock(THREADS_PER_BLOCK, 1);
 
    // Test for intersection.
    cuda_hit <<< dimGrid, dimBlock >>> (rays_d, num, results_d);
+   //cuda_hit <<< dimGrid, dimBlock >>> (rays_d, num, triangles_d, triangles.size(), results_d);
    //cuda_hit <<< dimGrid, dimBlock >>>
    //(rays_d, num, spheres_d, spheres.size(), results_d);
    // Check for error.

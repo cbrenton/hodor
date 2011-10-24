@@ -8,12 +8,17 @@
 #define _PIGMENT_T_H
 
 #include "structs/color_t.h"
+#include "img/PngImage.h"
 
 struct pigment_t
 {
    color_t c;
    
    float f;
+
+   bool hasTex;
+
+   PngImage * tex;
 
 };
 #endif

@@ -92,8 +92,10 @@ class Scene
       size_t triangles_size;
 
       ray_t *rays_d;
+      ray_t *rays_h;
       size_t rays_size;
 
+      hitd_t *results_h;
       hitd_t *results_d;
       size_t results_size;
 

@@ -9,6 +9,7 @@
 
 #include <string>
 #include "img/Image.h"
+#include "structs/color_t.h"
 #include <pngwriter.h>
 
 using namespace std;
@@ -19,8 +20,12 @@ class PngImage : public Image
 {
    public:
       PngImage(int w, int h, string name);
+      PngImage(string name);
 
       ~PngImage();
+
+      // Reads a single pixel from the file.
+      color_t getPixel(int x, int y);
 
       // Writes the image out to a file.
       void write();

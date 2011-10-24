@@ -41,6 +41,7 @@ ReservedWord Tokenizer::ReservedWords[] = {
    {  T_PHONG_SIZE, "phong_size"},
    {  T_INTERIOR, "interior"},
    {  T_IOR, "ior"},
+   {  T_TEXTURE, "texture"},
    {  T_LAST, ""}
 };
 
@@ -88,6 +89,7 @@ string Tokenizer::TokenNames[] = {
    "PHONG_SIZE",
    "INTERIOR",
    "IOR",
+   "TEXTURE", // added by cbrenton
    "NULL",
    "EOF"
 };
@@ -128,7 +130,7 @@ void Tokenizer::SkipSpaces() {
 void Tokenizer::ReadDouble() {
    /* this is cheating -- we'd better parse the number definition
       ourselves, to make sure it conforms to a known standard and
-      to do error hanndling properly,
+      to do error handling properly,
       but for our purposes  this is good enough */
    // int res;
    // res = fscanf( token.infile, "%le", &token.double_value);
@@ -239,6 +241,12 @@ Token Tokenizer::GetToken() {
       }
    }
    return token;
+}
+
+std::string Tokenizer::GetWord() { // added by cbrenton
+   std::string word;
+   infile >> word;
+   return word;
 }
 
 /* Assumes that GetToken() was called at least once.

@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "geom/Transformation.h"
 #include "structs/vector.h"
+#include "img/PngImage.h"
 
 class NYUParser{
    private:
@@ -48,6 +49,8 @@ class NYUParser{
       void ParseQuadric();
       Triangle * ParseTriangle(); // added by mbecker
       Plane * ParsePlane(); // added by mbecker
+      PngImage * ParseTexture(); // added by cbrenton
+      std::string ParseFilename(); // added by cbrenton
       // void ParseLightSource();
       Light * ParseLightSource();
       void ParseGlobalSettings();

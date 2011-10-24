@@ -64,6 +64,7 @@ enum TokenIDs {
   T_PHONG_SIZE,
   T_INTERIOR,
   T_IOR,
+  T_TEXTURE, // added by cbrenton
 
   T_NULL,
   T_EOF,
@@ -107,6 +108,7 @@ class Tokenizer{
 	
 	public:
 	Token GetToken();
+        std::string GetWord(); // added by cbrenton
 	void UngetToken();
 };
 

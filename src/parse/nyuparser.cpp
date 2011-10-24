@@ -300,6 +300,9 @@ void NYUParser::ParseModifiers(Geometry & s){
          // ParseInterior(&(modifiers->interior));
          ParseInterior(s.f.ior);
          break;
+      case T_TEXTURE:
+         ParseTexture();
+         break;
       default: tokenizer->UngetToken(); return;
       }
    }
@@ -629,6 +632,22 @@ Plane * NYUParser::ParsePlane(){
    ParseRightCurly();
    
    return p;
+}
+
+PngImage * NYUParser::ParseTexture() // added by cbrenton
+{
+   string filename = ParseFilename();
+   PngImage *readImg;
+   readImg = new PngImage(filename);
+   return readImg;
+}
+
+string NYUParser::ParseFilename() // added by cbrenton
+{
+   ParseLeftCurly();
+   string filename = tokenizer->GetWord();
+   ParseRightCurly();
+   return filename;
 }
 
 Light * NYUParser::ParseLightSource()
