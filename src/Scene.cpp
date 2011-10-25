@@ -331,6 +331,7 @@ Pixel Scene::shade(HitData *data, Vector3f view)
       // Cast light feeler ray.
       Ray feeler;
       feeler.dir = curLight->location - data->point;
+      float lightLen = feeler.dir.norm();
       feeler.dir.normalize();
       feeler.point = data->point + feeler.dir * EPSILON;
 
@@ -339,7 +340,7 @@ Pixel Scene::shade(HitData *data, Vector3f view)
       // If feeler hits any object, current point is in shadow.
       bool isShadow = gpuHit(feeler, &tmpHit);
 
-      if (!isShadow)
+      if (!isShadow || tmpHit.t > lightLen)
       {
          // GPU.
          if (useGPU)
