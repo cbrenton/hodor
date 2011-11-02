@@ -254,6 +254,7 @@ Pixel *Scene::shadeArray(hitd_t *data, ray_t *view, int num)
    Pixel *pixelResults = new Pixel[num];
    hitd_t *feelerResults = new hitd_t[num];
    ray_t *rays = new ray_t[num];
+   float *lightLens = new float[num];
 
    for (int dataNdx = 0; dataNdx < num; dataNdx++)
    {
@@ -265,6 +266,7 @@ Pixel *Scene::shadeArray(hitd_t *data, ray_t *view, int num)
          lightVecPos += view[dataNdx].point;
 
          vec3_t lightVec = lights[0]->location - lightVecPos;
+         lightLens[dataNdx] = lightVec.length();
          lightVec.normalize();
          vec3_t offset = lightVec * EPSILON;
 
@@ -278,7 +280,7 @@ Pixel *Scene::shadeArray(hitd_t *data, ray_t *view, int num)
    // Shade each pixel on the CPU.
    for (int shadeNdx = 0; shadeNdx < num; shadeNdx++)
    {
-      pixelResults[shadeNdx] = shade(data[shadeNdx], view[shadeNdx], feelerResults[shadeNdx].hit);
+      pixelResults[shadeNdx] = shade(data[shadeNdx], view[shadeNdx], feelerResults[shadeNdx].hit && feelerResults[shadeNdx].t <= lightLens[shadeNdx]);
    }
 
    delete[] feelerResults;
