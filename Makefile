@@ -16,8 +16,8 @@ KILL   = killall -9
 SHELL  = /bin/sh
 MAKE   = make
 
-IFLAGS = -I./src -I./lib -I./lib/pngwriter/include -DNO_FREETYPE
-LFLAGS = -lpng -lz -lpngwriter -L./lib/pngwriter/lib
+IFLAGS = -I./src -I./lib
+LFLAGS = -lpng -lz
 DEBUG = -ggdb
 OPTIMIZE = -O3
 ERROR = -Wconversion -Werror

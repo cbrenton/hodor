@@ -14,12 +14,16 @@ class Pixel
    public:
       Pixel() {};
 
+      Pixel(int r, int g, int b);
+      
       Pixel(double r, double g, double b);
 
       void clamp();
 
       void add(Pixel other);
 
+      void multiply(int factor);
+      
       void multiply(double factor);
 
       // The color of the pixel.

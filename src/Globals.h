@@ -8,6 +8,7 @@
 #define _GLOBALS_H
 
 #include <cstdlib>
+#include <stdint.h>
 #include <Eigen/Dense>
 #include "structs/box_t.h"
 #include "structs/plane_t.h"
@@ -24,6 +25,8 @@
 #define PLANE_HIT 2
 #define SPHERE_HIT 3
 #define TRIANGLE_HIT 4
+#define COLOR_T uint16_t
+#define COLOR_RANGE 65536.0
 
 inline int randInt()
 {
