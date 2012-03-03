@@ -9,7 +9,7 @@
 
 #include <string>
 #include "img/Image.h"
-#include <pngwriter.h>
+#include <png++/png.hpp>
 
 using namespace std;
 
@@ -35,7 +35,6 @@ class PngImage : public Image
       string getExt();
 
    protected:
-      pngwriter *png;
-
+      png::image<png::rgb_pixel_16> *png;
 };
 #endif

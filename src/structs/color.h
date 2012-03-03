@@ -10,12 +10,15 @@
 struct color
 {
    // The red component of the color.
+   //double r;
    double r;
 
    // The green component of the color.
+   //double g;
    double g;
 
    // The blue component of the color.
+   //double b;
    double b;
 
 };

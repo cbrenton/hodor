@@ -328,7 +328,7 @@ Camera NYUParser::ParseCamera()
       assign fields in the camera object */
 
    Vector3f location, right, up, look_at;
-   double angle;
+   //double angle;
    // struct Matrix4d  transform;
    bool done = false;
    Token t;
@@ -356,7 +356,7 @@ Camera NYUParser::ParseCamera()
       case T_RIGHT:     ParseVector(right);     break;
       case T_UP:        ParseVector(up);        break;
       case T_LOOK_AT:   ParseVector(look_at);   break;
-      case T_ANGLE:     angle = M_PI*ParseDouble()/180.0;   break;
+      //case T_ANGLE:     angle = M_PI*ParseDouble()/180.0;   break;
       default: done = true; tokenizer->UngetToken(); break;
       }
    }
