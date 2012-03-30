@@ -43,5 +43,8 @@ class Image
       // Gets the file extension.
       virtual string getExt();
 
+      // Get the pixel data in an OpenGL-readable buffer.
+      virtual unsigned char *getPixelBuffer();
+
 };
 #endif

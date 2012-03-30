@@ -5,30 +5,33 @@
  */
 
 #include <iostream>
-#include "img/PngImage.h"
+#include "img/SFMLImage.h"
 #include "Pixel.h"
 #include "Globals.h"
 
 using namespace std;
 
-PngImage::PngImage(int w, int h, string name) : Image(w, h)
+SFMLImage::SFMLImage(int w, int h, string name) : Image(w, h)
 {
    filename = name;
+   app = new sf::RenderWindow(sf::VideoMode(800, 600, 32), "SFML Graphics");
    cout << "filename: " << filename << endl;
    png = new png::image<png::rgb_pixel_16>(width, height);
+   image = sf::Image();
+   imgSprite = new sf::Sprite(image);
 }
 
-PngImage::~PngImage()
+SFMLImage::~SFMLImage()
 {
    delete png;
 }
 
-void PngImage::write()
+void SFMLImage::write()
 {
    png->write(filename);
 }
 
-void PngImage::writePixel(int x, int y, const Pixel & pix)
+void SFMLImage::writePixel(int x, int y, const Pixel & pix)
 {
    // Convert colors from double to uint8_t without overflow.
    COLOR_T r = (COLOR_T)(min(pix.c.r * COLOR_RANGE, COLOR_RANGE));
@@ -39,16 +42,26 @@ void PngImage::writePixel(int x, int y, const Pixel & pix)
    int correctY = png->get_height() - 1 - y;
    int correctX = x;
 
-   pixelData[x][y] = pix;
    (*png)[correctY][correctX] = png::rgb_pixel_16(r, g, b);
+
+   if (y == 0)
+   {
+      write();
+      if (!image.LoadFromFile(filename))
+      {
+         // Error...
+      }
+      imgSprite->SetImage(image);
+      app->Draw(*imgSprite);
+   }
 }
 
-void PngImage::close()
+void SFMLImage::close()
 {
    write();
 }
 
-string PngImage::getExt()
+string SFMLImage::getExt()
 {
    return "png";
 }

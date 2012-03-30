@@ -17,7 +17,7 @@ SHELL  = /bin/sh
 MAKE   = make
 
 IFLAGS = -I./src -I./lib
-LFLAGS = -lpng -lz
+LFLAGS = -lpng -lz -lsfml-window -lsfml-graphics -lGL -lGLU
 DEBUG = -ggdb
 OPTIMIZE = -O3
 ERROR = -Wconversion -Werror

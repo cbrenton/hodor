@@ -13,7 +13,9 @@
 #include "img/Image.h"
 #include "img/TgaImage.h"
 #include "img/PngImage.h"
+#include "img/SFMLImage.h"
 #include "Scene.h"
+#include "SFMLWindow.h"
 
 #define POV_EXT ".pov"
 #define DEFAULT_W 256
@@ -255,6 +257,9 @@ int main(int argc, char **argv)
       }
    }
 
+   SFMLWindow win = SFMLWindow(width, height);
+   win.update();
+
    image = new PngImage(width, height, filename);
 
    // Open input file.
@@ -381,6 +386,7 @@ int main(int argc, char **argv)
                   image->width * image->height, tick);
          }
       }
+      win.update(image->getPixelBuffer());
    }
    if (showProgress)
    {
@@ -399,4 +405,8 @@ int main(int argc, char **argv)
    delete image;
 
    delete scene;
+
+   sleep(1);
+
+   return EXIT_SUCCESS;
 }
