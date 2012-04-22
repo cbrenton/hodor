@@ -1,16 +1,18 @@
-terlR will probably stand for something, someday.
+hodor is a CUDA-accelerated raytracer written by Chris Brenton.
 
-terlR exists to please its namesake.
+hodor stands for Highly Optimized Device Oriented Raytracer.
 
-terlR is a CUDA-accelerated raytracer written by Chris Brenton.
+At some point in the future, hodor may actually be highly optimized.
 
-terlR depends on libpng++.
+hodor, like its namesake, is a little slow. It also can only say its own name.
+
+hodor depends on libpng++.
 
 To build:
    make lib all
 
 To run:
-   ./terlR -w [width] -h [height] -i [input file]
+   ./hodor -w [width] -h [height] -i [input file]
 
 Copyright (c) 2011, Chris Brenton
 All rights reserved.
@@ -22,9 +24,9 @@ modification, are permitted provided that the following conditions are met:
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name of California Polytechnic State University nor the
-      names of its contributors may be used to endorse or promote products
-      derived from this software without specific prior written permission.
+    * Neither the name of hodor nor the names of its contributors may be
+      used to endorse or promote products derived from this software
+      without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
