@@ -8,9 +8,11 @@
 #define _IMAGE_H
 
 #include <string>
+#include "vector.h"
+
 using namespace std;
 
-class Pixel;
+//class Pixel;
 
 class Image
 {
@@ -32,10 +34,12 @@ class Image
       virtual void write() {};
 
       // The pixel data currently stored in the image.
-      Pixel **pixelData;
+      //Pixel **pixelData;
 
       // Writes a single pixel to the file.
-      virtual void writePixel(int x, int y, const Pixel & pix) {};
+      //virtual void writePixel(int x, int y, const Pixel & pix) {};
+      virtual void writePixel(int x, int y, vec3 *pix) {};
+      virtual void writePixel(int x, int y, vec_t r, vec_t g, vec_t b) {};
 
       // Closes the file.
       virtual void close() {};
@@ -44,7 +48,7 @@ class Image
       virtual string getExt();
 
       // Get the pixel data in an OpenGL-readable buffer.
-      virtual unsigned char *getPixelBuffer();
+      //virtual unsigned char *getPixelBuffer();
 
 };
 #endif

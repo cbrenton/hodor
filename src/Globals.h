@@ -9,13 +9,6 @@
 
 #include <cstdlib>
 #include <stdint.h>
-#include <Eigen/Dense>
-#include "structs/box_t.h"
-#include "structs/plane_t.h"
-#include "structs/sphere_t.h"
-#include "structs/triangle_t.h"
-#include "structs/HitData.h"
-#include "Ray.h"
 
 #define EPSILON 0.001f
 #define MIN_T 0.0f
@@ -50,11 +43,7 @@ inline float min3(float a, float b, float c)
 
 inline bool closeEnough(float a, float b)
 {
-   return abs(a - b) <= EPSILON;
+   return a - b <= EPSILON || b - a <= EPSILON;
 }
-
-#define mReflect(d, n) ((n) * (2 * (-(d).dot(n))) + d)
-
-#define mPrintVec(v) cout << "<" << v.x() << ", " << v.y() << ", " << v.z() << ">" << endl;
 
 #endif

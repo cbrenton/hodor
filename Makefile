@@ -16,8 +16,8 @@ KILL   = killall -9
 SHELL  = /bin/sh
 MAKE   = make
 
-IFLAGS = -I./src -I./lib
-LFLAGS = -lpng -lz -lsfml-window -lsfml-graphics -lGL -lGLU
+IFLAGS = -I./src
+LFLAGS = -lpng -lz -lsfml-window -lsfml-graphics -lGL -lGLU -lobj
 DEBUG = -ggdb
 OPTIMIZE = -O3
 ERROR = -Wconversion -Werror
@@ -42,8 +42,9 @@ LIBS = $(LIBFLAGS)
 # Nothing should need changing below this line
 
 # The source files
-SRCS = $(wildcard src/*.cpp src/*/*.cpp)
-#SRCS = $(wildcard *.cpp)
+#SRCS = $(wildcard src/*.cpp src/*/*.cpp)
+#SRCS = $(wildcard src/*.cpp src/*/*.cpp src/*.h src/*/*.h)
+SRCS = $(wildcard src/*.cpp src/structs/*.cpp src/geom/*.cpp src/img/*.cpp src/parse/*.cpp)
 
 OBJS = $(SRCS:.cpp=.o)
 
@@ -55,10 +56,6 @@ $(TARGET): $(OBJS)
 
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@
-
-.PHONY: lib
-lib:
-	$(shell) ./lib.sh
 
 run:
 	./$(TARGET) $(ARGS)

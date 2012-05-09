@@ -5,20 +5,20 @@
  */
 
 #include "img/Image.h"
-#include "Pixel.h"
+//#include "Pixel.h"
 #include <stdio.h>
 
 Image::Image(int w, int h) :
    width(w), height(h)
 {
    // Initialize pixelData.
-   pixelData = new Pixel*[width];
+   //pixelData = new Pixel*[width];
    for (int x = 0; x < width; x++)
    {
-      pixelData[x] = new Pixel[height];
+      //pixelData[x] = new Pixel[height];
       for (int y = 0; y < height; y++)
       {
-         pixelData[x][y] = Pixel(0.0, 0.0, 0.0);
+         //pixelData[x][y] = Pixel(0.0, 0.0, 0.0);
       }
    }
 }
@@ -28,7 +28,7 @@ Image::~Image()
    // Delete pixelData.
    for (int x = 0; x < width; x++)
    {
-      delete[] pixelData[width];
+      //delete[] pixelData[width];
    }
 }
 
@@ -37,6 +37,7 @@ string Image::getExt()
    return "out";
 }
 
+/*
 unsigned char * Image::getPixelBuffer()
 {
    unsigned char *ret = new unsigned char[width * height * 3];
@@ -50,3 +51,4 @@ unsigned char * Image::getPixelBuffer()
    }
    return ret;
 }
+*/

@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include "img/PngImage.h"
-#include "Pixel.h"
+//#include "Pixel.h"
 #include "Globals.h"
 
 using namespace std;
@@ -28,19 +28,24 @@ void PngImage::write()
    png->write(filename);
 }
 
-void PngImage::writePixel(int x, int y, const Pixel & pix)
+void PngImage::writePixel(int x, int y, vec_t r_in, vec_t g_in, vec_t b_in)
 {
    // Convert colors from double to uint8_t without overflow.
-   COLOR_T r = (COLOR_T)(min(pix.c.r * COLOR_RANGE, COLOR_RANGE));
-   COLOR_T g = (COLOR_T)(min(pix.c.g * COLOR_RANGE, COLOR_RANGE));
-   COLOR_T b = (COLOR_T)(min(pix.c.b * COLOR_RANGE, COLOR_RANGE));
+   COLOR_T r = (COLOR_T)(min(r_in * COLOR_RANGE, COLOR_RANGE));
+   COLOR_T g = (COLOR_T)(min(g_in * COLOR_RANGE, COLOR_RANGE));
+   COLOR_T b = (COLOR_T)(min(b_in * COLOR_RANGE, COLOR_RANGE));
 
    // Adjust the x and y coordinates for libpng++.
    int correctY = png->get_height() - 1 - y;
    int correctX = x;
 
-   pixelData[x][y] = pix;
+   //pixelData[x][y] = pix;
    (*png)[correctY][correctX] = png::rgb_pixel_16(r, g, b);
+}
+
+void PngImage::writePixel(int x, int y, vec3 *pix)
+{
+   writePixel(x, y, pix->v[0] * 255.f, pix->v[1] * 255.f, pix->v[2] * 255.f);
 }
 
 void PngImage::close()

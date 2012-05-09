@@ -13,7 +13,7 @@
 
 using namespace std;
 
-class Pixel;
+//class Pixel;
 
 class PngImage : public Image
 {
@@ -26,7 +26,10 @@ class PngImage : public Image
       void write();
 
       // Writes a single pixel to the file.
-      void writePixel(int x, int y, const Pixel & pix);
+      //void writePixel(int x, int y, const Pixel & pix);
+      void writePixel(int x, int y, vec3 *pix);
+      void writePixel(int x, int y, vec_t r_in, vec_t g_in,
+            vec_t b_in);
 
       // Closes the file.
       void close();
