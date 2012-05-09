@@ -35,6 +35,14 @@ class Scene
       // Reads in scene data from a file and returns a new Scene containing the newly stored data.
       static Scene* read(std::fstream & input);
 
+      // Handles vertices passed by the parser.
+      static void vertex_callback(obj::float_type x, obj::float_type y,
+            obj::float_type z);
+
+      // Handles triangle faces passed by the parser.
+      void face_callback(obj::index_type p1, obj::index_type p2,
+            obj::index_type p3);
+
       // Checks if a ray intersects any geometry in the scene, using structs.
       bool gpuHit(const Ray & ray, HitData *data);
 

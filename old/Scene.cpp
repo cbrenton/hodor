@@ -27,16 +27,36 @@ void Scene::constructBVH()
 Scene* Scene::read(std::fstream & input)
 {
    Scene* curScene = new Scene();
-   NYUParser *parser = new NYUParser;
-   parser->parse(input, *curScene);
-   /*
-      for (int geomNdx = 0; geomNdx < (int)curScene->geometry.size(); geomNdx++)
-      {
-      curScene->geometry[geomNdx]->debug();
-      }
-      */
-   delete parser;
+   obj::obj_parser parser;
+
+   parser.geometric_vertex_callback(vertex_callback);
+   parser.triangular_face_geometric_vertices_callback(face_callback);
+   parser.parse(inputFileName.c_str());
+
    return curScene;
+}
+
+/**
+ * Handles vertices passed by the parser.
+ */
+void Scene::vertex_callback(obj::float_type x, obj::float_type y,
+      obj::float_type z)
+{
+   vertex vert;
+   vert.coord.v[0] = (vec_t)x;
+   vert.coord.v[1] = (vec_t)y;
+   vert.coord.v[2] = (vec_t)z;
+   printf("vert: ");
+   debug(&vert);
+}
+
+/**
+ * Handles triangle faces passed by the parser.
+ */
+void Scene::face_callback(obj::index_type p1, obj::index_type p2,
+      obj::index_type p3)
+{
+   printf("face: %td, %td, %td\n", p1, p2, p3);
 }
 
 /**

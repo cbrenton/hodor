@@ -9,10 +9,9 @@
 
 #include <string>
 #include "vector.h"
+#include "pixel.h"
 
 using namespace std;
-
-//class Pixel;
 
 class Image
 {
@@ -34,7 +33,7 @@ class Image
       virtual void write() {};
 
       // The pixel data currently stored in the image.
-      //Pixel **pixelData;
+      Pixel **pixelData;
 
       // Writes a single pixel to the file.
       //virtual void writePixel(int x, int y, const Pixel & pix) {};
@@ -48,7 +47,7 @@ class Image
       virtual string getExt();
 
       // Get the pixel data in an OpenGL-readable buffer.
-      //virtual unsigned char *getPixelBuffer();
+      virtual unsigned char *getPixelBuffer();
 
 };
 #endif

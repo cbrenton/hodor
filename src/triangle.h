@@ -15,4 +15,14 @@ struct triangle
    material *mat;
 };
 
+inline void initTri(triangle *t)
+{
+   t->pts[0] = new vertex;
+   initVert(t->pts[0]);
+   t->pts[1] = new vertex;
+   initVert(t->pts[1]);
+   t->pts[2] = new vertex;
+   initVert(t->pts[2]);
+}
+
 #endif

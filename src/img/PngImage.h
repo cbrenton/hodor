@@ -13,8 +13,6 @@
 
 using namespace std;
 
-//class Pixel;
-
 class PngImage : public Image
 {
    public:
