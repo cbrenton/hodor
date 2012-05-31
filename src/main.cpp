@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cstring>
 #include <fstream>
 #include <math.h>
 #include <stdio.h>
@@ -13,17 +14,14 @@
 #include "ray.h"
 #include "scene.h"
 #include "sfmlWindow.h"
-#include "vector.h"
+#include "glm/glm.hpp"
 #include "vertex.h"
-#include "img/Image.h"
-//#include "img/TgaImage.h"
-#include "img/PngImage.h"
-//#include "img/SFMLImage.h"
+#include "img/image.h"
 
 #define AA_RAYS 4
 #define DEFAULT_H 256
 #define DEFAULT_W 256
-#define POV_EXT ".pov"
+#define INPUT_EXT ".obj"
 #define RECURSION_DEPTH 6
 
 using namespace std;
@@ -92,7 +90,7 @@ int main(int argc, char **argv)
       win->update();
    }
 
-   image = new PngImage(width, height, filename);
+   image = new Image(width, height, filename);
 
    // Parse scene.
    scene = Scene::read(inputFileName);
@@ -106,10 +104,23 @@ int main(int argc, char **argv)
       aRayArray[i] = new ray[height];
    }
 
-   float l = length(negative(scene->camera.right)) / 2;
-   float r = length(scene->camera.right) / 2;
-   float b = length(negative(scene->camera.up)) / 2;
-   float t = length(scene->camera.up) / 2;
+   /*
+   float l = length(negative(scene->camera.right)) / 2.f;
+   float r = length(scene->camera.right) / 2.f;
+   float b = length(negative(scene->camera.up)) / 2.f;
+   float t = length(scene->camera.up) / 2.f;
+   */
+   float l = length(-1.0f * (scene->camera.right));
+   float r = length(scene->camera.right);
+   float b = length(-1.0f * (scene->camera.up));
+   float t = length(scene->camera.up);
+
+   /*
+   printf("l: %f\n", l);
+   printf("r: %f\n", r);
+   printf("b: %f\n", b);
+   printf("t: %f\n", t);
+   */
 
    // Generate rays.
    // TODO: Add AA.
@@ -125,31 +136,54 @@ int main(int argc, char **argv)
          }
 
          float uScale = (float)(l + (r - l) * ((float)x + jitter)
-               / (float)image->width);
+               / (float)width);
          float vScale = (float)(b + (t - b) * ((float)y + jitter)
-               / (float)image->height);
+               / (float)height);
          float wScale = -1;
          vec3 sVector = scene->camera.location;
          vec3 uVector = scene->camera.right;
          vec3 vVector = scene->camera.up;
-         vec3 wVector = scene->camera.look_at;
-         subtract(wVector, scene->camera.location);
+         vec3 wVector = scene->camera.look_at - scene->camera.location;
          normalize(uVector);
          normalize(vVector);
          normalize(wVector);
          // Left-handed.
-         wVector = negative(wVector);
-         multiply(uVector, uScale);
-         multiply(vVector, vScale);
-         multiply(wVector, wScale);
-         add(sVector, uVector);
-         add(sVector, vVector);
-         add(sVector, wVector);
-         vec3 rayDir = uVector;
-         add(rayDir, vVector);
-         add(rayDir, wVector);
-         normalize(rayDir);
+         wVector *= -1;
+         uVector *= uScale;
+         vVector *= vScale;
+         wVector *= wScale;
+         sVector += uVector;
+         sVector += vVector;
+         sVector += wVector;
+         vec3 rayDir = uVector + vVector + wVector;
+         rayDir = normalize(rayDir);
          vec3 curPoint = scene->camera.location;
+
+
+         /*
+         float uScale = (float)(l + (r - l) * ((float)x + jitter)
+               / (float)image->width);
+         float vScale = (float)(b + (t - b) * ((float)y + jitter)
+               / (float)image->height);
+         float wScale = -1;
+         glm::vec3 sVector = scene->camera.location;
+         glm::vec3 uVector = normalize(scene->camera.right);
+         glm::vec3 vVector = normalize(scene->camera.up);
+         glm::vec3 wVector = normalize(scene->camera.look_at - scene->camera.location);
+         // Left-handed.
+         wVector *= -1.0f;
+         uVector *= uScale;
+         vVector *= vScale;
+         wVector *= wScale;
+         sVector += uVector;
+         sVector += vVector;
+         sVector += wVector;
+         glm::vec3 rayDir = uVector;
+         rayDir += vVector;
+         rayDir += wVector;
+         rayDir = normalize(rayDir);
+         glm::vec3 curPoint = scene->camera.location;
+         */
          //ray *curRay = new ray(curPoint, rayDir);
          ray curRay = {curPoint, rayDir};
          //aRayArray[i][j][k] = *curRay;
@@ -157,7 +191,7 @@ int main(int argc, char **argv)
       }
    }
    cout << "done." << endl;
-   
+
    if (numAA > 1)
       cout << "Using " << numAA << "x AA." << endl;
    else
@@ -180,29 +214,32 @@ int main(int argc, char **argv)
       {
          // TODO: Replace Pixel.
          Pixel curPix = scene->castRay(&aRayArray[x][y], RECURSION_DEPTH);
+         //if (curPix.c.r > 0.0f)
+            //printf("pix: <%f, %f, %f>\n", curPix.c.r, curPix.c.g, curPix.c.b);
          // Write pixel out to file.
          // TODO: Write correctly.
          //image->writePixel(x, y, curPix);
-         image->writePixel(x, y, curPix.c.r, curPix.c.g, curPix.c.b);
+         glm::vec3 color = glm::vec3(curPix.c.r, curPix.c.g, curPix.c.b);
+         image->setPixel(x, y, &color);
          // Print out progress bar.
          //if (showProgress)
-            // TODO: Display progress bar.
+         // TODO: Display progress bar.
       }
-      if (showPreview)
-         win->update(image->getPixelBuffer());
+      //if (showPreview)
+         //win->update(image->getPixelBuffer());
    }
    if (showProgress)
       cout << endl;
 
    // Finish writing image out to file.
-   image->close();
-   
+   image->write();
+
    for (int i = 0; i < width; i++)
    {
       delete[] aRayArray[i];
    }
    delete[] aRayArray;
-   
+
    delete image;
 
    delete scene;
@@ -255,10 +292,10 @@ void setFilename(char* strIn)
       name = strIn;
    inputFileName = name;
    int dirIndex = (int)inputFileName.rfind('/');
-   int extIndex = (int)inputFileName.rfind(POV_EXT);
+   int extIndex = (int)inputFileName.rfind(INPUT_EXT);
    filename = "images/";
    filename.append(inputFileName.substr(dirIndex + 1, extIndex - dirIndex - 1));
-   filename.append(".png");
+   filename.append(".tga");
 }
 
 float r2d(float rads)

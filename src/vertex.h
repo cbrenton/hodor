@@ -7,26 +7,19 @@
 #define _VERTEX_H
 
 #include <stdio.h>
-#include "vector.h"
+#include "glm/glm.hpp"
 
 struct vertex
 {
-   vec3 coord;
-   vec2 texCoord;
-   vec3 normal;
+   glm::vec3 coord;
+   glm::vec3 texCoord;
+   glm::vec3 normal;
 };
-
-inline void initVert(vertex *v)
-{
-   initVec(&v->coord);
-   initVec(&v->texCoord);
-   initVec(&v->normal);
-}
 
 inline void debug(vertex *v)
 {
    printf("vertex: ");
-   debug(v->coord);
+   //debug(v->coord);
 }
 
 #endif

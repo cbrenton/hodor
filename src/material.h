@@ -8,18 +8,18 @@
 
 #include <string>
 #include "buffer.h"
-#include "vector.h"
+#include "glm/glm.hpp"
 
 struct material
 {
    buffer3 *albedo;
    std::string name;
-   vec3 kA, kD, kS;
-   vec_t rough;
-   vec_t illum;
+   glm::vec3 kA, kD, kS;
+   float rough;
+   float illum;
 };
 
 extern material * matFromFile(std::string filename);
-extern void debug(material *mat);
+//extern void debug(material *mat);
 
 #endif

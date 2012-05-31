@@ -9,6 +9,32 @@
 using namespace std;
 
 /**
+ * Constructs a Scene from an objLoader object.
+ */
+Scene::Scene(objLoader *objScene)
+{
+   vertexList.assign(objScene->vertexList,
+         objScene->vertexList + objScene->vertexCount);
+   normalList.assign(objScene->normalList,
+         objScene->normalList + objScene->normalCount);
+   textureList.assign(objScene->textureList,
+         objScene->textureList + objScene->textureCount);
+   for (int i = 0; i < objScene->faceCount; i++)
+   {
+      if (objScene->faceList[i]->vertex_count == 4)
+      {
+         triangle *quadTris = quadToTri(objScene->faceList[i], objScene);
+         triangles.push_back(quadTris);
+         triangles.push_back(quadTris + 1);
+      }
+      else
+      {
+         triangles.push_back(faceToTri(objScene->faceList[i], objScene));
+      }
+   }
+}
+
+/**
  * Constructs a bounding volume heirarchy for the scene.
  */
 void Scene::constructBVH()
@@ -22,24 +48,29 @@ void Scene::constructBVH()
  */
 Scene* Scene::read(std::string filename)
 {
+   /*
    Scene* curScene = new Scene();
+
+   //vec3 location = {{-1.711963f, 4.333467f, 10.445557f}};
+   //vec3 up = {{0.042266f, 0.963630f, -0.263875f}};
+   //vec3 right = {{1.316552f, 0.f, 0.210877f}};
+   //vec3 look_at = {{0.421718f, 0.592129f, -2.875471f}};
+   vec3 location = {{0.f, 0.f, -2.f}};
+   vec3 up = {{0.f, 1.f, 0.f}};
+   vec3 right = {{1.f, 0.f, 0.f}};
+   vec3 look_at = {{0.f, 0.f, 0.f}};
+   curScene->camera = Camera();
+   curScene->camera.location = location;
+   curScene->camera.up = up;
+   curScene->camera.right = right;
+   curScene->camera.look_at = look_at;
 
    triangle *test = new triangle;
    initTri(test);
-   /*
-   vec3 p1 = {{-1.f, -1.f, 10.0f}};
-   vec3 p2 = {{0.f, 1.f, 10.0f}};
-   vec3 p3 = {{1.f, -1.f, 10.0f}};
-   */
-   /*
-   vec3 p1 = {{-0.1f, -0.1f, 10.0f}};
-   vec3 p2 = {{0.f, 0.1f, 10.0f}};
-   vec3 p3 = {{0.1f, -0.1f, 10.0f}};
-   */
    // TODO: Always detects hit if coord is negative.
-   vec3 p1 = {{-0.1f, 0.f, 10.0f}};
-   vec3 p2 = {{0.1f, 01.f, 10.0f}};
-   vec3 p3 = {{0.2f, 0.f, 10.0f}};
+   vec3 p1 = {{-1.1f, 1.f, 1.0f}};
+   vec3 p2 = {{0.1f, 2.1f, 1.0f}};
+   vec3 p3 = {{1.2f, 1.f, 1.0f}};
    vertex *v1 = new vertex;
    vertex *v2 = new vertex;
    vertex *v3 = new vertex;
@@ -50,9 +81,28 @@ Scene* Scene::read(std::string filename)
    test->pts[1] = v2;
    test->pts[2] = v3;
    curScene->triangles.push_back(test);
+   */
 
    // TODO: Parse an obj file.
+   objLoader *objData = new objLoader();
+   objData->load((char *)filename.c_str());
 
+   // TODO: Convert data to a usable format.
+   Scene *curScene = new Scene(objData);
+   
+   glm::vec3 location(0.f, 0.f, 2.f);
+   glm::vec3 up(0.f, 1.f, 0.f);
+   glm::vec3 right(1.f, 0.f, 0.f);
+   glm::vec3 look_at(0.f, 0.f, 0.f);
+   curScene->camera = Camera();
+   curScene->camera.location = location;
+   curScene->camera.up = up;
+   curScene->camera.right = right;
+   glm::vec3 d = look_at - location;
+   d = normalize(d);
+   curScene->camera.look_at = look_at;
+
+   delete objData;
    return curScene;
 }
 
@@ -63,7 +113,7 @@ Scene* Scene::read(std::string filename)
 bool Scene::gpuHit(ray *ray, hit_data *data)
 {
    // INITIALIZE closestT to MAX_DIST + 0.1
-   vec_t closestT = MAX_DIST + 0.1f;
+   float closestT = MAX_DIST + 0.1f;
    // INITIALIZE closestData to empty hit_data
    hit_data *closestData = new hit_data;
 
@@ -72,7 +122,7 @@ bool Scene::gpuHit(ray *ray, hit_data *data)
    // TODO: Make this work.
    for (int triNdx = 0; triNdx < (int)triangles.size(); triNdx++)
    {
-      vec_t triT = -1;
+      float triT = -1;
       hit_data *triData = new hit_data;
       // IF current item is hit by ray
       /*
@@ -161,6 +211,7 @@ Pixel Scene::castRay(ray *ray, int depth)
 Pixel Scene::shade(hit_data *data, vec3 view)
 {
    Pixel result(1.f, 0.f, 0.f);
+   //printf("hit\n");
    // TODO: Make this work with EVERYTHING.
    /*
       Pigment hitP = {};

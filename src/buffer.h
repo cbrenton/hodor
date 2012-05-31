@@ -6,13 +6,14 @@
 #ifndef _BUFFER_H
 #define _BUFFER_H
 
-#include "vector.h"
-#include "img/Image.h"
-#include "img/PngImage.h"
+#include "glm/glm.hpp"
+#include "img/image.h"
+
+using namespace glm;
 
 struct buffer
 {
-   vec_t *data;
+   float *data;
    int w, h;
 };
 
@@ -25,13 +26,13 @@ struct buffer3
 inline void initBuffer(buffer *buf, int w, int h);
 inline void initBuffer3(buffer3 *buf, int w, int h);
 inline void drawStripes(buffer3 *buf, int w, int h);
-inline vec_t * lookup(buffer *buf, int x, int y);
+inline float * lookup(buffer *buf, int x, int y);
 inline vec3 * lookup(buffer3 *buf, int x, int y);
 inline void printToFile(std::string filename);
 
 inline void initBuffer(buffer *buf, int w, int h)
 {
-   buf->data = new vec_t[w * h];
+   buf->data = new float[w * h];
    buf->w = w;
    buf->h = h;
 }
@@ -52,17 +53,17 @@ inline void drawStripes(buffer3 *buf, int w, int h)
       for (int y = 0; y < h; y++)
       {
          vec3 *pix = lookup(buf, x, y);
-         vec_t val = 1.f;
+         float val = 1.f;
          if (y % 10 < 5)
             val = 0.f;
-         pix->v[0] = val;
-         pix->v[1] = 0.f;
-         pix->v[2] = 0.f;
+         pix->x = val;
+         pix->y = 0.f;
+         pix->z = 0.f;
       }
    }
 }
 
-inline vec_t * lookup(buffer *buf, int x, int y)
+inline float * lookup(buffer *buf, int x, int y)
 {
    int newX = x;
    int newY = y;
@@ -94,15 +95,15 @@ inline vec3 * lookup(buffer3 *buf, int x, int y)
 
 inline void printToFile(buffer3 *buf, std::string filename)
 {
-   Image *image = new PngImage(buf->w, buf->h, filename.c_str());
+   Image *image = new Image(buf->w, buf->h, filename.c_str());
    for (int x = 0; x < buf->w; x++)
    {
       for (int y = 0; y < buf->h; y++)
       {
-         image->writePixel(x, y, lookup(buf, x, y));
+         image->setPixel(x, y, lookup(buf, x, y));
       }
    }
-   image->close();
+   image->write();
    delete image;
 }
 

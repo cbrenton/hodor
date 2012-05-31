@@ -7,18 +7,16 @@
 #ifndef _COLOR_H
 #define _COLOR_H
 
-#include "vector.h"
-
 struct color
 {
    // The red component of the color.
-   vec_t r;
+   float r;
 
    // The green component of the color.
-   vec_t g;
+   float g;
 
    // The blue component of the color.
-   vec_t b;
+   float b;
 
 };
 #endif

@@ -16,21 +16,21 @@ KILL   = killall -9
 SHELL  = /bin/sh
 MAKE   = make
 
-IFLAGS = -I./src
-LFLAGS = -lpng -lz -lsfml-window -lsfml-graphics -lGL -lGLU
+IFLAGS = -I./src -I./lib/objTester -I./lib
+LFLAGS = -lpng -lz -lsfml-window -lsfml-graphics -lGL -lGLU -L./lib/objTester
 DEBUG = -ggdb
-OPTIMIZE = -O3
-ERROR = -Wconversion -Werror
+OPTIMIZE = 
+ERROR = -Werror
 CFLAGS = $(OPTIMIZE) -Wall -c $(DEBUG) $(ERROR) $(IFLAGS)
 LDFLAGS = $(OPTIMIZE) $(DEBUG) $(ERROR) $(LFLAGS)
 
-TARGET = terlR
-INPUTEXT=pov
+TARGET = hodor
+INPUTEXT=obj
 INPUTDIR=input
 #INPUTFILE=bunny_small
-INPUTFILE=cornell_box
+INPUTFILE=cube
 OUTPUTDIR=images
-OUTPUTEXT=png
+OUTPUTEXT=tga
 WIDTH=640
 HEIGHT=640
 ARGS = -a 4 -g -w $(WIDTH) -h $(HEIGHT) -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
@@ -44,7 +44,7 @@ LIBS = $(LIBFLAGS)
 # The source files
 #SRCS = $(wildcard src/*.cpp src/*/*.cpp)
 #SRCS = $(wildcard src/*.cpp src/*/*.cpp src/*.h src/*/*.h)
-SRCS = $(wildcard src/*.cpp src/structs/*.cpp src/geom/*.cpp src/img/*.cpp src/parse/*.cpp)
+SRCS = $(wildcard src/*.cpp src/structs/*.cpp src/geom/*.cpp src/img/*.cpp src/parse/*.cpp lib/objTester/*.cpp)
 
 OBJS = $(SRCS:.cpp=.o)
 

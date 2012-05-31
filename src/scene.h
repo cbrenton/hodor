@@ -13,12 +13,17 @@
 #include "hit_data.h"
 #include "pixel.h"
 #include "ray.h"
-#include "triangle.h"
 #include "vertex.h"
+#include "objLoader.h"
+
+#define mPR_VEC(a) printf("<%f, %f, %f>\n", (a).e[0], (a).e[1], (a).e[2])
 
 class Scene
 {
    public:
+      // Constructs a Scene from an objLoader object.
+      Scene(objLoader *objScene);
+
       // Constructs a bounding volume heirarchy for the scene.
       void constructBVH();
 
@@ -43,5 +48,9 @@ class Scene
 
       bool useGPU;
 
+   protected:
+      std::vector<obj_vector *> vertexList;
+      std::vector<obj_vector *> textureList;
+      std::vector<obj_vector *> normalList;
 };
 #endif

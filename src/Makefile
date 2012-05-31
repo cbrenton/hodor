@@ -7,6 +7,9 @@ clean:
 run:
 	make run -C ../
 
+pov:
+	make pov -C ../
+
 eog:
 	make eog -C ../
 

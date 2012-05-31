@@ -7,21 +7,21 @@
 #define _RAY_H
 
 #include "globals.h"
-#include "vector.h"
+#include "glm/glm.hpp"
 #include "triangle.h"
 #include "hit_data.h"
 
 struct ray
 {
-   vec3 pt;
-   vec3 dir;
+   glm::vec3 pt;
+   glm::vec3 dir;
 };
 
-extern bool hit(ray *ray_in, triangle *tri, vec_t *t = NULL, hit_data *data = NULL);
+extern bool hit(ray *ray_in, triangle *tri, float *t = NULL, hit_data *data = NULL);
 extern void normalize(ray *r);
 extern void normalize(ray &r);
-extern vec_t length(ray *r);
-extern vec_t length(ray &r);
+extern float length(ray *r);
+extern float length(ray &r);
 extern void debug(ray *r);
 extern void debug(ray &r);
 

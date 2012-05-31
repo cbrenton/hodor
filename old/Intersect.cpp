@@ -220,16 +220,28 @@ int triangle_hit(const triangle_t & t_t, const Ray & ray, float *t, HitData *dat
 
    Matrix3f A;
    A <<
-      t_t.c1.x()-t_t.c2.x(), t_t.c1.x()-t_t.c3.x(), ray.dir.x(),
-      t_t.c1.y()-t_t.c2.y(), t_t.c1.y()-t_t.c3.y(), ray.dir.y(),
-      t_t.c1.z()-t_t.c2.z(), t_t.c1.z()-t_t.c3.z(), ray.dir.z();
+      t_t.c1.x()-t_t.c2.x(),
+      t_t.c1.x()-t_t.c3.x(),
+      ray.dir.x(),
+      t_t.c1.y()-t_t.c2.y(),
+      t_t.c1.y()-t_t.c3.y(),
+      ray.dir.y(),
+      t_t.c1.z()-t_t.c2.z(),
+      t_t.c1.z()-t_t.c3.z(),
+      ray.dir.z();
    float detA = A.determinant();
 
    Matrix3f baryT;
    baryT <<
-      t_t.c1.x()-t_t.c2.x(), t_t.c1.x()-t_t.c3.x(), t_t.c1.x()-ray.point.x(),
-      t_t.c1.y()-t_t.c2.y(), t_t.c1.y()-t_t.c3.y(), t_t.c1.y()-ray.point.y(),
-      t_t.c1.z()-t_t.c2.z(), t_t.c1.z()-t_t.c3.z(), t_t.c1.z()-ray.point.z();
+      t_t.c1.x()-t_t.c2.x(),
+      t_t.c1.x()-t_t.c3.x(),
+      t_t.c1.x()-ray.point.x(),
+      t_t.c1.y()-t_t.c2.y(),
+      t_t.c1.y()-t_t.c3.y(),
+      t_t.c1.y()-ray.point.y(),
+      t_t.c1.z()-t_t.c2.z(),
+      t_t.c1.z()-t_t.c3.z(),
+      t_t.c1.z()-ray.point.z();
 
    bT = baryT.determinant() / detA;
 
@@ -241,9 +253,15 @@ int triangle_hit(const triangle_t & t_t, const Ray & ray, float *t, HitData *dat
    {
       Matrix3f baryGamma;
       baryGamma <<
-         t_t.c1.x()-t_t.c2.x(), t_t.c1.x()-ray.point.x(), ray.dir.x(),
-         t_t.c1.y()-t_t.c2.y(), t_t.c1.y()-ray.point.y(), ray.dir.y(),
-         t_t.c1.z()-t_t.c2.z(), t_t.c1.z()-ray.point.z(), ray.dir.z();
+         t_t.c1.x()-t_t.c2.x(),
+         t_t.c1.x()-ray.point.x(),
+         ray.dir.x(),
+         t_t.c1.y()-t_t.c2.y(),
+         t_t.c1.y()-ray.point.y(),
+         ray.dir.y(),
+         t_t.c1.z()-t_t.c2.z(),
+         t_t.c1.z()-ray.point.z(),
+         ray.dir.z();
 
       bGamma = baryGamma.determinant() / detA;
 
@@ -255,9 +273,15 @@ int triangle_hit(const triangle_t & t_t, const Ray & ray, float *t, HitData *dat
       {
          Matrix3f baryBeta;
          baryBeta <<
-            t_t.c1.x()-ray.point.x(), t_t.c1.x()-t_t.c3.x(), ray.dir.x(),
-            t_t.c1.y()-ray.point.y(), t_t.c1.y()-t_t.c3.y(), ray.dir.y(),
-            t_t.c1.z()-ray.point.z(), t_t.c1.z()-t_t.c3.z(), ray.dir.z();
+            t_t.c1.x()-ray.point.x(),
+            t_t.c1.x()-t_t.c3.x(),
+            ray.dir.x(),
+            t_t.c1.y()-ray.point.y(),
+            t_t.c1.y()-t_t.c3.y(),
+            ray.dir.y(),
+            t_t.c1.z()-ray.point.z(),
+            t_t.c1.z()-t_t.c3.z(),
+            ray.dir.z();
 
          bBeta = baryBeta.determinant() / detA;
 

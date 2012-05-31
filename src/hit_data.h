@@ -10,13 +10,13 @@ struct hit_data
 {
    // TODO: Remove most of these fields.
    int hit;
-   vec3 pt;
+   glm::vec3 pt;
    float t;
    int objIndex;
-   vec3 albedo;
-   vec3 kA, kD, kS;
-   vec_t rough;
-   vec_t illum;
+   glm::vec3 albedo;
+   glm::vec3 kA, kD, kS;
+   float rough;
+   float illum;
 };
 
 #endif

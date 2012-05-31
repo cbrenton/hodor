@@ -7,8 +7,8 @@
 #ifndef _PIXEL_H
 #define _PIXEL_H
 
-#include "vector.h"
 #include "structs/color.h"
+#include "glm/glm.hpp"
 
 class Pixel
 {
@@ -17,7 +17,7 @@ class Pixel
 
       Pixel(int r, int g, int b);
       
-      Pixel(vec_t r, vec_t g, vec_t b);
+      Pixel(float r, float g, float b);
 
       void clamp();
 
@@ -25,7 +25,7 @@ class Pixel
 
       void multiply(int factor);
       
-      void multiply(vec_t factor);
+      void multiply(float factor);
 
       // The color of the pixel.
       color c;

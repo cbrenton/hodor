@@ -8,16 +8,16 @@
 #define _CAMERA_H
 
 #include <iostream>
-#include "vector.h"
+#include "glm/glm.hpp"
 
 class Camera {
    public:
       Camera() {};
-      Camera(vec3 _loc, vec3 _up, vec3 _right, vec3 _look_at);
-      vec3 location;
-      vec3 up;
-      vec3 right;
-      vec3 look_at;
+      Camera(glm::vec3 _loc, glm::vec3 _up, glm::vec3 _right, glm::vec3 _look_at);
+      glm::vec3 location;
+      glm::vec3 up;
+      glm::vec3 right;
+      glm::vec3 look_at;
       inline void debug()
       {
          /*

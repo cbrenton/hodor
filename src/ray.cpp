@@ -97,8 +97,9 @@ bool hit(ray *ray_in, triangle *tri, vec_t *t, hit_data *data)
    {
       data->hit = 1;
       data->pt = ray_in->pt;
+      data->pt = ray_in->dir;
+      multiply(data->pt, *t);
       add(data->pt, ray_in->dir);
-      multiply(&data->pt, *t);
       data->t = (*t);
       return true;
    }
