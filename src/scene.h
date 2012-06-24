@@ -16,8 +16,6 @@
 #include "vertex.h"
 #include "objLoader.h"
 
-#define mPR_VEC(a) printf("<%f, %f, %f>\n", (a).e[0], (a).e[1], (a).e[2])
-
 class Scene
 {
    public:

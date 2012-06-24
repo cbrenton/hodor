@@ -8,6 +8,8 @@
 #include <string>
 #include "light.h"
 
+using namespace glm;
+
 Light::Light(vec3 loc, double red, double green, double blue) :
    location(loc), r(red), g(green), b(blue)
 {

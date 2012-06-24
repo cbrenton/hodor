@@ -11,10 +11,10 @@ using namespace std;
 
 Pixel::Pixel(int r, int g, int b)
 {
-   Pixel((vec_t)r, (vec_t)g, (vec_t)b);
+   Pixel((float)r, (float)g, (float)b);
 }
 
-Pixel::Pixel(vec_t r, vec_t g, vec_t b)
+Pixel::Pixel(float r, float g, float b)
 {
    c.r = r;
    c.g = g;
@@ -37,10 +37,10 @@ void Pixel::add(Pixel other)
 
 void Pixel::multiply(int factor)
 {
-   multiply((vec_t)factor);
+   multiply((float)factor);
 }
 
-void Pixel::multiply(vec_t factor)
+void Pixel::multiply(float factor)
 {
    c.r *= factor;
    c.g *= factor;

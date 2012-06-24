@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include "camera.h"
 
+using namespace glm;
+
 Camera::Camera(vec3 _loc, vec3 _up, vec3 _right, vec3 _look_at) :
    location(_loc), up(_up), right(_right), look_at(_look_at)
 {

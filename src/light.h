@@ -9,12 +9,12 @@
 
 #include <iostream>
 #include <stdio.h>
-#include "vector.h"
+#include <glm/glm.hpp>
 
 class Light {
    public:
-      Light(vec3 loc, double red, double green, double blue);
-      vec3 location;
+      Light(glm::vec3 loc, double red, double green, double blue);
+      glm::vec3 location;
       double r;
       double g;
       double b;

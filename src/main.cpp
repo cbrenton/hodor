@@ -17,6 +17,7 @@
 #include "glm/glm.hpp"
 #include "vertex.h"
 #include "img/image.h"
+#include "ProgressBar/progress.h"
 
 #define AA_RAYS 4
 #define DEFAULT_H 256
@@ -160,33 +161,7 @@ int main(int argc, char **argv)
          vec3 curPoint = scene->camera.location;
 
 
-         /*
-         float uScale = (float)(l + (r - l) * ((float)x + jitter)
-               / (float)image->width);
-         float vScale = (float)(b + (t - b) * ((float)y + jitter)
-               / (float)image->height);
-         float wScale = -1;
-         glm::vec3 sVector = scene->camera.location;
-         glm::vec3 uVector = normalize(scene->camera.right);
-         glm::vec3 vVector = normalize(scene->camera.up);
-         glm::vec3 wVector = normalize(scene->camera.look_at - scene->camera.location);
-         // Left-handed.
-         wVector *= -1.0f;
-         uVector *= uScale;
-         vVector *= vScale;
-         wVector *= wScale;
-         sVector += uVector;
-         sVector += vVector;
-         sVector += wVector;
-         glm::vec3 rayDir = uVector;
-         rayDir += vVector;
-         rayDir += wVector;
-         rayDir = normalize(rayDir);
-         glm::vec3 curPoint = scene->camera.location;
-         */
-         //ray *curRay = new ray(curPoint, rayDir);
          ray curRay = {curPoint, rayDir};
-         //aRayArray[i][j][k] = *curRay;
          aRayArray[x][y] = curRay;
       }
    }
@@ -203,8 +178,7 @@ int main(int argc, char **argv)
       cout << "Not using bounding volume heirarchy." << endl;
 
    // Initialize variables for timekeeping.
-   struct timeval startTime;
-   gettimeofday(&startTime, NULL);
+   initProgress();
 
    // Test for intersection.
    cout << "Testing intersections." << endl;
@@ -222,11 +196,13 @@ int main(int argc, char **argv)
          glm::vec3 color = glm::vec3(curPix.c.r, curPix.c.g, curPix.c.b);
          image->setPixel(x, y, &color);
          // Print out progress bar.
-         //if (showProgress)
-         // TODO: Display progress bar.
+         if (showProgress)
+         {
+            printProgress(x * height + y, width * height, x * y / 1000);
+         }
       }
-      //if (showPreview)
-         //win->update(image->getPixelBuffer());
+      if (showPreview)
+         win->update(image->getPixelBuffer());
    }
    if (showProgress)
       cout << endl;

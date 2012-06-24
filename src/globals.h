@@ -21,6 +21,9 @@
 #define COLOR_T uint16_t
 #define COLOR_RANGE 65536.0
 
+#define mPR_VEC(a) printf("<%f, %f, %f>", (a).x, (a).y, (a).z)
+#define mPRLN_VEC(a) printf("<%f, %f, %f>\n", (a).x, (a).y, (a).z)
+
 inline int randInt()
 {
    return rand();

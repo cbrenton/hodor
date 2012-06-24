@@ -21,5 +21,5 @@ void debug(material *mat)
 {
    printf("material:\n\t%s\n", mat->name.c_str());
    printf("\t[0][0]: ");
-   debug(lookup(mat->albedo, 0, 0));
+   mPRLN_VEC(*lookup(mat->albedo, 0, 0));
 }

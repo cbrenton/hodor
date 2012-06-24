@@ -9,6 +9,7 @@
 #include <string>
 #include "buffer.h"
 #include "glm/glm.hpp"
+#include "globals.h"
 
 struct material
 {
@@ -20,6 +21,6 @@ struct material
 };
 
 extern material * matFromFile(std::string filename);
-//extern void debug(material *mat);
+extern void debug(material *mat);
 
 #endif
