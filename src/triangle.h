@@ -17,6 +17,17 @@ struct triangle
    int matNdx;
 };
 
+inline void debug(triangle *t)
+{
+   printf("triangle:\n");
+   printf("\t");
+   mPRLN_VEC(t->pts[0]->coord);
+   printf("\t");
+   mPRLN_VEC(t->pts[1]->coord);
+   printf("\t");
+   mPRLN_VEC(t->pts[2]->coord);
+}
+
 inline void initTri(triangle *t)
 {
    t->pts[0] = new vertex;

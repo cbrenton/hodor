@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <stdio.h>
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 
 class Light {
    public:

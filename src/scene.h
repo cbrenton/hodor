@@ -11,7 +11,6 @@
 #include "camera.h"
 #include "globals.h"
 #include "hit_data.h"
-#include "pixel.h"
 #include "ray.h"
 #include "vertex.h"
 #include "objLoader.h"
@@ -32,10 +31,10 @@ class Scene
       bool gpuHit(ray *ray, hit_data *data);
 
       // Casts a ray into the scene and returns a correctly colored pixel.
-      Pixel castRay(ray *ray, int depth);
+      glm::vec3 castRay(ray *ray, int depth);
 
       // Calculates proper shading at the current point.
-      Pixel shade(hit_data *data, vec3 view);
+      glm::vec3 shade(hit_data *data, vec3 view);
 
       //vec3 reflect(vec3 incident, vec3 normal);
 

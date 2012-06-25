@@ -33,7 +33,7 @@ OUTPUTDIR=images
 OUTPUTEXT=tga
 WIDTH=640
 HEIGHT=640
-ARGS = -a 4 -g -w $(WIDTH) -h $(HEIGHT) -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
+ARGS = -g -w $(WIDTH) -h $(HEIGHT) -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
 
 # Additional linker libraries
 LIBS = $(LIBFLAGS)

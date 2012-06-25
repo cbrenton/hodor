@@ -46,3 +46,8 @@ void Pixel::multiply(float factor)
    c.g *= factor;
    c.b *= factor;
 }
+
+void Pixel::debug()
+{
+   printf("Pixel: <%f, %f, %f>\n", c.r, c.g, c.b);
+}

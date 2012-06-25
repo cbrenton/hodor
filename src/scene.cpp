@@ -6,7 +6,7 @@
 
 #include "scene.h"
 
-using namespace std;
+using namespace glm;
 
 /**
  * Constructs a Scene from an objLoader object.
@@ -48,49 +48,15 @@ void Scene::constructBVH()
  */
 Scene* Scene::read(std::string filename)
 {
-   /*
-   Scene* curScene = new Scene();
-
-   //vec3 location = {{-1.711963f, 4.333467f, 10.445557f}};
-   //vec3 up = {{0.042266f, 0.963630f, -0.263875f}};
-   //vec3 right = {{1.316552f, 0.f, 0.210877f}};
-   //vec3 look_at = {{0.421718f, 0.592129f, -2.875471f}};
-   vec3 location = {{0.f, 0.f, -2.f}};
-   vec3 up = {{0.f, 1.f, 0.f}};
-   vec3 right = {{1.f, 0.f, 0.f}};
-   vec3 look_at = {{0.f, 0.f, 0.f}};
-   curScene->camera = Camera();
-   curScene->camera.location = location;
-   curScene->camera.up = up;
-   curScene->camera.right = right;
-   curScene->camera.look_at = look_at;
-
-   triangle *test = new triangle;
-   initTri(test);
-   // TODO: Always detects hit if coord is negative.
-   vec3 p1 = {{-1.1f, 1.f, 1.0f}};
-   vec3 p2 = {{0.1f, 2.1f, 1.0f}};
-   vec3 p3 = {{1.2f, 1.f, 1.0f}};
-   vertex *v1 = new vertex;
-   vertex *v2 = new vertex;
-   vertex *v3 = new vertex;
-   v1->coord = p1;
-   v2->coord = p2;
-   v3->coord = p3;
-   test->pts[0] = v1;
-   test->pts[1] = v2;
-   test->pts[2] = v3;
-   curScene->triangles.push_back(test);
-   */
-
-   // TODO: Parse an obj file.
+   // Parse an obj file.
    objLoader *objData = new objLoader();
    objData->load((char *)filename.c_str());
 
-   // TODO: Convert data to a usable format.
+   // Convert data to a usable format.
    Scene *curScene = new Scene(objData);
    
-   glm::vec3 location(0.f, 0.f, 2.f);
+   // TODO: Actually parse the camera/handle cases where no camera is specified.
+   glm::vec3 location(0.f, 0.f, -10.f);
    glm::vec3 up(0.f, 1.f, 0.f);
    glm::vec3 right(1.f, 0.f, 0.f);
    glm::vec3 look_at(0.f, 0.f, 0.f);
@@ -112,6 +78,7 @@ Scene* Scene::read(std::string filename)
  */
 bool Scene::gpuHit(ray *ray, hit_data *data)
 {
+   //debug(ray);
    // INITIALIZE closestT to MAX_DIST + 0.1
    float closestT = MAX_DIST + 0.1f;
    // INITIALIZE closestData to empty hit_data
@@ -136,7 +103,7 @@ bool Scene::gpuHit(ray *ray, hit_data *data)
          // IF intersection is closer than closestT
          if (triT < closestT)
          {
-         //printf(" closer than before!");
+            //printf(" closer than before!");
             // SET closestT to intersection
             closestT = triT;
             // SET closestData to intersection data
@@ -160,15 +127,16 @@ bool Scene::gpuHit(ray *ray, hit_data *data)
    // ENDIF
    delete closestData;
    // RETURN true if closestT is less than or equal to MAX_DIST
+   //printf("%f ?= %f\n", closestT, MAX_DIST);
    return (closestT <= MAX_DIST);
 }
 
 // Casts a ray into the scene and returns a correctly colored pixel.
-Pixel Scene::castRay(ray *ray, int depth)
+vec3 Scene::castRay(ray *ray, int depth)
 {
-   Pixel result(0.f, 0.f, 0.f);
-   Pixel reflectPix(0.f, 0.f, 0.f);
-   Pixel refractPix(0.f, 0.f, 0.f);
+   vec3 result(0.f, 0.f, 0.f);
+   vec3 reflectPix(0.f, 0.f, 0.f);
+   vec3 refractPix(0.f, 0.f, 0.f);
    hit_data rayData;
    //if (hit(ray, &rayData))
    if (gpuHit(ray, &rayData))
@@ -208,9 +176,9 @@ Pixel Scene::castRay(ray *ray, int depth)
 }
 
 // Calculates proper shading at the current point.
-Pixel Scene::shade(hit_data *data, vec3 view)
+vec3 Scene::shade(hit_data *data, vec3 view)
 {
-   Pixel result(1.f, 0.f, 0.f);
+   vec3 result(1.f, 0.f, 0.f);
    //printf("hit\n");
    // TODO: Make this work with EVERYTHING.
    /*

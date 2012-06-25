@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include "glm/glm.hpp"
+#include "globals.h"
 
 class Camera {
    public:
@@ -20,16 +21,11 @@ class Camera {
       glm::vec3 look_at;
       inline void debug()
       {
-         /*
-         std::cout << "Camera: <" << location.x() << ", " << location.y() <<
-            ", " << location.z() << ">" << std::endl;
-         std::cout << "\t<" << up.x() << ", " << up.y() <<
-            ", " << up.z() << ">" << std::endl;
-         std::cout << "\t<" << right.x() << ", " << right.y() <<
-            ", " << right.z() << ">" << std::endl;
-         std::cout << "\t<" << look_at.x() << ", " << look_at.y() <<
-            ", " << look_at.z() << ">" << std::endl;
-            */
+         std::cout << "Camera: ";
+         mPRLN_VEC(location);
+         mPRLN_VEC(up);
+         mPRLN_VEC(right);
+         mPRLN_VEC(look_at);
       }
 };
 

@@ -27,6 +27,8 @@ class Pixel
       
       void multiply(float factor);
 
+      void debug();
+
       // The color of the pixel.
       color c;
 
