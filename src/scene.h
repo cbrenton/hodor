@@ -49,5 +49,6 @@ class Scene
       std::vector<obj_vector *> vertexList;
       std::vector<obj_vector *> textureList;
       std::vector<obj_vector *> normalList;
+      std::vector<material *> matList;
 };
 #endif

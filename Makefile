@@ -16,8 +16,8 @@ KILL   = killall -9
 SHELL  = /bin/sh
 MAKE   = make
 
-IFLAGS = -I./src -I./lib/objTester -I./lib
-LFLAGS = -lpng -lz -lsfml-window -lsfml-graphics -lGL -lGLU -L./lib/objTester
+IFLAGS = -I./src -I./lib/objTester -I./lib -fopenmp -I/usr/include/ImageMagick
+LFLAGS = -lpng -lz -lsfml-window -lsfml-graphics -lGL -lGLU -L./lib/objTester -lMagick++ -lMagickCore
 DEBUG = -ggdb
 OPTIMIZE = 
 ERROR = -Werror
@@ -28,12 +28,12 @@ TARGET = hodor
 INPUTEXT=obj
 INPUTDIR=input
 #INPUTFILE=bunny_small
-INPUTFILE=cube
+INPUTFILE=test
 OUTPUTDIR=images
 OUTPUTEXT=tga
 WIDTH=640
 HEIGHT=640
-ARGS = -g -w $(WIDTH) -h $(HEIGHT) -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT)
+ARGS = -g -w $(WIDTH) -h $(HEIGHT) -i $(INPUTDIR)/$(INPUTFILE).$(INPUTEXT) -p
 
 # Additional linker libraries
 LIBS = $(LIBFLAGS)

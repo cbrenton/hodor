@@ -108,6 +108,9 @@ bool hit(ray *ray_in, triangle *tri, float *t, hit_data *data)
    if (result > EPSILON)
    {
       data->hit = 1;
+      data->beta = bBeta;
+      data->gamma = bGamma;
+      data->alpha = 1 - bBeta - bGamma;
       data->pt = ray_in->pt;
       data->pt = ray_in->dir;
       data->pt *= *t;

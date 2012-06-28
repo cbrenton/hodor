@@ -19,6 +19,10 @@ Scene::Scene(objLoader *objScene)
          objScene->normalList + objScene->normalCount);
    textureList.assign(objScene->textureList,
          objScene->textureList + objScene->textureCount);
+   for (int i = 0; i < objScene->materialCount; i++)
+   {
+      matList.push_back(new material(objScene->materialList[i]));
+   }
    for (int i = 0; i < objScene->faceCount; i++)
    {
       if (objScene->faceList[i]->vertex_count == 4)
@@ -31,6 +35,11 @@ Scene::Scene(objLoader *objScene)
       {
          triangles.push_back(faceToTri(objScene->faceList[i], objScene));
       }
+   }
+   for (int i = 0; i < (int)triangles.size(); i++)
+   {
+      // Assign materials.
+      triangles[i]->mat = matList[triangles[i]->matNdx];
    }
 }
 
@@ -78,7 +87,6 @@ Scene* Scene::read(std::string filename)
  */
 bool Scene::gpuHit(ray *ray, hit_data *data)
 {
-   //debug(ray);
    // INITIALIZE closestT to MAX_DIST + 0.1
    float closestT = MAX_DIST + 0.1f;
    // INITIALIZE closestData to empty hit_data
@@ -86,31 +94,22 @@ bool Scene::gpuHit(ray *ray, hit_data *data)
 
    // Find hit for triangles.
    // FOR each item in triangles
-   // TODO: Make this work.
    for (int triNdx = 0; triNdx < (int)triangles.size(); triNdx++)
    {
       float triT = -1;
       hit_data *triData = new hit_data;
       // IF current item is hit by ray
-      /*
-      debug(triangles[triNdx]->pts[0]);
-      debug(triangles[triNdx]->pts[1]);
-      debug(triangles[triNdx]->pts[2]);
-      */
       if (hit(ray, triangles[triNdx], &triT, triData))
       {
-         //printf("hit!");
          // IF intersection is closer than closestT
          if (triT < closestT)
          {
-            //printf(" closer than before!");
             // SET closestT to intersection
             closestT = triT;
             // SET closestData to intersection data
             *closestData = *triData;
             closestData->objIndex = triNdx;
          }
-         //printf("\n");
          // ENDIF
       }
       // ENDIF
@@ -127,7 +126,6 @@ bool Scene::gpuHit(ray *ray, hit_data *data)
    // ENDIF
    delete closestData;
    // RETURN true if closestT is less than or equal to MAX_DIST
-   //printf("%f ?= %f\n", closestT, MAX_DIST);
    return (closestT <= MAX_DIST);
 }
 
@@ -178,8 +176,17 @@ vec3 Scene::castRay(ray *ray, int depth)
 // Calculates proper shading at the current point.
 vec3 Scene::shade(hit_data *data, vec3 view)
 {
-   vec3 result(1.f, 0.f, 0.f);
-   //printf("hit\n");
+   //vec3 result(1.f, 0.f, 0.f);
+   triangle *t = triangles[data->objIndex];
+   //vec3 result = t->mat->getSpec();
+   /*
+   glm::vec3 texCoords = t->pts[0]->texCoord * data->alpha +
+      t->pts[1]->texCoord * data->beta +
+      t->pts[2]->texCoord * data->gamma;
+   */
+   //vec3 result = t->mat->getAmb(texCoords.x, texCoords.y);
+   vec3 result = t->mat->getAmb(0, 0);
+   //debug(t->mat);
    // TODO: Make this work with EVERYTHING.
    /*
       Pigment hitP = {};

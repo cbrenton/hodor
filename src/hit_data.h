@@ -11,6 +11,7 @@ struct hit_data
    // TODO: Remove most of these fields.
    int hit;
    glm::vec3 pt;
+   float alpha, beta, gamma;
    float t;
    int objIndex;
    glm::vec3 albedo;
