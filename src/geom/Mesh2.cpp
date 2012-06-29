@@ -14,7 +14,7 @@ int Mesh2::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT)
    return 0;
 }
 
-Vector3f Mesh2::getNormal(const Vector3f & point)
+vec3 Mesh2::getNormal(const vec3 & point)
 {
-   return Vector3f();
+   return vec3();
 }

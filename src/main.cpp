@@ -297,10 +297,10 @@ int main(int argc, char **argv)
       aRayArray[i] = new Ray[height];
    }
 
-   float l = -scene->camera.right.norm() / 2;
-   float r = scene->camera.right.norm() / 2;
-   float b = -scene->camera.up.norm() / 2;
-   float t = scene->camera.up.norm() / 2;
+   float l = -length(scene->camera.right) / 2.f;
+   float r = length(scene->camera.right) / 2.f;
+   float b = -length(scene->camera.up) / 2.f;
+   float t = length(scene->camera.up) / 2.f;
 
    // Generate rays.
    cout << "Generating rays...";
@@ -319,13 +319,13 @@ int main(int argc, char **argv)
          float vScale = (float)(b + (t - b) * ((float)y + jitter)
                / (float)image->height);
          float wScale = -1;
-         Vector3f sVector = scene->camera.location;
-         Vector3f uVector = scene->camera.right;
-         Vector3f vVector = scene->camera.up;
-         Vector3f wVector = scene->camera.look_at - scene->camera.location;
-         uVector.normalize();
-         vVector.normalize();
-         wVector.normalize();
+         vec3 sVector = scene->camera.location;
+         vec3 uVector = scene->camera.right;
+         vec3 vVector = scene->camera.up;
+         vec3 wVector = scene->camera.look_at - scene->camera.location;
+         uVector = normalize(uVector);
+         vVector = normalize(vVector);
+         wVector = normalize(wVector);
          // Left-handed.
          wVector *= -1;
          uVector *= uScale;
@@ -334,9 +334,9 @@ int main(int argc, char **argv)
          sVector += uVector;
          sVector += vVector;
          sVector += wVector;
-         Vector3f rayDir = uVector + vVector + wVector;
-         rayDir.normalize();
-         Vector3f curPoint = Vector3f(scene->camera.location);
+         vec3 rayDir = uVector + vVector + wVector;
+         rayDir = normalize(rayDir);
+         vec3 curPoint = vec3(scene->camera.location);
          //Ray *curRay = new Ray(curPoint, rayDir);
          Ray curRay(curPoint, rayDir);
          //aRayArray[i][j][k] = *curRay;
@@ -381,7 +381,7 @@ int main(int argc, char **argv)
          if (showProgress)
          {
             // Set the frequency of ticks to update every .01%, if possible.
-            int tick = max(image->width*image->height/numAA / 10000, 100);
+            int tick = std::max(image->width*image->height/numAA / 10000, 100);
             printProgress(startTime, x * image->height + y,
                   image->width * image->height, tick);
          }
@@ -406,7 +406,7 @@ int main(int argc, char **argv)
 
    delete scene;
 
-   sleep(1);
+   //sleep(1);
 
    return EXIT_SUCCESS;
 }

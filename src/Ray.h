@@ -8,7 +8,7 @@
 #define _RAY_H
 
 #include <iostream>
-#include <Eigen/Dense>
+#include <glm/glm.hpp>
 
 using namespace std;
 
@@ -17,21 +17,19 @@ class Ray
    public:
       Ray() {};
 
-      Ray(Eigen::Vector3f _point, Eigen::Vector3f _dir);
+      Ray(glm::vec3 _point, glm::vec3 _dir);
 
       // The origin of the ray.
-      Eigen::Vector3f point;
+      glm::vec3 point;
 
       // The direction of the ray.
-      Eigen::Vector3f dir;
+      glm::vec3 dir;
 
       inline void debug()
       {
-         cout << "Ray: <" << point.x() << ", " << point.y() << ", " << point.z() << ">" << endl;
-         cout << "\t<" << dir.x() << ", " << dir.y() << ", " << dir.z() << ">" << endl;
+         cout << "Ray: <" << point.x << ", " << point.y << ", " << point.z << ">" << endl;
+         cout << "\t<" << dir.x << ", " << dir.y << ", " << dir.z << ">" << endl;
       }
-
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 };
 #endif

@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "Camera.h"
 
-Camera::Camera(Vector3f _loc, Vector3f _up, Vector3f _right, Vector3f _look_at) :
+Camera::Camera(vec3 _loc, vec3 _up, vec3 _right, vec3 _look_at) :
    location(_loc), up(_up), right(_right), look_at(_look_at)
 {
 }

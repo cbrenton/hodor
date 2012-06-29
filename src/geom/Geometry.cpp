@@ -19,11 +19,13 @@ int Geometry::hit(const Ray & ray, float *t, HitData *data, float minT, float ma
    return 0;
 }
 
-Vector3f Geometry::getNormal(const Vector3f & point)
+vec3 Geometry::getNormal(const vec3 & point)
 {
-   return Vector3f();
+   return vec3();
 }
 
+/*
 void Geometry::addTransformation(Transform<float, 3, Affine> t)
 {
 }
+*/

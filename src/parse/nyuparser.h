@@ -3,7 +3,7 @@
 
 #include "parse/tokens.h"
 #include "Scene.h"
-#include "geom/Transformation.h"
+//#include "geom/Transformation.h"
 
 class NYUParser{
    private:
@@ -16,7 +16,7 @@ class NYUParser{
       void ParseLeftCurly();
       void ParseRightCurly();
       void ParseComma();
-      void ParseVector(Vector3f & v);
+      void ParseVector(glm::vec3 & v);
       void ParseRGBFColor(color & c, float & f);
       void ParseRGBColor(color & c, float & f);
       void ParseColor(color & c, float & f);

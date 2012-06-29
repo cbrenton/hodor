@@ -8,7 +8,7 @@
 #include "Ray.h"
 #include "structs/HitData.h"
 
-Plane::Plane(Vector3f normal, float offset)
+Plane::Plane(vec3 normal, float offset)
 {
    p_t.normal = normal;
    p_t.offset = offset;
@@ -22,14 +22,14 @@ Box Plane::bBox()
 
 int Plane::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT)
 {
-   float denominator = ray.dir.dot(p_t.normal);
+   float denominator = dot(ray.dir, p_t.normal);
    if (denominator == 0.0)
    {
       return 0;
    }
-   Vector3f p = p_t.normal * p_t.offset;
-   Vector3f pMinusL = p - ray.point;
-   float numerator = pMinusL.dot(p_t.normal);
+   vec3 p = p_t.normal * p_t.offset;
+   vec3 pMinusL = p - ray.point;
+   float numerator = dot(pMinusL, p_t.normal);
    *t = numerator / denominator;
    if (*t >= minT && *t <= maxT)
    {
@@ -42,7 +42,7 @@ int Plane::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT)
    return 0;
 }
 
-Vector3f Plane::getNormal(const Vector3f & point)
+vec3 Plane::getNormal(const vec3 & point)
 {
    return p_t.normal;
 }

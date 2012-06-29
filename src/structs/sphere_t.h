@@ -7,11 +7,9 @@
 #ifndef _SPHERE_T_H
 #define _SPHERE_T_H
 
-#include <Eigen/Dense>
+#include <glm/glm.hpp>
 #include "structs/Pigment.h"
 #include "structs/Finish.h"
-
-using Eigen::Vector3f;
 
 struct sphere_t
 {
@@ -19,7 +17,7 @@ struct sphere_t
    float radius;
 
    // The location in world space of the sphere.
-   Vector3f location;
+   glm::vec3 location;
 
    Pigment p;
 

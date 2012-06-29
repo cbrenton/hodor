@@ -10,11 +10,11 @@
 #include "structs/Pigment.h"
 #include "structs/Finish.h"
 #include <iostream>
-#include <Eigen/Dense>
+#include <glm/glm.hpp>
 
 #define MAX_DIST 10000.0f
 
-using namespace Eigen;
+using namespace glm;
 using namespace std;
 
 class Ray;
@@ -37,15 +37,13 @@ class Geometry
       virtual int hit(const Ray & ray, float *t, HitData *data = NULL, float minT = 0.0, float maxT = MAX_DIST); 
 
       // Returns the normal of the current geometry object at the specified point.
-      virtual Vector3f getNormal(const Vector3f & point);
+      virtual glm::vec3 getNormal(const glm::vec3 & point);
 
       virtual void debug() {};
 
-      void addTransformation(Transform<float, 3, Affine> t);
+      //void addTransformation(Transform<float, 3, Affine> t);
 
-      Transform<float, 3, Affine> transform;
-
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      //Transform<float, 3, Affine> transform;
 
 };
 #endif

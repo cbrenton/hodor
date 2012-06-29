@@ -11,7 +11,7 @@ SFMLWindow::SFMLWindow(int w, int h): width(w), height(h)
    // Set up window.
    app = new RenderWindow(VideoMode(width, height, colorDepth), windowTitle);
 
-   app->Show(true);
+   app->setVisible(true);
 
    // Setup OpenGL.
    setupGL(width, height);
@@ -20,7 +20,7 @@ SFMLWindow::SFMLWindow(int w, int h): width(w), height(h)
 SFMLWindow::~SFMLWindow()
 {
    // Clean up.
-   app->Close();
+   app->close();
    delete app;
 }
 
@@ -47,17 +47,17 @@ void SFMLWindow::setupGL(int width, int height)
 
 void SFMLWindow::resize(Event e)
 {
-   cout << "Window resized to " << app->GetWidth() << " x " <<
-      app->GetHeight() << endl;
-   glViewport(0, 0, e.Size.Width, e.Size.Height);
+   cout << "Window resized to " << app->getSize().x << " x " <<
+      app->getSize().y << endl;
+   glViewport(0, 0, e.size.width, e.size.height);
    glLoadIdentity();
-   gluOrtho2D(-(float)e.Size.Width/(float)e.Size.Height, (float)e.Size.Width/(float)e.Size.Height, -1., 1.);
+   gluOrtho2D(-(float)e.size.width/(float)e.size.height, (float)e.size.width/(float)e.size.height, -1., 1.);
 }
 
 void SFMLWindow::update(unsigned char *image)
 {
    // Clear the window.
-   app->Clear();
+   app->clear();
 
    glClear(GL_COLOR_BUFFER_BIT);
    // If an image is given, update the displayed image.
@@ -69,10 +69,10 @@ void SFMLWindow::update(unsigned char *image)
    glFlush();
       
    // Update the main window. This is SFML.
-   app->Display();
+   app->display();
 }
 
 bool SFMLWindow::isOpen()
 {
-   return app->IsOpened();
+   return app->isOpen();
 }

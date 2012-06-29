@@ -27,16 +27,14 @@ class Triangle : public Geometry
       int hit(const Ray & ray, float *t, HitData *data = NULL, float minT = 0.0, float maxT = MAX_DIST);
 
       // Returns the normal of the current geometry object at the specified point.
-      Vector3f getNormal(const Vector3f & point);
+      glm::vec3 getNormal(const glm::vec3 & point);
 
       inline void debug()
       {
-         cout << "Triangle: <" << t_t.c1.x() << ", " << t_t.c1.y() << ", " << t_t.c1.z() << ">" << endl;
-         cout << "\t<" << t_t.c2.x() << ", " << t_t.c2.y() << ", " << t_t.c2.z() << ">" << endl;
-         cout << "\t<" << t_t.c3.x() << ", " << t_t.c3.y() << ", " << t_t.c3.z() << ">" << endl;
+         cout << "Triangle: <" << t_t.c1.x << ", " << t_t.c1.y << ", " << t_t.c1.z << ">" << endl;
+         cout << "\t<" << t_t.c2.x << ", " << t_t.c2.y << ", " << t_t.c2.z << ">" << endl;
+         cout << "\t<" << t_t.c3.x << ", " << t_t.c3.y << ", " << t_t.c3.z << ">" << endl;
       }
-
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 };
 #endif

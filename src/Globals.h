@@ -9,7 +9,7 @@
 
 #include <cstdlib>
 #include <stdint.h>
-#include <Eigen/Dense>
+#include <glm/glm.hpp>
 #include "structs/box_t.h"
 #include "structs/plane_t.h"
 #include "structs/sphere_t.h"
@@ -53,8 +53,8 @@ inline bool closeEnough(float a, float b)
    return abs(a - b) <= EPSILON;
 }
 
-#define mReflect(d, n) ((n) * (2 * (-(d).dot(n))) + d)
+#define mReflect(d, n) ((n) * (2 * (-dot((d), (n)))) + d)
 
-#define mPrintVec(v) cout << "<" << v.x() << ", " << v.y() << ", " << v.z() << ">" << endl;
+#define mPrintVec(v) cout << "<" << v.x << ", " << v.y << ", " << v.z << ">" << endl;
 
 #endif

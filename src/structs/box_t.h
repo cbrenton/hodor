@@ -7,20 +7,18 @@
 #ifndef _BOX_T_H
 #define _BOX_T_H
 
-#include <Eigen/Dense>
+#include <glm/glm.hpp>
 #include "structs/plane_t.h"
 #include "structs/Pigment.h"
 #include "structs/Finish.h"
 
-using Eigen::Vector3f;
-
 struct box_t
 {
    // The first corner of the box.
-   Vector3f c1;
+   glm::vec3 c1;
 
    // The second corner of the box.
-   Vector3f c2;
+   glm::vec3 c2;
 
    plane_t left;
 

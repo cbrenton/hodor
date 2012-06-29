@@ -19,7 +19,7 @@ class Plane : public Geometry
    public:
       Plane() {};
 
-      Plane(Vector3f normal, float offset);
+      Plane(glm::vec3 normal, float offset);
 
       // The plane_t struct representing the geometry object.
       plane_t p_t;
@@ -31,14 +31,12 @@ class Plane : public Geometry
       int hit(const Ray & ray, float *t, HitData *data = NULL, float minT = 0.0, float maxT = MAX_DIST);
 
       // Returns the normal of the current geometry object at the specified point.
-      Vector3f getNormal(const Vector3f & point);
+      glm::vec3 getNormal(const glm::vec3 & point);
 
       inline void debug()
       {
-         cout << "Plane: <" << p_t.normal.x() << ", " << p_t.normal.y() << ", " << p_t.normal.z() << ">, " << p_t.offset << endl;
+         cout << "Plane: <" << p_t.normal.x << ", " << p_t.normal.y << ", " << p_t.normal.z << ">, " << p_t.offset << endl;
       }
-
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 };
 #endif

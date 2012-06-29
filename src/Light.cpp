@@ -8,7 +8,7 @@
 #include <string>
 #include "Light.h"
 
-Light::Light(Vector3f loc, double red, double green, double blue) :
+Light::Light(vec3 loc, double red, double green, double blue) :
    location(loc), r(red), g(green), b(blue)
 {
 }

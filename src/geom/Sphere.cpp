@@ -17,9 +17,9 @@ Box Sphere::bBox()
 int Sphere::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT)
 {
    // Optimized algorithm courtesy of "Real-Time Rendering, Third Edition".
-   Vector3f l = s_t.location - ray.point;
-   float s = l.dot(ray.dir);
-   float l2 = l.dot(l);
+   vec3 l = s_t.location - ray.point;
+   float s = dot(l, ray.dir);
+   float l2 = dot(l, l);
    float r2 = s_t.radius * s_t.radius;
    if (s < 0 && l2 > r2)
    {
@@ -55,9 +55,9 @@ int Sphere::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT
    }
 }
 
-Vector3f Sphere::getNormal(const Vector3f & point)
+vec3 Sphere::getNormal(const vec3 & point)
 {
-   Vector3f n = point - s_t.location;
-   n.normalize();
+   vec3 n = point - s_t.location;
+   n = normalize(n);
    return n;
 }

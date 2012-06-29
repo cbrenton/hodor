@@ -9,29 +9,29 @@
 #include "structs/HitData.h"
 #include "Globals.h"
 
-Box::Box(Vector3f c1, Vector3f c2)
+Box::Box(vec3 c1, vec3 c2)
 {
-   Vector3f tmpC1(0.0, 0.0, 0.0);
-   Vector3f tmpC2(0.0, 0.0, 0.0);
+   vec3 tmpC1(0.0, 0.0, 0.0);
+   vec3 tmpC2(0.0, 0.0, 0.0);
    for (int dim = 0; dim < 3; dim++)
    {
-      tmpC1[dim] = min(c1[dim], c2[dim]);
-      tmpC2[dim] = max(c1[dim], c2[dim]);
+      tmpC1[dim] = std::min(c1[dim], c2[dim]);
+      tmpC2[dim] = std::max(c1[dim], c2[dim]);
    }
    b_t.c1 = tmpC1;
    b_t.c2 = tmpC2;
-   b_t.left.normal = Vector3f(-1, 0, 0);
-   b_t.left.offset = b_t.c1.x();
-   b_t.right.normal = Vector3f(1, 0, 0);
-   b_t.right.offset = b_t.c2.x();
-   b_t.bottom.normal = Vector3f(0, -1, 0);
-   b_t.bottom.offset = b_t.c1.y();
-   b_t.top.normal = Vector3f(0, 1, 0);
-   b_t.top.offset = b_t.c2.y();
-   b_t.back.normal = Vector3f(0, 0, -1);
-   b_t.back.offset = b_t.c1.z();
-   b_t.front.normal = Vector3f(0, 0, 1);
-   b_t.front.offset = b_t.c2.z();
+   b_t.left.normal = vec3(-1, 0, 0);
+   b_t.left.offset = b_t.c1.x;
+   b_t.right.normal = vec3(1, 0, 0);
+   b_t.right.offset = b_t.c2.x;
+   b_t.bottom.normal = vec3(0, -1, 0);
+   b_t.bottom.offset = b_t.c1.y;
+   b_t.top.normal = vec3(0, 1, 0);
+   b_t.top.offset = b_t.c2.y;
+   b_t.back.normal = vec3(0, 0, -1);
+   b_t.back.offset = b_t.c1.z;
+   b_t.front.normal = vec3(0, 0, 1);
+   b_t.front.offset = b_t.c2.z;
 }
 
 // Gets the bounding box of the current geometry object.
@@ -53,9 +53,9 @@ int Box::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT)
       // Component of the ray's origin in the current dimension.
       float xO = ray.point[i];
       // Component of the mininum plane location in the current dimension.
-      float xL = min(b_t.c1[i], b_t.c2[i]);
+      float xL = std::min(b_t.c1[i], b_t.c2[i]);
       // Component of the maxinum plane location in the current dimension.
-      float xH = max(b_t.c1[i], b_t.c2[i]);
+      float xH = std::max(b_t.c1[i], b_t.c2[i]);
       // If direction in current dimension is 0, ray is parallel to planes.
       if (xD == 0)
       {
@@ -103,33 +103,33 @@ int Box::hit(const Ray & ray, float *t, HitData *data, float minT, float maxT)
 
 }
 
-Vector3f Box::getNormal(const Vector3f & point)
+vec3 Box::getNormal(const vec3 & point)
 {
    cout << "box normal" << endl;
-   if (closeEnough(point.x(), b_t.left.offset))
+   if (closeEnough(point.x, b_t.left.offset))
    {
       return b_t.left.normal;
    }
-   if (closeEnough(point.x(), b_t.right.offset))
+   if (closeEnough(point.x, b_t.right.offset))
    {
       return b_t.right.normal;
    }
-   if (closeEnough(point.y(), b_t.bottom.offset))
+   if (closeEnough(point.y, b_t.bottom.offset))
    {
       return b_t.bottom.normal;
    }
-   if (closeEnough(point.y(), b_t.top.offset))
+   if (closeEnough(point.y, b_t.top.offset))
    {
       return b_t.top.normal;
    }
-   if (closeEnough(point.z(), b_t.back.offset))
+   if (closeEnough(point.z, b_t.back.offset))
    {
       return b_t.back.normal;
    }
-   if (closeEnough(point.z(), b_t.front.offset))
+   if (closeEnough(point.z, b_t.front.offset))
    {
       return b_t.front.normal;
    }
    cerr << "Error: point not on box." << endl;
-   return Vector3f(0, 0, 0);
+   return vec3(0, 0, 0);
 }

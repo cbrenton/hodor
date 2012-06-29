@@ -220,7 +220,7 @@ Pixel Scene::castRay(const Ray & ray, int depth)
          {
             Pigment hitP = {};
             Finish hitF = {};
-            Vector3f hitNormal(0.0, 0.0, 0.0);
+            vec3 hitNormal(0.0, 0.0, 0.0);
             box_t b_t;
             plane_t p_t;
             sphere_t s_t;
@@ -252,8 +252,8 @@ Pixel Scene::castRay(const Ray & ray, int depth)
                break;
             }
 
-            Vector3f reflectVec = *rayData.reflect;
-            reflectVec.normalize();
+            vec3 reflectVec = *rayData.reflect;
+            reflectVec = normalize(reflectVec);
             Ray reflectRay(rayData.point + reflectVec * EPSILON, reflectVec);
 
             reflectPix = castRay(reflectRay, depth - 1);
@@ -269,12 +269,12 @@ Pixel Scene::castRay(const Ray & ray, int depth)
 }
 
 // Calculates proper shading at the current point.
-Pixel Scene::shade(HitData *data, Vector3f view)
+Pixel Scene::shade(HitData *data, vec3 view)
 {
    Pixel result(0.0, 0.0, 0.0);
    Pigment hitP = {};
    Finish hitF = {0};
-   Vector3f hitNormal(0.0, 0.0, 0.0);
+   vec3 hitNormal(0.0, 0.0, 0.0);
    box_t b_t;
    plane_t p_t;
    sphere_t s_t;
@@ -331,8 +331,8 @@ Pixel Scene::shade(HitData *data, Vector3f view)
       // Cast light feeler ray.
       Ray feeler;
       feeler.dir = curLight->location - data->point;
-      float lightLen = feeler.dir.norm();
-      feeler.dir.normalize();
+      float lightLen = length(feeler.dir);
+      feeler.dir = normalize(feeler.dir);
       feeler.point = data->point + feeler.dir * EPSILON;
 
       HitData tmpHit;
@@ -346,12 +346,12 @@ Pixel Scene::shade(HitData *data, Vector3f view)
          if (useGPU)
          {
             // Diffuse.
-            Vector3f n = hitNormal;
-            n.normalize();
-            Vector3f l = curLight->location - data->point;
-            l.normalize();
-            float nDotL = n.dot(l);
-            nDotL = min(nDotL, 1.0f);
+            vec3 n = hitNormal;
+            n = normalize(n);
+            vec3 l = curLight->location - data->point;
+            l = normalize(l);
+            float nDotL = dot(n, l);
+            nDotL = std::min(nDotL, 1.0f);
 
             if (nDotL > 0)
             {
@@ -361,13 +361,13 @@ Pixel Scene::shade(HitData *data, Vector3f view)
             }
 
             // Specular (Phong).
-            Vector3f r = mReflect(l, n);
-            r.normalize();
-            Vector3f v = view;
-            v.normalize();
-            float rDotV = r.dot(v);
+            vec3 r = mReflect(l, n);
+            r = normalize(r);
+            vec3 v = view;
+            v = normalize(v);
+            float rDotV = dot(r, v);
             rDotV = (float)pow(rDotV, 1.0f / hitF.roughness);
-            rDotV = min(rDotV, 1.0f);
+            rDotV = std::min(rDotV, 1.0f);
 
             if (rDotV > 0)
             {
@@ -380,12 +380,12 @@ Pixel Scene::shade(HitData *data, Vector3f view)
          else
          {
             // Diffuse.
-            Vector3f n = data->object->getNormal(data->point);
-            n.normalize();
-            Vector3f l = curLight->location - data->point;
-            l.normalize();
-            float nDotL = n.dot(l);
-            nDotL = min(nDotL, 1.0f);
+            vec3 n = data->object->getNormal(data->point);
+            n = normalize(n);
+            vec3 l = curLight->location - data->point;
+            l = normalize(l);
+            float nDotL = dot(n, l);
+            nDotL = std::min(nDotL, 1.0f);
             if (nDotL < 0)
             {
                nDotL *= -1;
@@ -402,13 +402,13 @@ Pixel Scene::shade(HitData *data, Vector3f view)
             }
 
             // Specular (Phong).
-            Vector3f r = mReflect(l, n);
-            r.normalize();
-            Vector3f v = view;
-            v.normalize();
-            float rDotV = r.dot(v);
+            vec3 r = mReflect(l, n);
+            r = normalize(r);
+            vec3 v = view;
+            v = normalize(v);
+            float rDotV = dot(r, v);
             rDotV = (float)pow(rDotV, 1.0f / data->object->f.roughness);
-            rDotV = min(rDotV, 1.0f);
+            rDotV = std::min(rDotV, 1.0f);
 
             if (rDotV > 0)
             {
@@ -426,7 +426,7 @@ Pixel Scene::shade(HitData *data, Vector3f view)
 }
 
 /*
-   Vector3f Scene::reflect(Vector3f d, Vector3f n)
+   vec3 Scene::reflect(vec3 d, vec3 n)
    {
    return n * (2 * (-d.dot(n))) + d;
    }

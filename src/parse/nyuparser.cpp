@@ -46,14 +46,14 @@ void NYUParser::ParseComma()
    if(t.id != T_COMMA ) tokenizer->Error("Expected ,");
 }
 
-void NYUParser::ParseVector(Vector3f & v)
+void NYUParser::ParseVector(vec3 & v)
 {
    ParseLeftAngle();
-   v(0) = ParseDouble();
+   v.x = ParseDouble();
    ParseComma();
-   v(1) = ParseDouble();
+   v.y = ParseDouble();
    ParseComma();
-   v(2) = ParseDouble();
+   v.z = ParseDouble();
    ParseRightAngle();
 }
 
@@ -110,28 +110,27 @@ void NYUParser::ParseTransform(Geometry & s)
 {
    /* if there is nothing to parse, this is not our problem:
       this should be handled by the caller */
-   Vector3f v;
+   vec3 v;
    Token t;
-   Transformation trans = Transformation();
-   // while(1){
+   //Transformation trans = Transformation();
    for(;;){
       t = tokenizer->GetToken();
       switch( t.id )
       {
       case T_SCALE:
          ParseVector(v);
-         trans.setScale(v);
-         s.addTransformation(trans.m);
+         //trans.setScale(v);
+         //s.addTransformation(trans.m);
          break;
       case T_ROTATE:
          ParseVector(v);
-         trans.setRotation(v(0),v(1),v(2));
-         s.addTransformation(trans.m);
+         //trans.setRotation(v(0),v(1),v(2));
+         //s.addTransformation(trans.m);
          break;
       case T_TRANSLATE:
          ParseVector(v);
-         trans.setTranslation(v(0),v(1),v(2));
-         s.addTransformation(trans.m);
+         //trans.setTranslation(v(0),v(1),v(2));
+         //s.addTransformation(trans.m);
          break;
          /* once we run into an unknown token, we assume there are no
             more  transforms to parse and we return to caller */
@@ -327,7 +326,7 @@ Camera NYUParser::ParseCamera()
       camera; they can be used in the end of the function to
       assign fields in the camera object */
 
-   Vector3f location, right, up, look_at;
+   vec3 location, right, up, look_at;
    //double angle;
    // struct Matrix4d  transform;
    bool done = false;
@@ -429,7 +428,7 @@ void NYUParser::ParsePolygon()
 
 Sphere * NYUParser::ParseSphere()
 {
-   // Vector3f center;
+   // vec3 center;
    // double radius;
    // struct ModifierStruct modifiers;
    Sphere * s = new Sphere();
@@ -461,7 +460,7 @@ Sphere * NYUParser::ParseSphere()
 Box * NYUParser::ParseBox(){
    // struct Vector corner1, corner2;
    // struct ModifierStruct modifiers;
-   // Vector3f corner1, corner2;
+   // vec3 corner1, corner2;
    // InitModifiers(&modifiers);
 
    Box * b;
@@ -470,8 +469,8 @@ Box * NYUParser::ParseBox(){
    // SetVect(&corner2, 0,0,0);
 
    ParseLeftCurly();
-   Vector3f c1;
-   Vector3f c2;
+   vec3 c1;
+   vec3 c2;
    ParseVector(c1);
    ParseComma();
    ParseVector(c2);
@@ -496,7 +495,7 @@ void NYUParser::ParseCylinder(){
    exit(0);
    /*
    // struct Vector base_point , cap_point ;
-   Vector3f base_point, cap_point;
+   vec3 base_point, cap_point;
    double radius;
    // struct ModifierStruct modifiers;
    // InitModifiers(&modifiers);
@@ -528,7 +527,7 @@ void NYUParser::ParseCylinder(){
 /*
    Cone * NYUParser::ParseCone(){
 // struct Vector base_point, cap_point;
-Vector3f base_point, cap_point;
+vec3 base_point, cap_point;
 double base_radius, cap_radius;
 // struct ModifierStruct modifiers;
 // InitModifiers(&modifiers);
@@ -567,7 +566,7 @@ void NYUParser::ParseQuadric(){
    exit(0);
    /*
    // struct Vector ABC, DEF, GHI;
-   Vector3f ABC, DEF, GHI;
+   vec3 ABC, DEF, GHI;
    double J;
    // struct ModifierStruct modifiers;
    // InitModifiers(&modifiers);
@@ -638,10 +637,10 @@ Light * NYUParser::ParseLightSource()
    Token t;
    color c;
    float f;
-   Vector3f pos;
+   vec3 pos;
 
    c.r = 0; c.g = 0; c.b = 0; f =0;
-   pos(0) = 0; pos(1) = 0; pos(2) = 0;
+   pos.x = 0; pos.y = 0; pos.z = 0;
    ParseLeftCurly();
    ParseVector(pos);
    t = tokenizer->GetToken();

@@ -9,13 +9,13 @@
 
 #include <iostream>
 #include <stdio.h>
-#include <Eigen/Dense>
-using Eigen::Vector3f;
+#include <glm/glm.hpp>
+using glm::vec3;
 
 class Light {
    public:
-      Light(Vector3f loc, double red, double green, double blue);
-      Vector3f location;
+      Light(glm::vec3 loc, double red, double green, double blue);
+      glm::vec3 location;
       double r;
       double g;
       double b;
@@ -23,7 +23,6 @@ class Light {
       {
          printf("Light: (r,g,b) (%f, %f, %f)\n", r, g, b);
       }
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 #endif

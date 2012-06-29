@@ -45,9 +45,9 @@ class Scene
       Pixel castRay(const Ray & ray, int depth);
 
       // Calculates proper shading at the current point.
-      Pixel shade(HitData *data, Vector3f view);
+      Pixel shade(HitData *data, glm::vec3 view);
 
-      //Vector3f reflect(Vector3f incident, Vector3f normal);
+      //glm::vec3 reflect(glm::vec3 incident, glm::vec3 normal);
 
       Camera camera;
 

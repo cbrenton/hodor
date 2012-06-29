@@ -27,14 +27,12 @@ class Sphere : public Geometry
       int hit(const Ray & ray, float *t, HitData *data = NULL, float minT = 0.0, float maxT = MAX_DIST);
 
       // Returns the normal of the current geometry object at the specified point.
-      Vector3f getNormal(const Vector3f & point);
+      glm::vec3 getNormal(const glm::vec3 & point);
 
       inline void debug()
       {
-         cout << "Sphere: <" << s_t.location.x() << ", " << s_t.location.y() << ", " << s_t.location.z() << ">, " << s_t.radius << endl;
+         cout << "Sphere: <" << s_t.location.x << ", " << s_t.location.y << ", " << s_t.location.z << ">, " << s_t.radius << endl;
       }
-
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 };
 #endif

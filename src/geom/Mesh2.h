@@ -29,9 +29,7 @@ class Mesh2 : public Geometry
       int hit(const Ray & ray, float *t, HitData *data = NULL, float minT = 0.0, float maxT = MAX_DIST);
 
       // Returns the normal of the current geometry object at the specified point.
-      Vector3f getNormal(const Vector3f & point);
-
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      glm::vec3 getNormal(const glm::vec3 & point);
 
 };
 #endif
