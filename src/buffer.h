@@ -7,7 +7,7 @@
 #define _BUFFER_H
 
 #include "glm/glm.hpp"
-#include "img/image.h"
+#include "image.h"
 
 using namespace glm;
 

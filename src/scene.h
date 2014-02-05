@@ -13,7 +13,7 @@
 #include "hit_data.h"
 #include "ray.h"
 #include "vertex.h"
-#include "objLoader.h"
+#include "obj.hpp"
 
 class Scene
 {

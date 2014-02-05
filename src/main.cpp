@@ -16,7 +16,7 @@
 #include "sfmlWindow.h"
 #include "glm/glm.hpp"
 #include "vertex.h"
-#include "img/image.h"
+#include "image.h"
 #include "ProgressBar/progress.h"
 
 #define AA_RAYS 4

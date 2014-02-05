@@ -16,12 +16,14 @@ KILL   = killall -9
 SHELL  = /bin/sh
 MAKE   = make
 
-IFLAGS = -I./src -I./lib/objTester -I./lib -fopenmp -I/usr/include/ImageMagick
+IFLAGS = -I./src -I./lib/objTester -I./lib -fopenmp -I/usr/local/include/ImageMagick-6
 LFLAGS = -lpng -lz -lsfml-window -lsfml-graphics -lGL -lGLU -L./lib/objTester -lMagick++ -lMagickCore
 DEBUG = -ggdb
 OPTIMIZE = 
-ERROR = -Werror
-CFLAGS = $(OPTIMIZE) -Wall -c $(DEBUG) $(ERROR) $(IFLAGS)
+#ERROR = -Werror
+ERROR = 
+#CFLAGS = $(OPTIMIZE) -Wall -c $(DEBUG) $(ERROR) $(IFLAGS)
+CFLAGS = $(OPTIMIZE) -c $(DEBUG) $(ERROR) $(IFLAGS) -Wno-deprecated
 LDFLAGS = $(OPTIMIZE) $(DEBUG) $(ERROR) $(LFLAGS)
 
 TARGET = hodor
